@@ -1,0 +1,189 @@
+# =====================================================
+# 🚀 BASH Configuration - Arch Linux Fallback
+# =====================================================
+# This file provides basic configuration when Zsh is not available
+# =====================================================
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# =====================================================
+# ⚙️ ENVIRONMENT & PATH
+# =====================================================
+
+# Editor Configuration
+export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+
+# Locale Configuration (Peru)
+export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
+
+# PATH Configuration
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
+
+# XDG Base Directory Specification
+export XDG_CONFIG_HOME="$HOME/.config" XDG_DATA_HOME="$HOME/.local/share" XDG_CACHE_HOME="$HOME/.cache" XDG_STATE_HOME="$HOME/.local/state"
+
+# =====================================================
+# 🎨 COLORS & PROMPT
+# =====================================================
+
+# Colors
+export CLICOLOR=1
+export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+
+# Prompt
+PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+
+# =====================================================
+# 🛠️ ALIASES
+# =====================================================
+
+# File Operations
+alias ls='ls --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ~='cd ~'
+
+# Directory shortcuts
+alias dl='cd ~/Downloads'
+alias dt='cd ~/Desktop'
+alias dc='cd ~/Documents'
+alias dev='cd ~/Development'
+alias proj='cd ~/Projects'
+
+# Git aliases
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gpl='git pull'
+alias gl='git log --oneline'
+
+# System aliases
+alias pac='sudo pacman'
+alias pacs='pacman -Ss'
+alias paci='sudo pacman -S'
+alias pacu='sudo pacman -Syu'
+
+# Safety aliases
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias mkdir='mkdir -p'
+
+# =====================================================
+# 🚀 FUNCTIONS
+# =====================================================
+
+# Extract function
+extract() {
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.tar.bz2) tar xjf "$1" ;;
+            *.tar.gz)  tar xzf "$1" ;;
+            *.bz2)     bunzip2 "$1" ;;
+            *.rar)     unrar x "$1" ;;
+            *.gz)      gunzip "$1"  ;;
+            *.tar)     tar xf "$1"  ;;
+            *.tbz2)    tar xjf "$1" ;;
+            *.tgz)     tar xzf "$1" ;;
+            *.zip)     unzip "$1"   ;;
+            *.Z)       uncompress "$1" ;;
+            *.7z)      7z x "$1"    ;;
+            *.xz)      unxz "$1"    ;;
+            *.exe)     cabextract "$1" ;;
+            *)         echo "'$1': unrecognized file compression" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Create directory and cd into it
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Quick backup
+backup() {
+    cp "$1" "$1.backup.$(date +%Y%m%d_%H%M%S)"
+}
+
+# System information
+sysinfo() {
+    echo "=== System Information ==="
+    echo "Hostname: $(hostname)"
+    echo "Kernel: $(uname -r)"
+    echo "Uptime: $(uptime -p)"
+    echo "Memory Usage: $(free -h | awk '/^Mem:/ {printf "%s/%s (%.1f%%)", $3, $2, $3/$2*100}')"
+    echo "Disk Usage: $(df -h / | awk 'NR==2 {printf "%s/%s (%s)", $3, $2, $5}')"
+}
+
+# =====================================================
+# 🔧 COMPLETION
+# =====================================================
+
+# Enable programmable completion features
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
+
+# =====================================================
+# 📋 HISTORY
+# =====================================================
+
+# History configuration
+HISTCONTROL=ignoreboth
+HISTSIZE=1000
+HISTFILESIZE=2000
+HISTTIMEFORMAT="%Y-%m-%d %T "
+
+# Append to the history file, don't overwrite it
+shopt -s histappend
+
+# =====================================================
+# 🎯 PRODUCTIVITY
+# =====================================================
+
+# Check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Make less more friendly for non-text input files
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# Set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# =====================================================
+# 🏁 INITIALIZATION
+# =====================================================
+
+# Load Node Version Manager (if exists)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Rust environment
+[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+
+# Load any additional custom configurations
+[ -f ~/.bashrc.local ] && source ~/.bashrc.local
+
+# Welcome message
+echo "🐚 Bash fallback loaded. Consider installing Zsh for a better experience."
+echo "💡 Run: sudo pacman -S zsh" 

@@ -1,0 +1,46 @@
+# Arch Dream Machine - .gitignore
+
+# Logs
+*.log
+setup_arch_dream.log
+arch_dream_verification_report.txt
+
+# Backup files
+*.backup.*
+*.bak
+*.old
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+
+# User-specific files
+.nano/backups/
+.zsh_history
+.bash_history
+
+# Cache directories
+.cache/
+.oh-my-zsh/cache/
+
+# Package manager cache
+/var/cache/pacman/pkg/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+test_*.sh
+demo_*.sh
+
+# Configuration backups
+*.backup
+*.orig 

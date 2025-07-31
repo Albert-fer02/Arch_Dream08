@@ -1,0 +1,58 @@
+{
+  "zsh": {
+    "name": "Zsh Configuration",
+    "description": "Configuración completa de Zsh con Oh My Zsh y Powerlevel10k",
+    "dependencies": ["zsh", "oh-my-zsh", "powerlevel10k"],
+    "files": ["zshrc", "p10k.zsh"],
+    "aur_packages": [],
+    "optional": false
+  },
+  "bash": {
+    "name": "Bash Fallback",
+    "description": "Configuración de fallback para sistemas sin Zsh",
+    "dependencies": ["bash"],
+    "files": ["bashrc"],
+    "aur_packages": [],
+    "optional": true
+  },
+  "kitty": {
+    "name": "Kitty Terminal",
+    "description": "Emulador de terminal con aceleración GPU y tema personalizado",
+    "dependencies": ["kitty"],
+    "files": ["kitty.conf", "colors-dreamcoder.conf"],
+    "aur_packages": [],
+    "optional": false
+  },
+  "fastfetch": {
+    "name": "Fastfetch",
+    "description": "Información del sistema con temas personalizados",
+    "dependencies": ["fastfetch"],
+    "files": ["config.jsonc"],
+    "aur_packages": [],
+    "optional": true
+  },
+  "nano": {
+    "name": "Nano Editor",
+    "description": "Editor de texto con configuración avanzada",
+    "dependencies": ["nano"],
+    "files": ["nanorc.conf"],
+    "aur_packages": [],
+    "optional": true
+  },
+  "git": {
+    "name": "Git Configuration",
+    "description": "Configuración de Git con aliases y funciones",
+    "dependencies": ["git"],
+    "files": [],
+    "aur_packages": [],
+    "optional": true
+  },
+  "neovim": {
+    "name": "Neovim",
+    "description": "Editor avanzado con configuración",
+    "dependencies": ["neovim"],
+    "files": [],
+    "aur_packages": [],
+    "optional": true
+  }
+} 
