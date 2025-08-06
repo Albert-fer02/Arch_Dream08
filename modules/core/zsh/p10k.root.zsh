@@ -1,4 +1,4 @@
-# My Powerlevel10k Configuration
+# My Powerlevel10k Configuration for ROOT
 # ---------------------------------------------------------------------
 # ╔═════════════════════════════════════════════════════════════
 # ║                     𓂀 DreamCoder 08 𓂀                     ║
@@ -164,6 +164,7 @@
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 - System Identity & Context ]=========================
     os_icon                 # Arch Linux identity
+    root_indicator          # 🔥 ROOT indicator (before directory)
     dir                     # spatial context with glassmorphism
     vcs                     # development state
     # =========================[ Line #2 - Interaction Point ]=========================
@@ -536,7 +537,7 @@
     typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='\uE0B1'
     typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='\uE0B3'
     
-    # Enhanced visual separators for Warp AI
+    # Enhanced visual separators for Warp AI - consistent with main config
     typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{${P10K_PRIMARY_COLOR}}╭─"
     typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX="%F{${P10K_PRIMARY_COLOR}}├─"
     typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{${P10K_PRIMARY_COLOR}}╰─"
@@ -580,6 +581,12 @@
   # Disable gitstatusd messages
   export GITSTATUS_DAEMON_LOG_LEVEL=ERROR
   export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
+
+  # =========================[ ROOT_INDICATOR: ELEGANT ROOT INDICATOR ]=========================
+  # Elegant root indicator with fire icon - positioned before directory
+  function prompt_root_indicator() {
+    p10k segment -f red -i '🔥' -t '' -b ''
+  }
 
   # =========================[ THEME RELOAD FUNCTION ]=========================
   # Function to reload theme with new colors

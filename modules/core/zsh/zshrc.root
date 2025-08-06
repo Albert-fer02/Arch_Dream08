@@ -1,0 +1,373 @@
+# My Powerlevel10k Configuration
+# ---------------------------------------------------------------------
+# ╔═════════════════════════════════════════════════════════════
+# ║                     𓂀 DreamCoder 08 𓂀                     ║
+# ║                ⚡ Digital Dream Architect ⚡                 ║
+# ║                                                            ║
+# ║        Author: https://github.com/Albert-fer02             ║
+# ╚══════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------------    
+# =====================================================
+# 🚀 ROOT ZSH Configuration - Arch Linux Optimized
+# =====================================================
+# Optimized for superuser environment with p10k integration
+# =====================================================
+
+# =====================================================
+# ⚡ PERFORMANCE OPTIMIZATIONS
+# =====================================================
+
+# Disable flow control commands (keeps C-s from freezing everything)
+stty -ixon
+
+# =====================================================
+# ⚙️ ENVIRONMENT & PATH
+# =====================================================
+
+# Editor Configuration
+export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+
+# Disable gitstatusd messages
+export GITSTATUS_DAEMON_LOG_LEVEL=ERROR
+export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
+
+# Locale Configuration (Peru)
+export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
+
+# PATH Configuration - Optimized order
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+# XDG Base Directory Specification
+export XDG_CONFIG_HOME="/root/.config" 
+export XDG_DATA_HOME="/root/.local/share" 
+export XDG_CACHE_HOME="/root/.cache" 
+export XDG_STATE_HOME="/root/.local/state"
+
+# Development environment
+export GOPATH="/root/go"
+export PATH="$GOPATH/bin:$PATH"
+export NODE_ENV=development
+
+# =====================================================
+# 🎨 OH-MY-ZSH CONFIGURATION
+# =====================================================
+
+# Path to your oh-my-zsh installation
+export ZSH="/root/.oh-my-zsh"
+
+# Theme name
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Plugins
+plugins=(
+    git
+    sudo
+    extract
+    web-search
+    copypath
+    dirhistory
+    history
+    jsontools
+)
+
+# Source Oh My Zsh
+source $ZSH/oh-my-zsh.sh
+
+# =====================================================
+# 🛠️ ENHANCED ALIASES
+# =====================================================
+
+# File Operations with modern tools
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons --group-directories-first --git'
+    alias ll='eza -l --icons --group-directories-first --git --time-style=long-iso'
+    alias la='eza -la --icons --group-directories-first --git'
+    alias tree='eza --tree --level=3 --icons --git-ignore'
+    alias ltree='eza --tree --level=4 --icons --long --git-ignore'
+else
+    alias ls='ls --color=auto --group-directories-first'
+    alias ll='ls -alF --color=auto --group-directories-first'
+    alias la='ls -A --color=auto --group-directories-first'
+    alias l='ls -CF --color=auto'
+fi
+
+# Modern replacements
+if command -v bat &> /dev/null; then
+    alias cat='bat --style=plain --paging=never'
+    alias ccat='bat --style=full'
+    export BAT_THEME="Catppuccin Frappe"
+fi
+
+if command -v rg &> /dev/null; then
+    alias grep='rg --smart-case --hidden --glob "!**/.git/*" --glob "!**/node_modules/*"'
+    alias rga='rg --no-ignore --hidden'
+    alias rgi='rg --case-insensitive'
+fi
+
+if command -v fd &> /dev/null; then
+    alias find='fd'
+    alias fda='fd --no-ignore --hidden'
+    alias fdi='fd --case-insensitive'
+fi
+
+# Navigation shortcuts
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias ~='cd ~'
+alias -- -='cd -'
+
+# Directory shortcuts
+alias dl='cd /root/Downloads'
+alias dt='cd /root/Desktop'
+alias dc='cd /root/Documents'
+alias dev='cd /root/Development'
+alias proj='cd /root/Projects'
+alias tmp='cd /tmp'
+
+# Git aliases - Enhanced
+alias g='git'
+alias gs='git status --short --branch'
+alias ga='git add'
+alias gaa='git add --all'
+alias gc='git commit --verbose'
+alias gcm='git commit -m'
+alias gca='git commit -am'
+alias gp='git push'
+alias gpl='git pull'
+alias gl='git log --oneline --graph --decorate --all -10'
+alias gd='git diff'
+alias gdc='git diff --cached'
+alias gco='git checkout'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gm='git merge'
+alias gr='git rebase'
+alias gst='git stash'
+alias gstp='git stash pop'
+alias gf='git fetch'
+alias gcl='git clone'
+
+# Arch Linux specific aliases
+alias pac='pacman'
+alias pacr='pacman -R'
+alias pacu='pacman -Syu'
+alias pacq='pacman -Q'
+alias pacqi='pacman -Qi'
+alias pacql='pacman -Ql'
+alias pacqo='pacman -Qo'
+alias pacc='pacman -Sc'
+alias paccc='pacman -Scc'
+
+# AUR helper detection
+if command -v yay &> /dev/null; then
+    alias aur='yay'
+    alias aurs='yay -Ss'
+    alias auri='yay -S'
+    alias auru='yay -Syu'
+elif command -v paru &> /dev/null; then
+    alias aur='paru'
+    alias aurs='paru -Ss'
+    alias auri='paru -S'
+    alias auru='paru -Syu'
+fi
+
+# System monitoring
+if command -v btop &> /dev/null; then
+    alias top='btop'
+elif command -v htop &> /dev/null; then
+    alias top='htop'
+fi
+
+if command -v duf &> /dev/null; then
+    alias df='duf'
+fi
+
+if command -v dust &> /dev/null; then
+    alias du='dust'
+fi
+
+# Safety aliases
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias mkdir='mkdir -p'
+
+# Network aliases
+alias myip='curl -s ifconfig.me && echo'
+alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
+alias ports='lsof -i -P -n | grep LISTEN'
+alias ping='ping -c 5'
+
+# Development aliases
+alias py='python'
+alias py3='python3'
+alias pip='pip3'
+alias venv='python -m venv'
+alias n='npm'
+alias ni='npm install'
+alias nid='npm install --save-dev'
+alias nrb='npm run build'
+alias nrd='npm run dev'
+
+# =====================================================
+# 🚀 ADVANCED FUNCTIONS
+# =====================================================
+
+# Extract function - Enhanced
+extract() {
+    if [[ -f "$1" ]]; then
+        case "$1" in
+            *.tar.bz2) tar xjf "$1" ;;
+            *.tar.gz)  tar xzf "$1" ;;
+            *.bz2)     bunzip2 "$1" ;;
+            *.rar)     unrar x "$1" ;;
+            *.gz)      gunzip "$1"  ;;
+            *.tar)     tar xf "$1"  ;;
+            *.tbz2)    tar xjf "$1" ;;
+            *.tgz)     tar xzf "$1" ;;
+            *.zip)     unzip "$1"   ;;
+            *.Z)       uncompress "$1" ;;
+            *.7z)      7z x "$1"    ;;
+            *.xz)      unxz "$1"    ;;
+            *.exe)     cabextract "$1" ;;
+            *.deb)     ar x "$1" && tar xf data.tar.* ;;
+            *.rpm)     rpm2cpio "$1" | cpio -idmv ;;
+            *)         echo "'$1': unrecognized file compression" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Create directory and cd into it
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Quick backup with timestamp
+backup() {
+    cp "$1" "$1.backup.$(date +%Y%m%d_%H%M%S)"
+}
+
+# Quick system cleanup - Enhanced
+sysclean() {
+    echo "🧹 Cleaning system..."
+    pacman -Sc
+    journalctl --vacuum-time=7d
+    pacman -Rns $(pacman -Qtdq) 2>/dev/null || true
+    echo "✅ System cleaned!"
+}
+
+# Git functions
+gac() {
+    git add --all && git commit -m "$1"
+}
+
+gacp() {
+    git add --all && git commit -m "$1" && git push
+}
+
+gundo() {
+    git reset --soft HEAD~1
+}
+
+gamend() {
+    git commit --amend --no-edit
+}
+
+# =====================================================
+# 🎨 COMPLETION ENHANCEMENTS
+# =====================================================
+
+# Case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# Better completion for kill command
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+
+# SSH completion
+zstyle ':completion:*:ssh:*' hosts off
+zstyle ':completion:*:scp:*' hosts off
+
+# =====================================================
+# 🔌 PLUGIN CONFIGURATIONS
+# =====================================================
+
+# Autosuggestions - Enhanced
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666,bold"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+# Syntax highlighting - Enhanced
+typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+ZSH_HIGHLIGHT_STYLES[command]='fg=green,bold'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=cyan,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=yellow,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=blue,bold'
+
+# =====================================================
+# 🏁 INITIALIZATION
+# =====================================================
+
+# Load completions
+autoload -Uz compinit
+compinit -d /root/.zsh/compdump
+
+# Load zsh-autosuggestions and zsh-syntax-highlighting from system paths
+[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Load Node Version Manager (if exists)
+export NVM_DIR="/root/.nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
+[[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+
+# Bun completions
+[[ -s "/root/.bun/_bun" ]] && source "/root/.bun/_bun"
+
+# Rust environment
+[[ -f "/root/.cargo/env" ]] && source "/root/.cargo/env"
+
+# FZF key bindings
+[[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+[[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
+
+# Load any additional custom configurations
+[[ -f /root/.zshrc.local ]] && source /root/.zshrc.local
+
+# Source Powerlevel10k configuration
+[[ -f /root/.p10k.zsh ]] && source /root/.p10k.zsh
+
+# Welcome message disabled for cleaner experience
+# if [[ -z "$ZSH_WELCOME_SHOWN" ]]; then
+#     echo "🔴 ROOT MODE: Be careful with your commands!"
+#     echo "💡 Tip: Use 'exit' to return to normal user"
+#     export ZSH_WELCOME_SHOWN=1
+# fi
+
+# =====================================================
+# 🚫 DISABLE FASTFETCH AUTO-LAUNCH FOR ROOT
+# =====================================================
+
+# Disable Fastfetch auto-launch in root mode
+export FASTFETCH_DISABLE_AUTO=1
+export NEOFETCH_DISABLE_AUTO=1
+
+# Override any potential auto-launch configurations
+if command -v fastfetch >/dev/null 2>&1; then
+    # Create a wrapper that prevents auto-launch
+    fastfetch() {
+        if [[ "$1" == "--auto" || "$1" == "-a" ]]; then
+            echo "🔴 Fastfetch auto-launch disabled in root mode"
+            return 0
+        fi
+        command fastfetch "$@"
+    }
+fi
+
+alias vim="nvim" 

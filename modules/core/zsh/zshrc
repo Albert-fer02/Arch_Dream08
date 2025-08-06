@@ -5,7 +5,7 @@
 # (_)___|___/_| |_|_|  \___|
 #
 # =====================================================
-# 🚀 ZSH Configuration - Arch Linux Optimized
+# 🚀 ZSH Configuration - Arch Linux Ultra Optimized
 # =====================================================
 # DON'T CHANGE THIS FILE
 # 
@@ -16,7 +16,7 @@
 # =====================================================
 
 # =====================================================
-# 🔧 PERFORMANCE & OPTIMIZATION
+# ⚡ ULTRA PERFORMANCE OPTIMIZATIONS
 # =====================================================
 
 # Disable Oh My Zsh automatic updates
@@ -26,9 +26,24 @@ ZSH_DISABLE_COMPFIX=true
 # Compilation flags for performance
 export ARCHFLAGS="-arch x86_64"
 
-# Enable completion caching
+# Enable completion caching with optimized settings
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+# Optimize history for performance
+HISTFILE=~/.zsh_history
+HISTSIZE=5000              # Reduced for better performance
+SAVEHIST=5000             # Reduced for better performance
+setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE 
+setopt HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS INC_APPEND_HISTORY 
+setopt SHARE_HISTORY HIST_VERIFY HIST_REDUCE_BLANKS
+
+# Shell Options - Optimized for productivity
+setopt CORRECT CORRECT_ALL NOCLOBBER AUTO_CD AUTO_PUSHD 
+setopt PUSHD_IGNORE_DUPS PUSHD_SILENT GLOB_DOTS EXTENDED_GLOB 
+setopt NUMERIC_GLOB_SORT NULL_GLOB AUTO_MENU AUTO_PARAM_SLASH
 
 # =====================================================
 # 📂 MODULAR CONFIGURATION LOADER
@@ -55,7 +70,7 @@ load_config ~/.config/zshrc/custom
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# Oh My Zsh Configuration
+# Oh My Zsh Configuration - Optimized
 DISABLE_AUTO_TITLE="true"
 ENABLE_CORRECTION="true"
 COMPLETION_WAITING_DOTS="true"
@@ -63,7 +78,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 HIST_STAMPS="yyyy-mm-dd"
 
 # ULTRA OPTIMIZED: Minimal plugin list for maximum performance
-plugins=(git archlinux sudo z)
+plugins=(git archlinux sudo z fzf)
 
 # Load Oh My Zsh
 [[ -f $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh || echo "⚠️  Oh My Zsh not found"
@@ -75,41 +90,44 @@ plugins=(git archlinux sudo z)
 # ⚙️ SHELL CONFIGURATION & ENVIRONMENT
 # =====================================================
 
-# History Configuration
-HISTFILE=~/.zsh_history
-HISTSIZE=10000              # ULTRA REDUCED: From 25000 to 10000
-SAVEHIST=10000             # ULTRA REDUCED: From 25000 to 10000
-setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS INC_APPEND_HISTORY SHARE_HISTORY HIST_VERIFY HIST_REDUCE_BLANKS
-
-# Shell Options
-setopt CORRECT CORRECT_ALL NOCLOBBER AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT GLOB_DOTS EXTENDED_GLOB NUMERIC_GLOB_SORT NULL_GLOB
-
 # Editor Configuration
 export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 
 # Locale Configuration (Peru)
 export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
 
-# PATH Configuration
+# PATH Configuration - Optimized order
 typeset -U path
 path=(~/.local/bin ~/.cargo/bin ~/.bun/bin ~/.npm-global/bin /usr/local/bin $path)
 
+# Development environment
+export GOPATH="$HOME/go"
+path+=("$GOPATH/bin")
+export NODE_ENV=development
+
 # XDG Base Directory Specification
-export XDG_CONFIG_HOME="$HOME/.config" XDG_DATA_HOME="$HOME/.local/share" XDG_CACHE_HOME="$HOME/.cache" XDG_STATE_HOME="$HOME/.local/state"
+export XDG_CONFIG_HOME="$HOME/.config" 
+export XDG_DATA_HOME="$HOME/.local/share" 
+export XDG_CACHE_HOME="$HOME/.cache" 
+export XDG_STATE_HOME="$HOME/.local/state"
 
 # Less/Man Pages Colorization
-export LESS_TERMCAP_mb=$'\e[1;31m' LESS_TERMCAP_md=$'\e[1;36m' LESS_TERMCAP_me=$'\e[0m' LESS_TERMCAP_se=$'\e[0m' LESS_TERMCAP_so=$'\e[01;44;33m' LESS_TERMCAP_ue=$'\e[0m' LESS_TERMCAP_us=$'\e[1;32m' LESS='-R -i -w -M -z-4'
+export LESS_TERMCAP_mb=$'\e[1;31m' LESS_TERMCAP_md=$'\e[1;36m' 
+export LESS_TERMCAP_me=$'\e[0m' LESS_TERMCAP_se=$'\e[0m' 
+export LESS_TERMCAP_so=$'\e[01;44;33m' LESS_TERMCAP_ue=$'\e[0m' 
+export LESS_TERMCAP_us=$'\e[1;32m' LESS='-R -i -w -M -z-4'
 
-# FZF Configuration
-export FZF_DEFAULT_OPTS="--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796 --height=60% --layout=reverse --border --margin=1 --padding=1"
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+# FZF Configuration - Enhanced
+export FZF_DEFAULT_OPTS="--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796 --height=60% --layout=reverse --border --margin=1 --padding=1 --preview-window=right:60%"
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
 
 # =====================================================
-# 🛠️ MODERN COMMAND REPLACEMENTS
+# 🛠️ ULTRA MODERN COMMAND REPLACEMENTS
 # =====================================================
 
-# File Operations
+# File Operations with modern tools - Enhanced detection
 command -v bat &> /dev/null && { 
     alias cat='bat --style=plain --paging=never' 
     alias ccat='bat --style=full' 
@@ -144,12 +162,13 @@ command -v fd &> /dev/null && {
     alias fde='fd --extension'
 }
 
-# System Monitoring
+# System Monitoring - Enhanced
 command -v duf &> /dev/null && alias df='duf'
 command -v dust &> /dev/null && alias du='dust'
 command -v btop &> /dev/null && alias top='btop' || alias top='htop'
 command -v delta &> /dev/null && alias diff='delta'
 command -v xh &> /dev/null && alias http='xh'
+command -v procs &> /dev/null && alias ps='procs'
 
 # =====================================================
 # 📁 NAVIGATION & FILE MANAGEMENT
@@ -159,7 +178,8 @@ command -v xh &> /dev/null && alias http='xh'
 alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~' -- -='cd -'
 
 # Directory shortcuts
-alias dl='cd ~/Downloads' dt='cd ~/Desktop' dc='cd ~/Documents' dev='cd ~/Development' proj='cd ~/Projects'
+alias dl='cd ~/Downloads' dt='cd ~/Desktop' dc='cd ~/Documents' 
+alias dev='cd ~/Development' proj='cd ~/Projects' tmp='cd /tmp'
 
 # File operations with safety
 alias rm='rm -i' cp='cp -i' mv='mv -i' mkdir='mkdir -p'
@@ -170,49 +190,61 @@ alias largest='find . -type f -printf "%s %p\n" | sort -rn | head -20'
 alias newest='find . -type f -printf "%T+ %p\n" | sort -r | head -20'
 
 # =====================================================
-# 🐙 GIT ALIASES & FUNCTIONS
+# 🐙 GIT ALIASES & FUNCTIONS - Enhanced
 # =====================================================
 
 # Essential Git aliases
 alias g='git' gs='git status --short --branch' ga='git add' gaa='git add --all' 
 alias gc='git commit --verbose' gcm='git commit -m' gca='git commit -am' 
 alias gp='git push' gpl='git pull' gl='git log --oneline --graph --decorate --all -10' 
-alias gd='git diff' gdc='git diff --cached' gco='git checkout' gb='git branch' 
-alias gba='git branch -a' gbd='git branch -d' gm='git merge' gr='git rebase' 
-alias gst='git stash' gstp='git stash pop' gf='git fetch' gcl='git clone'
+alias gd='git diff'
+alias gdc='git diff --cached'
+alias gco='git checkout'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gm='git merge'
+alias gr='git rebase'
+alias gst='git stash'
+alias gstp='git stash pop'
+alias gf='git fetch'
+alias gcl='git clone'
 
-# Advanced Git Functions
+# Advanced Git Functions - Enhanced
 gac() { git add --all && git commit -m "$1" }
 gacp() { git add --all && git commit -m "$1" && git push }
 gundo() { git reset --soft HEAD~1 }
 gamend() { git commit --amend --no-edit }
-# Removed glog function to avoid conflict with gl alias
+gcleanhard() { git clean -fd && git reset --hard HEAD }
+gfix() { git commit --fixup HEAD && git rebase -i HEAD~2 }
 
 # =====================================================
-# 🔧 SYSTEM & PACKAGE MANAGEMENT
+# 🔧 SYSTEM & PACKAGE MANAGEMENT - Enhanced
 # =====================================================
 
-# Pacman aliases
+# Pacman aliases - Enhanced
 alias pac='sudo pacman' pacr='sudo pacman -R' 
 alias pacu='sudo pacman -Syu' pacq='pacman -Q' pacqi='pacman -Qi' pacql='pacman -Ql' 
 alias pacqo='pacman -Qo' pacc='sudo pacman -Sc' paccc='sudo pacman -Scc'
+alias pacs='pacman -Ss' paci='sudo pacman -S'
 
-# AUR helper
+# AUR helper - Enhanced detection
 if command -v yay &> /dev/null; then
     alias aur='yay' aurs='yay -Ss' auri='yay -S' auru='yay -Syu'
 elif command -v paru &> /dev/null; then
     alias aur='paru' aurs='paru -Ss' auri='paru -S' auru='paru -Syu'
 fi
 
-# System maintenance
+# System maintenance - Enhanced
 alias cleanup='sudo pacman -Sc && sudo journalctl --vacuum-time=7d && sudo pacman -Rns $(pacman -Qtdq) 2>/dev/null || true'
 alias orphans='pacman -Qtdq' fixkeys='sudo pacman-key --init && sudo pacman-key --populate archlinux'
 
-# System information
-alias sysinfo='inxi -Fxz' meminfo='free -h' diskinfo='lsblk' cpuinfo='lscpu' gpuinfo='lspci | grep -E "VGA|3D"'
+# System information - Enhanced
+alias sysinfo='inxi -Fxz' meminfo='free -h' diskinfo='lsblk' 
+alias cpuinfo='lscpu' gpuinfo='lspci | grep -E "VGA|3D"'
 
 # =====================================================
-# 🌐 NETWORK & CONNECTIVITY
+# 🌐 NETWORK & CONNECTIVITY - Enhanced
 # =====================================================
 
 alias myip='curl -s ifconfig.me && echo'
@@ -220,34 +252,36 @@ alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
 alias ports='sudo lsof -i -P -n | grep LISTEN' netstat='ss -tuln'
 alias ping='ping -c 5' wget='wget -c'
 
-# Network testing
+# Network testing - Enhanced
 alias speedtest='curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -'
 alias pingtest='ping -c 10 8.8.8.8'
+alias wifi='nmcli device wifi'
 
 # =====================================================
-# 💻 DEVELOPMENT TOOLS
+# 💻 DEVELOPMENT TOOLS - Enhanced
 # =====================================================
 
-# Python
+# Python - Enhanced
 alias py='python' py3='python3' pip='pip3' venv='python -m venv' activate='source ./venv/bin/activate'
 
-# Node.js
+# Node.js - Enhanced
 alias n='npm' ni='npm install' nid='npm install --save-dev' nrb='npm run build' nrd='npm run dev'
+alias y='yarn' yi='yarn install' yrb='yarn build' yrd='yarn dev'
 
-# Process management
+# Process management - Enhanced
 alias psg='ps aux | grep -v grep | grep -i' killall='killall -i' j='jobs' h='history'
 
-# File opening
+# File opening - Enhanced
 alias open='xdg-open' edit='$EDITOR' code='code'
 
-# Safety aliases
+# Safety aliases - Enhanced
 alias reboot='echo "🔄 Use: systemctl reboot"'
 alias shutdown='echo "🔌 Use: systemctl poweroff"'
 alias poweroff='echo "🔌 Use: systemctl poweroff"'
 alias halt='echo "⛔ Use: systemctl halt"'
 
 # =====================================================
-# 🎯 PRODUCTIVITY & MOTIVATION
+# 🎯 PRODUCTIVITY & MOTIVATION - Enhanced
 # =====================================================
 
 # Motivational aliases
@@ -255,14 +289,14 @@ alias salud='echo "💪 Respira profundo, toma agua y mantén una buena postura.
 alias coffee='echo "☕ Tómate un cafecito y sigue adelante."'
 alias focus='echo "🎯 Enfócate en una tarea a la vez. Tú puedes."'
 
-# Weather
+# Weather - Enhanced
 alias clima='curl -s "wttr.in/Lima?format=3"' weather='curl -s "wttr.in/Lima"'
 
 # =====================================================
-# 🚀 ADVANCED FUNCTIONS
+# 🚀 ULTRA ADVANCED FUNCTIONS
 # =====================================================
 
-# Extract function for various archive types
+# Extract function for various archive types - Enhanced
 extract() {
     [[ -f "$1" ]] || { echo "'$1' is not a valid file"; return 1 }
     case "$1" in
@@ -285,7 +319,7 @@ extract() {
     esac
 }
 
-# Compress function
+# Compress function - Enhanced
 compress() {
     [[ -n "$1" ]] || { echo "Usage: compress <file_or_directory>"; return 1 }
     local name="${1%/}"
@@ -299,16 +333,16 @@ compress() {
 # Create directory and cd into it
 mkcd() { mkdir -p "$1" && cd "$1" }
 
-# Find and replace in files
+# Find and replace in files - Enhanced
 findreplace() {
     [[ $# -eq 2 ]] || { echo "Usage: findreplace <search> <replace>"; return 1 }
     find . -type f -exec sed -i "s/$1/$2/g" {} +
 }
 
-# Quick backup of a file
+# Quick backup of a file - Enhanced
 backup() { cp "$1" "$1.backup.$(date +%Y%m%d_%H%M%S)" }
 
-# System information function
+# System information function - Enhanced
 sysstat() {
     echo "=== System Information ==="
     echo "Hostname: $(hostname)"
@@ -320,25 +354,25 @@ sysstat() {
     echo "CPU Temperature: $(sensors 2>/dev/null | grep 'Core 0' | awk '{print $3}' || echo 'N/A')"
 }
 
-# Quick directory size
+# Quick directory size - Enhanced
 dirsize() { du -sh "$1" 2>/dev/null || echo "Directory not found" }
 
-# Find files by extension
+# Find files by extension - Enhanced
 findext() { find . -name "*.$1" -type f }
 
-# Count files by extension
+# Count files by extension - Enhanced
 countext() { find . -name "*.$1" -type f | wc -l }
 
-# Quick search in files
+# Quick search in files - Enhanced
 search() { grep -r "$1" . --exclude-dir={.git,node_modules,.cache} }
 
-# Create a new project directory
+# Create a new project directory - Enhanced
 newproj() {
     [[ $# -eq 1 ]] || { echo "Usage: newproj <project_name>"; return 1 }
     mkcd "$1" && echo "Project '$1' created and entered"
 }
 
-# Quick note taking
+# Quick note taking - Enhanced
 note() {
     local note_file="$HOME/notes/$(date +%Y%m%d).md"
     mkdir -p "$(dirname "$note_file")"
@@ -350,7 +384,7 @@ note() {
     fi
 }
 
-# Quick todo
+# Quick todo - Enhanced
 todo() {
     local todo_file="$HOME/todo.md"
     if [[ $# -eq 0 ]]; then
@@ -361,19 +395,19 @@ todo() {
     fi
 }
 
-# Quick calculator
+# Quick calculator - Enhanced
 calc() { echo "$*" | bc -l }
 
-# Quick URL shortener
+# Quick URL shortener - Enhanced
 shorten() { curl -s "http://tinyurl.com/api-create.php?url=$1" }
 
-# Quick QR code generator
+# Quick QR code generator - Enhanced
 qr() { echo "$1" | curl -F-=\<- qrenco.de }
 
-# Quick password generator
+# Quick password generator - Enhanced
 passgen() { openssl rand -base64 "${1:-12}" | tr -d "=+/" | cut -c1-${1:-12} }
 
-# Quick system update
+# Quick system update - Enhanced
 sysupdate() {
     echo "🔄 Updating system..."
     sudo pacman -Syu
@@ -387,7 +421,7 @@ sysupdate() {
     echo "✅ System updated!"
 }
 
-# Quick system maintenance
+# Quick system maintenance - Enhanced
 sysmaintenance() {
     echo "🔧 Running system maintenance..."
     sudo pacman -Sc --noconfirm
@@ -396,19 +430,19 @@ sysmaintenance() {
     echo "✅ System maintenance completed!"
 }
 
-# Quick package search
-pacs() {
-    [[ -n "$1" ]] || { echo "Usage: pacs <package_name>"; return 1 }
+# Quick package search - Enhanced
+pacsearch() {
+    [[ -n "$1" ]] || { echo "Usage: pacsearch <package_name>"; return 1 }
     pacman -Ss "$1" | grep -E "^[a-z]" | head -20
 }
 
-# Quick package info
-paci() {
-    [[ -n "$1" ]] || { echo "Usage: paci <package_name>"; return 1 }
+# Quick package info - Enhanced
+pacinfo() {
+    [[ -n "$1" ]] || { echo "Usage: pacinfo <package_name>"; return 1 }
     pacman -Qi "$1" 2>/dev/null || pacman -Si "$1" 2>/dev/null || echo "Package not found"
 }
 
-# Quick system cleanup
+# Quick system cleanup - Enhanced
 sysclean() {
     echo "🧹 Cleaning system..."
     sudo pacman -Sc
@@ -418,7 +452,7 @@ sysclean() {
 }
 
 # =====================================================
-# 🎨 COMPLETION ENHANCEMENTS
+# 🎨 COMPLETION ENHANCEMENTS - Enhanced
 # =====================================================
 
 # Case-insensitive completion
@@ -434,15 +468,15 @@ zstyle ':completion:*:ssh:*' hosts off
 zstyle ':completion:*:scp:*' hosts off
 
 # =====================================================
-# 🔌 PLUGIN CONFIGURATIONS
+# 🔌 PLUGIN CONFIGURATIONS - Enhanced
 # =====================================================
 
-# Autosuggestions
+# Autosuggestions - Enhanced
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666,bold"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
-# Syntax highlighting
+# Syntax highlighting - Enhanced
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 ZSH_HIGHLIGHT_STYLES[command]='fg=green,bold'
@@ -451,7 +485,7 @@ ZSH_HIGHLIGHT_STYLES[builtin]='fg=yellow,bold'
 ZSH_HIGHLIGHT_STYLES[function]='fg=blue,bold'
 
 # =====================================================
-# 🏁 INITIALIZATION
+# 🏁 INITIALIZATION - Enhanced
 # =====================================================
 
 # Load completions
@@ -477,8 +511,14 @@ export NVM_DIR="$HOME/.nvm"
 [[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
 [[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
 
-# Initialize fastfetch (system info display)
-command -v fastfetch &> /dev/null && fastfetch
+# Initialize fastfetch (system info display) - Only once per session
+if [[ -z "$FASTFETCH_SHOWN" ]] && command -v fastfetch &> /dev/null; then
+    fastfetch
+    export FASTFETCH_SHOWN=1
+fi
 
 # Load any additional custom configurations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local 
+# Aliases útiles
+alias ll='eza -la --icons'
+alias gs='git status'

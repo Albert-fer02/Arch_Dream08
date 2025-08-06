@@ -1,7 +1,7 @@
 # =====================================================
-# 🚀 BASH Configuration - Arch Linux Optimized
+# 🚀 ROOT BASH Configuration - Arch Linux Optimized
 # =====================================================
-# Optimized for performance and productivity
+# Optimized for superuser environment with p10k integration
 # =====================================================
 
 # Source global definitions
@@ -31,16 +31,16 @@ export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
 
 # PATH Configuration - Optimized order
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
 # XDG Base Directory Specification
-export XDG_CONFIG_HOME="$HOME/.config" 
-export XDG_DATA_HOME="$HOME/.local/share" 
-export XDG_CACHE_HOME="$HOME/.cache" 
-export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_CONFIG_HOME="/root/.config" 
+export XDG_DATA_HOME="/root/.local/share" 
+export XDG_CACHE_HOME="/root/.cache" 
+export XDG_STATE_HOME="/root/.local/state"
 
 # Development environment
-export GOPATH="$HOME/go"
+export GOPATH="/root/go"
 export PATH="$GOPATH/bin:$PATH"
 export NODE_ENV=development
 
@@ -58,7 +58,7 @@ parse_git_branch() {
 }
 
 # Color prompt with git integration
-PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]\$ '
+PS1='\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]# '
 
 # =====================================================
 # 🛠️ ENHANCED ALIASES
@@ -101,8 +101,8 @@ fi
 alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~' -- -='cd -'
 
 # Directory shortcuts
-alias dl='cd ~/Downloads' dt='cd ~/Desktop' dc='cd ~/Documents' 
-alias dev='cd ~/Development' proj='cd ~/Projects' tmp='cd /tmp'
+alias dl='cd /root/Downloads' dt='cd /root/Desktop' dc='cd /root/Documents' 
+alias dev='cd /root/Development' proj='cd /root/Projects' tmp='cd /tmp'
 
 # Git aliases - Enhanced
 alias g='git' gs='git status --short --branch' ga='git add' gaa='git add --all'
@@ -113,9 +113,9 @@ alias gba='git branch -a' gbd='git branch -d' gm='git merge' gr='git rebase'
 alias gst='git stash' gstp='git stash pop' gf='git fetch' gcl='git clone'
 
 # Arch Linux specific aliases
-alias pac='sudo pacman' pacr='sudo pacman -R' pacu='sudo pacman -Syu'
+alias pac='pacman' pacr='pacman -R' pacu='pacman -Syu'
 alias pacq='pacman -Q' pacqi='pacman -Qi' pacql='pacman -Ql'
-alias pacqo='pacman -Qo' pacc='sudo pacman -Sc' paccc='sudo pacman -Scc'
+alias pacqo='pacman -Qo' pacc='pacman -Sc' paccc='pacman -Scc'
 
 # AUR helper detection
 if command -v yay &> /dev/null; then
@@ -145,7 +145,7 @@ alias rm='rm -i' cp='cp -i' mv='mv -i' mkdir='mkdir -p'
 # Network aliases
 alias myip='curl -s ifconfig.me && echo'
 alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
-alias ports='sudo lsof -i -P -n | grep LISTEN'
+alias ports='lsof -i -P -n | grep LISTEN'
 alias ping='ping -c 5'
 
 # Development aliases
@@ -236,7 +236,7 @@ newproj() {
 
 # Quick note taking
 note() {
-    local note_file="$HOME/notes/$(date +%Y%m%d).md"
+    local note_file="/root/notes/$(date +%Y%m%d).md"
     mkdir -p "$(dirname "$note_file")"
     if [ $# -eq 0 ]; then
         $EDITOR "$note_file"
@@ -248,7 +248,7 @@ note() {
 
 # Quick todo
 todo() {
-    local todo_file="$HOME/todo.md"
+    local todo_file="/root/todo.md"
     if [ $# -eq 0 ]; then
         $EDITOR "$todo_file"
     else
@@ -280,7 +280,7 @@ passgen() {
 # System update function
 sysupdate() {
     echo "🔄 Updating system..."
-    sudo pacman -Syu
+    pacman -Syu
     if command -v yay &> /dev/null; then
         echo "🔄 Updating AUR packages..."
         yay -Sua
@@ -294,9 +294,9 @@ sysupdate() {
 # System maintenance
 sysmaintenance() {
     echo "🔧 Running system maintenance..."
-    sudo pacman -Sc --noconfirm
-    sudo journalctl --vacuum-time=7d
-    sudo pacman -Rns $(pacman -Qtdq) 2>/dev/null || true
+    pacman -Sc --noconfirm
+    journalctl --vacuum-time=7d
+    pacman -Rns $(pacman -Qtdq) 2>/dev/null || true
     echo "✅ System maintenance completed!"
 }
 
@@ -364,23 +364,24 @@ esac
 # =====================================================
 
 # Load Node Version Manager (if exists)
-export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="/root/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Rust environment
-[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+[ -f "/root/.cargo/env" ] && source "/root/.cargo/env"
 
 # Bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+[ -s "/root/.bun/_bun" ] && source "/root/.bun/_bun"
 
 # Load any additional custom configurations
-[ -f ~/.bashrc.local ] && source ~/.bashrc.local
+[ -f /root/.bashrc.local ] && source /root/.bashrc.local
 
 # Welcome message - Only show once per session
 if [ -z "$BASH_WELCOME_SHOWN" ]; then
-    echo "🐚 Enhanced Bash loaded with productivity features"
-    echo "💡 Run: sysinfo, sysupdate, sysmaintenance for system management"
+    echo "🔴 ROOT MODE: Be careful with your commands!"
+    echo "💡 Tip: Use 'exit' to return to normal user"
     export BASH_WELCOME_SHOWN=1
 fi
-alias vim="nvim"
+
+alias vim="nvim" 
