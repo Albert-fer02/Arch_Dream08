@@ -556,7 +556,7 @@ show_verification_summary() {
     if [[ $FAILED -gt 0 ]]; then
         echo -e "${YELLOW}💡 Recomendaciones:${COLOR_RESET}"
         echo -e "   • Revisar las herramientas que fallaron"
-        echo -e "   • Ejecutar: $SCRIPT_DIR/install-ultra-fast.sh"
+        echo -e "   • Ejecutar: $SCRIPT_DIR/install.sh"
         echo -e "   • Verificar conexión a internet"
     fi
     

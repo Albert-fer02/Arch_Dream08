@@ -51,11 +51,11 @@ configure_module_files() {
     log "Configurando archivos del módulo $MODULE_NAME..."
     
     # Crear symlink para .bashrc
-    create_symlink "$CONFIG_DIR/bashrc" "$HOME/.bashrc" ".bashrc"
+    create_symlink "$SCRIPT_DIR/bashrc" "$HOME/.bashrc" ".bashrc"
     
     # Crear symlink para .bash_profile si no existe
     if [[ ! -e "$HOME/.bash_profile" ]]; then
-        create_symlink "$CONFIG_DIR/bashrc" "$HOME/.bash_profile" ".bash_profile"
+        create_symlink "$SCRIPT_DIR/bashrc" "$HOME/.bash_profile" ".bash_profile"
     fi
 }
 
@@ -69,7 +69,7 @@ verify_module_installation() {
     # Verificar Bash instalado
     if command -v bash &>/dev/null; then
         success "✓ Bash instalado"
-        ((checks_passed++))
+        ((++checks_passed))
     else
         error "✗ Bash no está instalado"
     fi
@@ -77,7 +77,7 @@ verify_module_installation() {
     # Verificar .bashrc
     if [[ -L "$HOME/.bashrc" ]] && [[ -e "$HOME/.bashrc" ]]; then
         success "✓ .bashrc configurado"
-        ((checks_passed++))
+        ((++checks_passed))
     else
         error "✗ .bashrc no está configurado"
     fi
@@ -85,10 +85,10 @@ verify_module_installation() {
     # Verificar .bash_profile
     if [[ -L "$HOME/.bash_profile" ]] && [[ -e "$HOME/.bash_profile" ]]; then
         success "✓ .bash_profile configurado"
-        ((checks_passed++))
+        ((++checks_passed))
     else
         success "✓ .bash_profile no es necesario (opcional)"
-        ((checks_passed++))
+        ((++checks_passed))
     fi
     
     if [[ $checks_passed -eq $total_checks ]]; then

@@ -153,20 +153,27 @@ get_arch_version() {
 
 # Verificar permisos sudo con timeout
 check_sudo() {
-    local timeout=${1:-5}
-    
-    if ! sudo -n true 2>/dev/null; then
-        warn "Solicitando permisos sudo..."
-        if timeout $timeout sudo -v; then
-            success "Permisos sudo obtenidos"
-            return 0
-        else
-            error "No se pudieron obtener permisos sudo"
-            return 1
-        fi
-    else
+    # Si ya hay credenciales en caché, salir
+    if sudo -n true 2>/dev/null; then
         debug "Permisos sudo ya disponibles"
         return 0
+    fi
+
+    # Pedir credenciales sin timeout para no cortar la escritura
+    warn "Solicitando permisos sudo (la contraseña no se muestra al escribir)..."
+    if sudo -v; then
+        success "Permisos sudo obtenidos"
+        return 0
+    fi
+
+    # Reintento único por si hubo error tipográfico
+    warn "Intento adicional de autenticación sudo..."
+    if sudo -v; then
+        success "Permisos sudo obtenidos"
+        return 0
+    else
+        error "No se pudieron obtener permisos sudo"
+        return 1
     fi
 }
 
@@ -190,6 +197,11 @@ check_internet() {
 check_disk_space() {
     local min_space=${1:-1048576}  # 1GB por defecto
     local path=${2:-/}
+    # En modo simulación, no bloquear por espacio
+    if [[ "${DRY_RUN:-false}" == "true" ]]; then
+        debug "DRY-RUN: omitiendo verificación de espacio en disco"
+        return 0
+    fi
     local available_space=$(df "$path" | awk 'NR==2 {print $4}')
     local total_space=$(df "$path" | awk 'NR==2 {print $2}')
     local used_percent=$(df "$path" | awk 'NR==2 {print $5}' | sed 's/%//')
@@ -227,10 +239,11 @@ check_memory() {
 check_system_load() {
     local max_load=${1:-5.0}
     local current_load=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')
-    
+
     debug "Carga actual del sistema: $current_load"
-    
-    if (( $(echo "$current_load > $max_load" | bc -l) )); then
+
+    # Comparación de floats sin depender de bc
+    if awk -v a="$current_load" -v b="$max_load" 'BEGIN{exit (a>b)?0:1}'; then
         warn "Alta carga del sistema: $current_load"
         return 1
     fi
@@ -253,22 +266,16 @@ install_package() {
     
     log "Instalando $description..."
     
-    # Verificar si el paquete existe en los repositorios
-    if ! pacman -Ss "^$package$" &>/dev/null; then
+    # Verificar si el paquete existe en los repositorios oficiales
+    if ! pacman -Si "$package" >/dev/null 2>&1; then
         error "Paquete $package no encontrado en los repositorios"
         return 1
     fi
     
-    if [[ "$force" == "true" ]]; then
-        sudo pacman -S --noconfirm --needed "$package" || {
-            error "Fallo al instalar $description"
-            return 1
-        }
-    else
-        sudo pacman -S --noconfirm --needed "$package" || {
-            error "Fallo al instalar $description"
-            return 1
-        }
+    # Instalar sin preguntar y evitando reinstalar si ya está
+    if ! sudo pacman -S --noconfirm --needed "$package"; then
+        error "Fallo al instalar $description"
+        return 1
     fi
     
     success "$description instalado correctamente."
@@ -377,27 +384,38 @@ create_symlink() {
     local source="$1"
     local target="$2"
     local description="${3:-symlink}"
-    
+
     if [[ ! -e "$source" ]]; then
         error "Origen no existe: $source"
         return 1
     fi
-    
-    # Crear backup si el target existe
-    if [[ -e "$target" ]]; then
+
+    # Crear backup si el target existe o es un symlink
+    if [[ -e "$target" ]] || [[ -L "$target" ]]; then
         create_backup "$target"
         rm -rf "$target"
     fi
-    
+
     # Crear directorio padre si no existe
     mkdir -p "$(dirname "$target")"
-    
-    if ln -sf "$source" "$target"; then
-        success "$description creado: $target -> $source"
-        return 0
+
+    # Permitir modo copia para evitar symlinks en el sistema del usuario
+    if [[ "${INSTALL_COPY_MODE:-false}" == "true" ]]; then
+        if cp -a "$source" "$target" 2>/dev/null; then
+            success "copiado: $target (desde $source)"
+            return 0
+        else
+            error "No se pudo copiar $description"
+            return 1
+        fi
     else
-        error "No se pudo crear $description"
-        return 1
+        if ln -sf "$source" "$target"; then
+            success "$description creado: $target -> $source"
+            return 0
+        else
+            error "No se pudo crear $description"
+            return 1
+        fi
     fi
 }
 
@@ -502,36 +520,6 @@ check_system_dependencies() {
 # 🔧 FUNCIONES DE INICIALIZACIÓN
 # =====================================================
 
-# Inicializar biblioteca
-init_library() {
-    debug "Inicializando biblioteca común..."
-    
-    # Verificar sistema
-    if ! is_arch_linux; then
-        error "Este script requiere Arch Linux"
-        exit 1
-    fi
-    
-    # Verificar permisos
-    if ! check_sudo; then
-        error "No se pudieron obtener permisos sudo"
-        exit 1
-    fi
-    
-    # Verificar conexión
-    if ! check_internet; then
-        error "Sin conexión a internet"
-        exit 1
-    fi
-    
-    # Verificar recursos del sistema
-    check_disk_space
-    check_memory
-    check_system_load
-    
-    success "Biblioteca inicializada correctamente"
-}
-
 # Función para mostrar banner
 show_banner() {
     local title="$1"
@@ -571,14 +559,46 @@ show_summary() {
     echo
 }
 
+# Inicializar biblioteca
+init_library() {
+    debug "Inicializando biblioteca común..."
+    
+    # Verificar sistema
+    if ! is_arch_linux; then
+        error "Este script requiere Arch Linux"
+        exit 1
+    fi
+
+    # En modo simulación, saltar checks que requieren sudo o conexión
+    if [[ "${DRY_RUN:-false}" == "true" ]]; then
+        warn "DRY-RUN: omitiendo verificación de sudo e internet"
+    else
+        # Verificar permisos
+        if ! check_sudo; then
+            error "No se pudieron obtener permisos sudo"
+            exit 1
+        fi
+        # Verificar conexión
+        if ! check_internet; then
+            error "Sin conexión a internet"
+            exit 1
+        fi
+    fi
+
+    # Verificar recursos del sistema
+    check_disk_space
+    check_memory
+    check_system_load
+    
+    success "Biblioteca inicializada correctamente"
+}
+
 # =====================================================
 # 🔧 FUNCIONES DE LIMPIEZA Y FINALIZACIÓN
 # =====================================================
 
 # Función de limpieza
 cleanup() {
-    debug "Ejecutando limpieza..."
-    
     # Limpiar variables temporales
     unset -f debug log success warn error critical
     unset -f show_progress spinner
@@ -588,19 +608,10 @@ cleanup() {
     unset -f create_backup create_symlink verify_file_integrity
     unset -f confirm validate_args check_system_dependencies
     unset -f init_library show_banner show_summary cleanup
-    
-    debug "Limpieza completada"
 }
 
-# Configurar trap para limpieza
-trap cleanup EXIT
+# No usar trap por ahora para evitar problemas
+# trap cleanup EXIT
 
-# Exportar funciones principales
-export -f debug log success warn error critical
-export -f show_progress spinner
-export -f is_arch_linux get_arch_version check_sudo check_internet
-export -f check_disk_space check_memory check_system_load
-export -f install_package install_aur_package update_system clean_package_cache
-export -f create_backup create_symlink verify_file_integrity
-export -f confirm validate_args check_system_dependencies
-export -f init_library show_banner show_summary 
+# Las funciones están disponibles para ser llamadas directamente
+# No es necesario exportarlas en este contexto 

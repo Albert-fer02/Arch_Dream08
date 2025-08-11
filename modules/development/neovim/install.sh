@@ -200,7 +200,7 @@ verify_module_installation() {
     # Verificar Neovim instalado
     if command -v nvim &>/dev/null; then
         success "✓ Neovim instalado"
-        ((checks_passed++))
+        ((++checks_passed))
     else
         error "✗ Neovim no está instalado"
     fi
@@ -208,7 +208,7 @@ verify_module_installation() {
     # Verificar directorio de configuración
     if [[ -d "$HOME/.config/nvim" ]]; then
         success "✓ Directorio de configuración creado"
-        ((checks_passed++))
+        ((++checks_passed))
     else
         error "✗ Directorio de configuración no creado"
     fi
@@ -216,7 +216,7 @@ verify_module_installation() {
     # Verificar archivo de configuración
     if [[ -f "$HOME/.config/nvim/init.lua" ]]; then
         success "✓ Archivo de configuración presente"
-        ((checks_passed++))
+        ((++checks_passed))
     else
         error "✗ Archivo de configuración no encontrado"
     fi

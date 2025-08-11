@@ -17,7 +17,7 @@ La configuración de root se instala automáticamente cuando ejecutas el script 
 
 ```bash
 # Instalar todo el entorno (incluye configuración de root)
-./install-ultra-fast.sh
+./install.sh
 ```
 
 ### Instalación Manual
@@ -170,7 +170,7 @@ modules/core/
 └── README-ROOT-CONFIG.md   # Este archivo
 ```
 
-**Nota**: La configuración de root se instala automáticamente desde el script principal `install-ultra-fast.sh`.
+**Nota**: La configuración de root se instala automáticamente desde el script principal `install.sh`.
 
 ## 🤝 Contribución
 

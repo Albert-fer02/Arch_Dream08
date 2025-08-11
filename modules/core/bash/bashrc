@@ -384,3 +384,15 @@ if [ -z "$BASH_WELCOME_SHOWN" ]; then
     export BASH_WELCOME_SHOWN=1
 fi
 alias vim="nvim"
+
+# Fastfetch aliases
+alias ff="fastfetch-random"
+alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"
+alias ff-custom="fastfetch-random --config ~/.config/fastfetch/config.local.jsonc"
+
+# Nano aliases
+alias nano="nano --rcfile ~/.config/nano/nanorc"
+alias nano-code="nano --rcfile ~/.config/nano/code.nanorc"
+alias nano-config="nano --rcfile ~/.config/nano/config.nanorc"
+alias nano-log="nano --rcfile ~/.config/nano/log.nanorc"
+alias nano-edit="nano --rcfile ~/.config/nano/nanorc.local"

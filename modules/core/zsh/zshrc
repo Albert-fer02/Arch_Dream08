@@ -511,14 +511,60 @@ export NVM_DIR="$HOME/.nvm"
 [[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
 [[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
 
-# Initialize fastfetch (system info display) - Only once per session
-if [[ -z "$FASTFETCH_SHOWN" ]] && command -v fastfetch &> /dev/null; then
-    fastfetch
+# Initialize fastfetch (system info display) - Only once per top-level interactive session
+if [[ $- == *i* ]]; then
+  if [[ -z "$FASTFETCH_SHOWN" && -z "${ZELLIJ:-}${TMUX:-}" && -z "${VSCODE_INJECTION:-}${TERM_PROGRAM:-}" ]]; then
+    if command -v fastfetch-random &> /dev/null; then
+      fastfetch-random
+    elif command -v fastfetch &> /dev/null; then
+      fastfetch
+    fi
     export FASTFETCH_SHOWN=1
+  fi
 fi
 
 # Load any additional custom configurations
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local 
-# Aliases útiles
-alias ll='eza -la --icons'
-alias gs='git status'
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# =====================================================
+# 🎯 ALIASES FINALES Y CONFIGURACIÓN
+# =====================================================
+
+# Editor aliases
+alias vim="nvim"
+alias vi="nvim"
+alias nano="nvim"
+
+# Quick access aliases
+alias zshrc="nvim ~/.zshrc"
+alias reload="source ~/.zshrc"
+alias zshrc-edit="nvim ~/.zshrc && source ~/.zshrc"
+
+# System aliases
+alias arch="cat /etc/arch-release"
+alias kernel="uname -r"
+alias uptime="uptime -p"
+alias memory="free -h"
+alias disk="df -h"
+alias processes="ps aux --sort=-%cpu | head -20"
+
+# Development aliases
+alias py="python3"
+alias pip="pip3"
+alias node="node --version"
+alias npm="npm --version"
+alias git="git --version"
+
+# =====================================================
+# 🏁 FINALIZACIÓN DE CONFIGURACIÓN
+# =====================================================
+
+# Final message
+if [[ -z "$ZSH_FINAL_LOADED" ]]; then
+    export ZSH_FINAL_LOADED=1
+fi
+
+# Fastfetch aliases
+alias ff="fastfetch-random"
+alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"
+alias ff-custom="fastfetch-random --config ~/.config/fastfetch/config.local.jsonc"

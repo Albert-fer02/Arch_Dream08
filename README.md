@@ -28,15 +28,15 @@ Configura automáticamente tu Arch Linux con configuraciones ultra optimizadas:
 - **Git** - Configuración con aliases avanzados
 - **Herramientas modernas** - eza, bat, ripgrep, fd, y más
 
-## 🚀 Instalación Ultra Rápida
+## 🚀 Instalación
 
 ```bash
 # Clonar y ejecutar
 git clone https://github.com/Albert-fer02/Arch_Dream08.git
 cd Arch_Dream08
 
-# ⚡ INSTALACIÓN ULTRA RÁPIDA (Recomendado)
-./install-ultra-fast.sh
+# ⚡ Instalación (Recomendado)
+./install.sh
 
 # ✅ Verificar que todo funcione
 ./verify-ultra-fast.sh
@@ -63,10 +63,10 @@ cd Arch_Dream08
 
 ## 🎮 Uso
 
-### **⚡ Instalación Ultra Rápida (Recomendado)**
+### **⚡ Instalación (Recomendado)**
 ```bash
 # Instalación completa en ~2 minutos
-./install-ultra-fast.sh
+./install.sh
 
 # Verificación inmediata
 ./verify-ultra-fast.sh
@@ -74,7 +74,7 @@ cd Arch_Dream08
 
 ### **📋 Comandos Simples**
 ```bash
-./install-ultra-fast.sh          # Instalar todo
+./install.sh                     # Instalar todo
 ./verify-ultra-fast.sh           # Verificar todo
 ```
 
@@ -141,7 +141,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 ```
 Arch_Dream08/
-├── install-ultra-fast.sh      # ⚡ Instalador ultra rápido (PRINCIPAL)
+├── install.sh                 # ⚡ Instalador principal
 ├── verify-ultra-fast.sh       # ✅ Verificador ultra rápido
 ├── modules.json               # Configuración de módulos
 ├── lib/common.sh              # Funciones comunes
