@@ -58,8 +58,17 @@ vim.api.nvim_set_keymap("x", "<A-k>", "<Nop>", { noremap = true, silent = true }
 vim.api.nvim_set_keymap("x", "J", "<Nop>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("x", "K", "<Nop>", { noremap = true, silent = true })
 
--- Redefine Ctrl+s to save with the custom function
-vim.api.nvim_set_keymap("n", "<C-s>", ":lua SaveFile()<CR>", { noremap = true, silent = true })
+-- Safe save mapping: avoid in special buffers (term, prompt, nofile)
+vim.keymap.set({ "n", "i", "v" }, "<C-s>", function()
+  local bt = vim.bo.buftype
+  if bt == "terminal" or bt == "prompt" or bt == "nofile" then
+    return
+  end
+  if vim.api.nvim_get_mode().mode ~= "n" then
+    vim.cmd("stopinsert")
+  end
+  SaveFile()
+end, { noremap = true, silent = true, desc = "Save file" })
 
 -- Grep keybinding for visual mode - search selected text
 vim.keymap.set("v", "<leader>sg", function()

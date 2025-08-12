@@ -10,7 +10,7 @@ format = """
 ╭─ $os$username$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill
 ╰─ $character"""
 
-right_format = "$cmd_duration $memory_usage $jobs"
+right_format = "$cmd_duration $jobs"
 
 add_newline = true
 command_timeout = 300

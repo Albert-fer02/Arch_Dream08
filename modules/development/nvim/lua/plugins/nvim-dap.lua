@@ -187,18 +187,23 @@ return {
           variables[k] = v
         end
 
-        -- Load variables from .env file manually
+        -- Load variables from .env file (supports quoted values and spaces)
         local env_file_path = vim.fn.getcwd() .. "/.env"
         local env_file = io.open(env_file_path, "r")
         if env_file then
           for line in env_file:lines() do
-            for key, value in string.gmatch(line, "([%w_]+)=([%w_]+)") do
-              variables[key] = value
+            -- skip comments and empty lines
+            if not line:match("^%s*#") and line:match("%S") then
+              local key, value = line:match('^%s*([%w_]+)%s*=%s*(.*)%s*$')
+              if key and value ~= nil then
+                -- strip surrounding quotes if present
+                value = value:gsub('^"', ""):gsub('"$', "")
+                value = value:gsub("^'", ""):gsub("'$", "")
+                variables[key] = value
+              end
             end
           end
           env_file:close()
-        else
-          print("Error: .env file not found in " .. env_file_path)
         end
         return variables
       end

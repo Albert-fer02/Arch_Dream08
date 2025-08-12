@@ -25,20 +25,26 @@ local mode = {
 }
 
 local function codecompanion_adapter_name()
-  local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
+  local ok, cc = pcall(require, "codecompanion")
+  if not ok then
+    return nil
+  end
+  local chat = cc.buf_get_chat(vim.api.nvim_get_current_buf())
   if not chat then
     return nil
   end
-
   return " " .. chat.adapter.formatted_name
 end
 
 local function codecompanion_current_model_name()
-  local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
+  local ok, cc = pcall(require, "codecompanion")
+  if not ok then
+    return nil
+  end
+  local chat = cc.buf_get_chat(vim.api.nvim_get_current_buf())
   if not chat then
     return nil
   end
-
   return chat.settings.model
 end
 -- This file contains the configuration for various UI-related plugins in Neovim.
@@ -59,6 +65,14 @@ return {
     opts = {
       preset = "classic",
       win = { border = "single" },
+      spec = {
+        { "<leader>o", group = "Obsidian" },
+        { "<leader>a", group = "AI" },
+        { "<leader>d", group = "Debug" },
+        { "<leader>b", group = "Buffers" },
+        { "<leader>s", group = "Search" },
+        { "<leader>u", group = "UI / Utils" },
+      },
     },
   },
 

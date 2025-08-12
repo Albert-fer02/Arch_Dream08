@@ -1,10 +1,4 @@
--- This file contains the configuration for setting up the lazy.nvim plugin manager in Neovim.
-
 -- Node.js host is configured early in `init.lua` via `config.nodejs`. Avoid printing version here.
-
--- Spell-checking
-vim.opt.spell = true -- activa spell checker
-vim.opt.spelllang = { "en" }
 
 -- Define the path to the lazy.nvim plugin
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -81,9 +75,8 @@ require("lazy").setup({
     { import = "plugins" },
   },
   defaults = {
-    -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
-    -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
-    lazy = false,
+    -- By default, lazy-load all plugins unless explicitly configured otherwise.
+    lazy = true,
     -- It's recommended to leave version=false for now, since a lot of the plugins that support versioning
     -- have outdated releases, which may break your Neovim install.
     version = false, -- Always use the latest git commit
