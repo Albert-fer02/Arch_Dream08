@@ -4,6 +4,13 @@
 # Optimized for superuser environment with p10k integration
 # =====================================================
 
+# Fix locale issues immediately - Complete override
+{
+    unset LANG LC_ALL LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT LC_IDENTIFICATION 2>/dev/null
+    export LANG=C.utf8
+    export LC_ALL=C.utf8
+} >/dev/null 2>&1
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
@@ -27,8 +34,7 @@ bind '"\e[B": history-search-forward'
 # Editor Configuration
 export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 
-# Locale Configuration (Peru)
-export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
+# Locale already configured at startup
 
 # PATH Configuration - Optimized order
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
@@ -52,13 +58,22 @@ export NODE_ENV=development
 export CLICOLOR=1
 export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 
-# Enhanced prompt with git status
-parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
+# =====================================================
+# 🚀 STARSHIP PROMPT INITIALIZATION (ROOT)
+# =====================================================
 
-# Color prompt with git integration
-PS1='\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]# '
+# Initialize Starship if available
+if command -v starship &> /dev/null; then
+    eval "$(starship init bash)"
+else
+    # Fallback prompt with git status for root
+    parse_git_branch() {
+        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    }
+    
+    # Enhanced color prompt with git integration (root style)
+    PS1='\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]# '
+fi
 
 # =====================================================
 # 🛠️ ENHANCED ALIASES
@@ -98,7 +113,8 @@ if command -v fd &> /dev/null; then
 fi
 
 # Navigation shortcuts
-alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~' -- -='cd -'
+alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~'
+alias -- -='cd -'
 
 # Directory shortcuts
 alias dl='cd /root/Downloads' dt='cd /root/Desktop' dc='cd /root/Documents' 

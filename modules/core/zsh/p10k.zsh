@@ -592,9 +592,9 @@
   export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
 
   # =========================[ ROOT_INDICATOR: ELEGANT ROOT INDICATOR ]=========================
-  # Elegant root indicator with fire icon - positioned before directory
+  # Elegant root indicator - positioned before directory
   function prompt_root_indicator() {
-    p10k segment -f red -i '🔥' -t '' -b ''
+    p10k segment -f red -t '' -b ''
   }
 
   # =========================[ THEME RELOAD FUNCTION ]=========================

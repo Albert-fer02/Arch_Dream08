@@ -2,8 +2,8 @@
 # =====================================================
 # 🧩 ARCH DREAM MACHINE - MÓDULO ZSH
 # =====================================================
-# Script de instalación del módulo Zsh con Oh My Zsh y Powerlevel10k
-# Versión 2.0 - Instalación optimizada y robusta
+# Script de instalación del módulo Zsh con Starship y Zinit (Red Team Optimized)
+# Versión 3.0 - Instalación idempotente y ultra-optimizada
 # =====================================================
 
 set -euo pipefail
@@ -17,22 +17,22 @@ source "$SCRIPT_DIR/../../../lib/common.sh"
 # 🔧 CONFIGURACIÓN DEL MÓDULO
 # =====================================================
 
-MODULE_NAME="Zsh Configuration"
-MODULE_DESCRIPTION="Configuración completa de Zsh con Oh My Zsh y Powerlevel10k"
-MODULE_DEPENDENCIES=("zsh" "git" "curl" "wget")
-MODULE_FILES=("zshrc" "p10k.zsh" "p10k.root.zsh" "zshrc.root")
-MODULE_AUR_PACKAGES=()
+MODULE_NAME="Zsh Red Team Configuration"
+MODULE_DESCRIPTION="Configuración ultra-optimizada de Zsh con Starship y Zinit para Red Team"
+MODULE_DEPENDENCIES=("zsh" "git" "curl" "wget" "starship")
+MODULE_FILES=("zshrc" "zshrc.root")
+MODULE_AUR_PACKAGES=("starship-bin")
 MODULE_OPTIONAL=false
 
 # URLs de instalación
-OH_MY_ZSH_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
-POWERLEVEL10K_URL="https://github.com/romkatv/powerlevel10k.git"
+ZINIT_URL="https://github.com/zdharma-continuum/zinit.git"
+STARSHIP_INSTALL_URL="https://starship.rs/install.sh"
 
 # Directorios de instalación
-ZSH_INSTALL_DIR="$HOME/.oh-my-zsh"
-POWERLEVEL10K_DIR="$ZSH_INSTALL_DIR/custom/themes/powerlevel10k"
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit"
 ZSH_CACHE_DIR="$HOME/.zsh"
 ZSH_COMPDUMP_DIR="$ZSH_CACHE_DIR/compdump"
+STARSHIP_CONFIG_DIR="$HOME/.config"
 
 # =====================================================
 # 🔧 FUNCIONES DEL MÓDULO
@@ -64,89 +64,90 @@ install_module_dependencies() {
     success "✅ Todas las dependencias están instaladas"
 }
 
-# Instalar Oh My Zsh
-install_oh_my_zsh() {
-    log "Instalando Oh My Zsh..."
+# Instalar Starship
+install_starship() {
+    log "Instalando Starship..."
     
-    if [[ -d "$ZSH_INSTALL_DIR" ]]; then
-        success "✓ Oh My Zsh ya está instalado"
+    if command -v starship &>/dev/null; then
+        success "✓ Starship ya está instalado"
         return 0
     fi
     
-    # Crear directorio temporal para la instalación
-    local temp_dir=$(mktemp -d)
-    cd "$temp_dir"
+    # Intentar instalar desde repositorios de Arch primero
+    if install_package "starship"; then
+        success "✅ Starship instalado desde repositorio"
+        return 0
+    fi
     
-    # Descargar script de instalación
-    if curl -fsSL "$OH_MY_ZSH_URL" -o install.sh; then
-        # Modificar script para instalación no interactiva
-        sed -i 's/read -r "Would you like to change the default shell to zsh? \[Y/n\]? " YN/read -r "Would you like to change the default shell to zsh? \[Y/n\]? " YN || YN=Y/' install.sh
-        sed -i 's/read -r "Would you like to change the default shell to zsh? \[Y/n\]? " YN/read -r "Would you like to change the default shell to zsh? \[Y/n\]? " YN || YN=Y/' install.sh
-        
-        # Ejecutar instalación
-        if bash install.sh --unattended; then
-            success "✅ Oh My Zsh instalado correctamente"
+    # Si falla, instalar desde AUR
+    log "Instalando Starship desde AUR..."
+    if command -v yay &>/dev/null; then
+        yay -S --noconfirm starship-bin
+    elif command -v paru &>/dev/null; then
+        paru -S --noconfirm starship-bin
+    else
+        # Último recurso: instalación manual
+        log "Instalando Starship manualmente..."
+        curl -sS https://starship.rs/install.sh | sh -s -- --yes
+    fi
+    
+    if command -v starship &>/dev/null; then
+        success "✅ Starship instalado correctamente"
+    else
+        error "❌ Fallo al instalar Starship"
+        return 1
+    fi
+}
+
+# Instalar Zinit
+install_zinit() {
+    log "Instalando Zinit plugin manager..."
+    
+    if [[ -d "$ZINIT_HOME/zinit.git" ]]; then
+        success "✓ Zinit ya está instalado"
+        return 0
+    fi
+    
+    # Crear directorio de Zinit
+    mkdir -p "$(dirname "$ZINIT_HOME")"
+    
+    # Clonar Zinit
+    if git clone --depth=1 "$ZINIT_URL" "$ZINIT_HOME/zinit.git"; then
+        success "✅ Zinit instalado correctamente"
+    else
+        error "❌ Fallo al instalar Zinit"
+        return 1
+    fi
+}
+
+# Instalar herramientas adicionales para Red Team
+install_redteam_tools() {
+    log "Instalando herramientas adicionales para Red Team..."
+    
+    local tools=(
+        "bat"           # Better cat
+        "eza"           # Better ls
+        "ripgrep"       # Better grep
+        "fd"            # Better find
+        "fzf"           # Fuzzy finder
+        "btop"          # Better top
+        "duf"           # Better df
+        "dust"          # Better du
+        "delta"         # Better diff
+        "xh"            # Better curl/http
+        "procs"         # Better ps
+    )
+    
+    for tool in "${tools[@]}"; do
+        if command -v "$tool" &>/dev/null; then
+            success "✓ $tool ya está instalado"
         else
-            error "❌ Fallo al instalar Oh My Zsh"
-            return 1
+            log "Instalando $tool..."
+            install_package "$tool" || warn "⚠️  No se pudo instalar $tool"
         fi
-    else
-        error "❌ No se pudo descargar Oh My Zsh"
-        return 1
-    fi
+    done
     
-    # Limpiar directorio temporal
-    cd - > /dev/null
-    rm -rf "$temp_dir"
-}
-
-# Instalar Powerlevel10k
-install_powerlevel10k() {
-    log "Instalando Powerlevel10k..."
-    
-    if [[ -d "$POWERLEVEL10K_DIR" ]]; then
-        success "✓ Powerlevel10k ya está instalado"
-        return 0
-    fi
-    
-    # Crear directorio de temas personalizados
-    mkdir -p "$ZSH_INSTALL_DIR/custom/themes"
-    
-    # Clonar Powerlevel10k
-    if git clone --depth=1 "$POWERLEVEL10K_URL" "$POWERLEVEL10K_DIR"; then
-        success "✅ Powerlevel10k instalado correctamente"
-    else
-        error "❌ Fallo al instalar Powerlevel10k"
-        return 1
-    fi
-}
-
-# Instalar plugins adicionales
-install_additional_plugins() {
-    log "Instalando plugins adicionales..."
-    
-    local plugins_dir="$ZSH_INSTALL_DIR/custom/plugins"
-    mkdir -p "$plugins_dir"
-    
-    # zsh-autosuggestions
-    if [[ ! -d "$plugins_dir/zsh-autosuggestions" ]]; then
-        log "Instalando zsh-autosuggestions..."
-        git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$plugins_dir/zsh-autosuggestions"
-    fi
-    
-    # zsh-syntax-highlighting
-    if [[ ! -d "$plugins_dir/zsh-syntax-highlighting" ]]; then
-        log "Instalando zsh-syntax-highlighting..."
-        git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$plugins_dir/zsh-syntax-highlighting"
-    fi
-    
-    # zsh-completions
-    if [[ ! -d "$plugins_dir/zsh-completions" ]]; then
-        log "Instalando zsh-completions..."
-        git clone --depth=1 https://github.com/zsh-users/zsh-completions "$plugins_dir/zsh-completions"
-    fi
-    
-    success "✅ Plugins adicionales instalados"
+    success "✅ Herramientas adicionales instaladas"
 }
 
 # Configurar directorios de Zsh
@@ -166,13 +167,22 @@ setup_zsh_directories() {
 configure_module_files() {
     log "Configurando archivos del módulo $MODULE_NAME..."
     
-    # Crear directorio de configuración
-    local config_dir="$HOME/.config/zshrc"
-    mkdir -p "$config_dir"
+    # Crear directorio de configuración de Starship
+    mkdir -p "$STARSHIP_CONFIG_DIR"
     
     # Crear symlinks para archivos de configuración
     create_symlink "$SCRIPT_DIR/zshrc" "$HOME/.zshrc" ".zshrc"
-    create_symlink "$SCRIPT_DIR/p10k.zsh" "$HOME/.p10k.zsh" ".p10k.zsh"
+    
+    # Copiar configuración de Starship si no existe o es diferente
+    local starship_source="$SCRIPT_DIR/../bash/starship.toml"
+    local starship_dest="$STARSHIP_CONFIG_DIR/starship.toml"
+    
+    if [[ ! -f "$starship_dest" ]] || ! cmp -s "$starship_source" "$starship_dest"; then
+        cp "$starship_source" "$starship_dest"
+        success "✅ Configuración de Starship copiada"
+    else
+        success "✅ Configuración de Starship ya está actualizada"
+    fi
     
     # Asegurar archivos de inicio mínimos para evitar zsh-newuser-install
     for startup_file in ".zshenv" ".zprofile" ".zlogin"; do
@@ -186,23 +196,29 @@ configure_module_files() {
     # Configurar archivos root si es necesario
     if [[ "$EUID" -eq 0 ]]; then
         create_symlink "$SCRIPT_DIR/zshrc.root" "$HOME/.zshrc" ".zshrc (root)"
-        create_symlink "$SCRIPT_DIR/p10k.root.zsh" "$HOME/.p10k.zsh" ".p10k.zsh (root)"
     fi
     
     # Crear archivo de configuración local si no existe
     if [[ ! -f "$HOME/.zshrc.local" ]]; then
         cat > "$HOME/.zshrc.local" << 'EOF'
 # =====================================================
-# 🧩 CONFIGURACIÓN LOCAL DE ZSH
+# 🧩 CONFIGURACIÓN LOCAL DE ZSH - RED TEAM
 # =====================================================
 # Personalizaciones específicas del usuario
 # Este archivo NO se sobrescribe con actualizaciones
 # =====================================================
 
-# Agregar aquí tus personalizaciones
-# Ejemplo:
-# export CUSTOM_VAR="valor"
+# Variables de entorno personalizadas
+# export TARGET=""
+# export PROXY=""
+
+# Aliases personalizados
 # alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
 
 EOF
         success "✅ Archivo de configuración local creado: ~/.zshrc.local"
@@ -258,20 +274,20 @@ verify_module_installation() {
         error "✗ Zsh no está instalado"
     fi
     
-    # Verificar Oh My Zsh
-    if [[ -d "$ZSH_INSTALL_DIR" ]]; then
-        success "✓ Oh My Zsh instalado"
+    # Verificar Starship instalado
+    if command -v starship &>/dev/null; then
+        success "✓ Starship instalado"
         ((++checks_passed))
     else
-        error "✗ Oh My Zsh no está instalado"
+        error "✗ Starship no está instalado"
     fi
     
-    # Verificar Powerlevel10k
-    if [[ -d "$POWERLEVEL10K_DIR" ]]; then
-        success "✓ Powerlevel10k instalado"
+    # Verificar Zinit instalado
+    if [[ -d "$ZINIT_HOME/zinit.git" ]]; then
+        success "✓ Zinit instalado"
         ((++checks_passed))
     else
-        error "✗ Powerlevel10k no está instalado"
+        error "✗ Zinit no está instalado"
     fi
     
     # Verificar .zshrc
@@ -282,12 +298,12 @@ verify_module_installation() {
         error "✗ .zshrc no está configurado"
     fi
     
-    # Verificar .p10k.zsh
-    if [[ -L "$HOME/.p10k.zsh" ]] && [[ -e "$HOME/.p10k.zsh" ]]; then
-        success "✓ .p10k.zsh configurado"
+    # Verificar configuración de Starship
+    if [[ -f "$STARSHIP_CONFIG_DIR/starship.toml" ]]; then
+        success "✓ Starship configurado"
         ((++checks_passed))
     else
-        error "✗ .p10k.zsh no está configurado"
+        error "✗ Starship no está configurado"
     fi
     
     # Verificar directorios de Zsh
@@ -340,19 +356,25 @@ EOF
 # Mostrar información de uso
 show_usage_info() {
     echo
-    echo -e "${BOLD}${GREEN}🚀 ZSH CONFIGURADO EXITOSAMENTE${COLOR_RESET}"
+    echo -e "${BOLD}${GREEN}🎯 ZSH RED TEAM CONFIGURADO EXITOSAMENTE${COLOR_RESET}"
     echo
     echo -e "${CYAN}📋 Próximos pasos:${COLOR_RESET}"
     echo -e "  1. Reinicia tu terminal o ejecuta: exec zsh"
-    echo -e "  2. Configura Powerlevel10k ejecutando: p10k configure"
-    echo -e "  3. Personaliza tu configuración en: ~/.zshrc.local"
+    echo -e "  2. Personaliza tu configuración en: ~/.zshrc.local"
+    echo -e "  3. Configura variables Red Team: set-target <ip>"
     echo
-    echo -e "${YELLOW}💡 Comandos útiles:${COLOR_RESET}"
-    echo -e "  - clean-zsh-cache: Limpiar caché de Zsh"
-    echo -e "  - omz update: Actualizar Oh My Zsh"
-    echo -e "  - p10k configure: Reconfigurar Powerlevel10k"
+    echo -e "${YELLOW}💡 Comandos Red Team útiles:${COLOR_RESET}"
+    echo -e "  - redteam-info: Mostrar información de red"
+    echo -e "  - set-target <ip>: Configurar objetivo"
+    echo -e "  - portscan <ip>: Escaneo rápido de puertos"
+    echo -e "  - direnum <url>: Enumeración de directorios"
     echo
-    echo -e "${PURPLE}🌟 ¡Disfruta tu nueva configuración de Zsh!${COLOR_RESET}"
+    echo -e "${RED}🔐 Funciones de seguridad:${COLOR_RESET}"
+    echo -e "  - b64e/b64d: Codificar/decodificar base64"
+    echo -e "  - urle/urld: Codificar/decodificar URL"
+    echo -e "  - passgen: Generar contraseñas"
+    echo
+    echo -e "${PURPLE}🌟 ¡Disfruta tu nueva configuración Red Team!${COLOR_RESET}"
 }
 
 # =====================================================
@@ -364,20 +386,20 @@ main() {
     init_library
     
     # Banner
-    echo -e "${BOLD}${CYAN}🧩 INSTALANDO MÓDULO: $MODULE_NAME${COLOR_RESET}"
+    echo -e "${BOLD}${CYAN}🎯 INSTALANDO MÓDULO: $MODULE_NAME${COLOR_RESET}"
     echo -e "${CYAN}$MODULE_DESCRIPTION${COLOR_RESET}\n"
     
     # Instalar dependencias
     install_module_dependencies
     
-    # Instalar Oh My Zsh
-    install_oh_my_zsh
+    # Instalar Starship
+    install_starship
     
-    # Instalar Powerlevel10k
-    install_powerlevel10k
+    # Instalar Zinit
+    install_zinit
     
-    # Instalar plugins adicionales
-    install_additional_plugins
+    # Instalar herramientas Red Team
+    install_redteam_tools
     
     # Configurar directorios
     setup_zsh_directories
@@ -395,7 +417,7 @@ main() {
     post_installation_setup
     
     echo -e "\n${BOLD}${GREEN}✅ Módulo $MODULE_NAME instalado exitosamente${COLOR_RESET}"
-    echo -e "${YELLOW}💡 Para usar Zsh: zsh o reinicia tu terminal${COLOR_RESET}"
+    echo -e "${YELLOW}🎯 Para usar Zsh Red Team: exec zsh${COLOR_RESET}"
 }
 
 # Ejecutar función principal

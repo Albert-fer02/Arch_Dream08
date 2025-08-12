@@ -4,6 +4,10 @@
 # Optimized for performance and productivity
 # =====================================================
 
+# Fix locale at startup
+export LANG=C.utf8
+export LC_ALL=C.utf8
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
@@ -13,12 +17,27 @@ fi
 # ⚡ PERFORMANCE OPTIMIZATIONS
 # =====================================================
 
+# Sistema de caché para inicio rápido
+export BASH_STARTUP_CACHE="$HOME/.cache/bash_startup"
+mkdir -p "$BASH_STARTUP_CACHE"
+
+# Caché de PATH y comandos costosos
+if [ -f "$BASH_STARTUP_CACHE/path_cache" ] && [ $(( $(date +%s) - $(stat -c %Y "$BASH_STARTUP_CACHE/path_cache") )) -lt 3600 ]; then
+    source "$BASH_STARTUP_CACHE/path_cache"
+else
+    # Cálculos de PATH y exports
+    export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
+    echo "export PATH=\"$PATH\"" > "$BASH_STARTUP_CACHE/path_cache"
+fi
+
 # Disable flow control commands (keeps C-s from freezing everything)
 stty -ixon
 
-# Enable incremental history search
+# Enable incremental history search with better performance
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
+bind '"\C-r": "\C-a hstr -- \C-j"'     # HSTR binding for Ctrl-r
+bind '"\C-xk": "\C-a hstr -k \C-j"'    # HSTR binding for kill history
 
 # =====================================================
 # ⚙️ ENVIRONMENT & PATH
@@ -27,8 +46,7 @@ bind '"\e[B": history-search-forward'
 # Editor Configuration
 export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 
-# Locale Configuration (Peru)
-export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
+# Locale already configured at startup
 
 # PATH Configuration - Optimized order
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
@@ -52,13 +70,22 @@ export NODE_ENV=development
 export CLICOLOR=1
 export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 
-# Enhanced prompt with git status
-parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
+# =====================================================
+# 🚀 STARSHIP PROMPT INITIALIZATION
+# =====================================================
 
-# Color prompt with git integration
-PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]\$ '
+# Initialize Starship if available
+if command -v starship &> /dev/null; then
+    eval "$(starship init bash)"
+else
+    # Fallback prompt with git status
+    parse_git_branch() {
+        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    }
+    
+    # Enhanced color prompt with git integration
+    PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]\$ '
+fi
 
 # =====================================================
 # 🛠️ ENHANCED ALIASES
@@ -98,7 +125,8 @@ if command -v fd &> /dev/null; then
 fi
 
 # Navigation shortcuts
-alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~' -- -='cd -'
+alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~'
+alias -- -='cd -'
 
 # Directory shortcuts
 alias dl='cd ~/Downloads' dt='cd ~/Desktop' dc='cd ~/Documents' 
@@ -291,30 +319,163 @@ sysupdate() {
     echo "✅ System updated!"
 }
 
-# System maintenance
+# System maintenance avanzado
 sysmaintenance() {
-    echo "🔧 Running system maintenance..."
+    echo "🔧 Ejecutando mantenimiento del sistema..."
+    
+    echo "📦 Limpiando caché de paquetes..."
     sudo pacman -Sc --noconfirm
+    yay -Sc --noconfirm 2>/dev/null || true
+    paru -Sc --noconfirm 2>/dev/null || true
+    
+    echo "📝 Optimizando logs del sistema..."
     sudo journalctl --vacuum-time=7d
+    
+    echo "🧹 Eliminando paquetes huérfanos..."
     sudo pacman -Rns $(pacman -Qtdq) 2>/dev/null || true
-    echo "✅ System maintenance completed!"
+    
+    echo "💾 Limpiando caches de desarrollo..."
+    rm -rf ~/.cache/pip/* ~/.npm/_cacache/* ~/.cargo/registry/cache/* 2>/dev/null || true
+    
+    echo "🗑️ Limpiando archivos temporales..."
+    rm -rf ~/.local/share/Trash/*/* 2>/dev/null || true
+    find ~/Downloads -type f -mtime +30 -delete 2>/dev/null || true
+    
+    echo "🔄 Actualizando base de datos de archivos..."
+    sudo updatedb
+    
+    echo "♻️ Limpiando cache de systemd..."
+    sudo systemctl restart systemd-journald
+    
+    echo "🧮 Verificando sistema de archivos..."
+    df -h / /home
+    
+    echo "✅ Mantenimiento del sistema completado!"
 }
 
-# Git functions
+# Funciones avanzadas de desarrollo
+# Git workflow mejorado
 gac() {
+    if [ -z "$1" ]; then
+        echo "❌ Error: Debes proporcionar un mensaje de commit"
+        echo "Uso: gac \"mensaje del commit\""
+        return 1
+    fi
     git add --all && git commit -m "$1"
 }
 
 gacp() {
+    if [ -z "$1" ]; then
+        echo "❌ Error: Debes proporcionar un mensaje de commit"
+        echo "Uso: gacp \"mensaje del commit\""
+        return 1
+    fi
     git add --all && git commit -m "$1" && git push
 }
 
 gundo() {
     git reset --soft HEAD~1
+    echo "✅ Último commit deshecho (cambios preservados)"
 }
 
 gamend() {
     git commit --amend --no-edit
+    echo "✅ Cambios agregados al último commit"
+}
+
+# Funciones de desarrollo
+create-project() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "❌ Error: Debes especificar nombre y tipo de proyecto"
+        echo "Uso: create-project nombre-proyecto tipo"
+        echo "Tipos disponibles: node, react, vue, python, go"
+        return 1
+    fi
+
+    case "$2" in
+        node)
+            mkdir -p "$1" && cd "$1"
+            npm init -y
+            echo "node_modules/" > .gitignore
+            git init
+            ;;
+        react)
+            npx create-react-app "$1"
+            cd "$1"
+            ;;
+        vue)
+            npm create vue@latest "$1"
+            cd "$1"
+            npm install
+            ;;
+        python)
+            mkdir -p "$1" && cd "$1"
+            python -m venv .venv
+            source .venv/bin/activate
+            echo ".venv/" > .gitignore
+            echo "__pycache__/" >> .gitignore
+            pip install --upgrade pip
+            ;;
+        go)
+            mkdir -p "$1" && cd "$1"
+            go mod init "$1"
+            mkdir -p cmd pkg internal
+            echo "bin/" > .gitignore
+            ;;
+        *)
+            echo "❌ Tipo de proyecto no soportado"
+            return 1
+            ;;
+    esac
+    echo "✅ Proyecto $1 ($2) creado exitosamente"
+}
+
+# Gestión de entornos virtuales Python
+venv-create() {
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install --upgrade pip
+    if [ -f "requirements.txt" ]; then
+        pip install -r requirements.txt
+    fi
+    echo "✅ Entorno virtual creado y activado"
+}
+
+venv-save() {
+    if [ -d ".venv" ]; then
+        pip freeze > requirements.txt
+        echo "✅ Dependencias guardadas en requirements.txt"
+    else
+        echo "❌ No se encontró un entorno virtual"
+    fi
+}
+
+# Node.js y npm
+node-cleanup() {
+    echo "🧹 Limpiando node_modules..."
+    find . -name "node_modules" -type d -prune -exec rm -rf {} +
+    echo "🧹 Limpiando package-lock.json..."
+    find . -name "package-lock.json" -type f -prune -exec rm {} +
+    echo "✅ Limpieza completada"
+}
+
+# Docker helpers
+docker-cleanup() {
+    echo "🧹 Limpiando contenedores detenidos..."
+    docker container prune -f
+    echo "🧹 Limpiando imágenes sin usar..."
+    docker image prune -f
+    echo "🧹 Limpiando volúmenes sin usar..."
+    docker volume prune -f
+    echo "✅ Limpieza de Docker completada"
+}
+
+# Kubernetes helpers
+k8s-context() {
+    echo "📦 Contextos disponibles:"
+    kubectl config get-contexts
+    echo "📦 Contexto actual:"
+    kubectl config current-context
 }
 
 # =====================================================
@@ -377,13 +538,45 @@ export NVM_DIR="$HOME/.nvm"
 # Load any additional custom configurations
 [ -f ~/.bashrc.local ] && source ~/.bashrc.local
 
-# Welcome message - Only show once per session
-if [ -z "$BASH_WELCOME_SHOWN" ]; then
-    echo "🐚 Enhanced Bash loaded with productivity features"
-    echo "💡 Run: sysinfo, sysupdate, sysmaintenance for system management"
-    export BASH_WELCOME_SHOWN=1
-fi
+# =====================================================
+# 🎯 RED TEAM BASH FUNCTIONS
+# =====================================================
+
+# Red Team information function
+redteam-info() {
+    echo "🎯 Red Team Bash Configuration Loaded"
+    echo "💡 Use 'sysinfo' to show system information"
+    echo "🎯 Use 'set-target <ip>' to set your target"
+    echo "🔧 Use 'sysupdate' for system updates"
+    echo "🧹 Use 'sysmaintenance' for system maintenance"
+}
+
+# Set target function
+set-target() {
+    if [ -z "$1" ]; then
+        echo "❌ Usage: set-target <ip_address>"
+        return 1
+    fi
+    export TARGET="$1"
+    echo "🎯 Target set to: $TARGET"
+}
+
+# Show target function
+show-target() {
+    if [ -n "$TARGET" ]; then
+        echo "🎯 Current target: $TARGET"
+    else
+        echo "❌ No target set. Use 'set-target <ip>' to set one."
+    fi
+}
+
+# Silent startup - No welcome messages
+export BASH_WELCOME_SHOWN=1
 alias vim="nvim"
+
+# Silent bash execution - no errors, no messages
+alias sbash='LANG=C.utf8 LC_ALL=C.utf8 bash 2> >(grep -v "setlocale" >&2)'
+alias silent-bash='LANG=C.utf8 LC_ALL=C.utf8 exec bash 2> >(grep -v "setlocale" >&2)'
 
 # Fastfetch aliases
 alias ff="fastfetch-random"

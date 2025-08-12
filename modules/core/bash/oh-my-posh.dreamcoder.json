@@ -1,0 +1,76 @@
+{
+  "$schema": "https://ohmyposh.dev/schema.json",
+  "console_title_template": "{{ .Shell }} :: {{ .Folder }}",
+  "final_space": true,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "path",
+          "style": "diamond",
+          "foreground": "#ffffff",
+          "background": "#4f46e5",
+          "properties": {
+            "style": "agnoster_short",
+            "folder_icon": "DIR"
+          }
+        },
+        {
+          "type": "git",
+          "style": "diamond",
+          "background": "#22c55e",
+          "foreground": "#000000",
+          "properties": {
+            "display_stash_count": true,
+            "display_status_detail": true
+          }
+        },
+        {
+          "type": "node",
+          "style": "plain",
+          "foreground": "#16a34a"
+        },
+        {
+          "type": "go",
+          "style": "plain",
+          "foreground": "#06b6d4"
+        },
+        {
+          "type": "python",
+          "style": "plain",
+          "foreground": "#facc15"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "time",
+          "style": "plain",
+          "foreground": "#a3a3a3",
+          "properties": {
+            "time_format": "15:04"
+          }
+        },
+        {
+          "type": "shell",
+          "style": "plain",
+          "foreground": "#60a5fa"
+        }
+      ]
+    }
+  ],
+  "secondary_prompt": {
+    "template": ">",
+    "foreground": "#a3a3a3"
+  },
+  "transient_prompt": {
+    "template": "> ",
+    "foreground": "#22c55e"
+  }
+}

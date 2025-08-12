@@ -482,7 +482,7 @@ show_completion_message() {
     echo -e "${BOLD}${GREEN}🎉 ¡INSTALACIÓN COMPLETADA!${COLOR_RESET}"
     echo
     echo -e "${CYAN}🚀 Próximos pasos:${COLOR_RESET}"
-    echo -e "  1. Reinicia tu terminal o ejecuta: source ~/.zshrc"
+    echo -e "  1. Reinicia tu terminal o ejecuta: exec zsh"
     echo -e "  2. Personaliza tu configuración en: $CONFIG_DIR"
     echo -e "  3. Ejecuta: arch_dream_status para ver el estado"
     echo
@@ -490,6 +490,11 @@ show_completion_message() {
     echo -e "  - Usa 'reload_arch_dream' para recargar configuración"
     echo -e "  - Los backups se guardan en: $BACKUP_DIR"
     echo -e "  - Consulta la documentación en: $PROJECT_ROOT/README.md"
+    echo
+    echo -e "${RED}🎯 Red Team ZSH:${COLOR_RESET}"
+    echo -e "  - Ejecuta: ./verify-redteam-zsh.sh para verificar ZSH Red Team"
+    echo -e "  - Usa: redteam-info para información de red"
+    echo -e "  - Configura: set-target <ip> para establecer objetivo"
     echo
     echo -e "${PURPLE}🌟 ¡Disfruta tu nueva configuración!${COLOR_RESET}"
 }
