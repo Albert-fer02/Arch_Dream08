@@ -583,3 +583,8 @@ alias processes="ps aux --sort=-%cpu | head -20"
 # Export environment variables for Starship
 export LOCAL_IP=$(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo "unknown")
 export PUBLIC_IP=""  # Will be set when needed to avoid slow startup
+# Fastfetch aliases
+alias ff="fastfetch-random"
+alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"
+alias ff-custom="fastfetch-random --config ~/.config/fastfetch/config.local.jsonc"
+alias fastfetch="fastfetch-random"

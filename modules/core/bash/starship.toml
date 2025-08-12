@@ -7,13 +7,14 @@
 
 # Configuración moderna y hermosa - Diseño elegante mejorado
 format = """
-╭─ $os$username$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill$cmd_duration
+╭─ $os$username$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill
 ╰─ $character"""
 
-right_format = ""
+right_format = "$cmd_duration $memory_usage $jobs"
 
 add_newline = true
-command_timeout = 500
+command_timeout = 300
+scan_timeout = 35
 continuation_prompt = "❯ "
 
 # Fill character para el diseño elegante
@@ -181,7 +182,7 @@ renamed = "[~${count}](fg:#89B4FA)"
 deleted = "[-${count}](fg:#F38BA8)"
 stashed = "[*${count}](fg:#CBA6F7)"
 conflicted = "[x${count}](fg:#F38BA8)"
-ignore_submodules = false
+ignore_submodules = true
 disabled = false
 
 # =====================================================
@@ -270,7 +271,7 @@ detect_folders = [".devcontainer"]
 format = "[$symbol$context( \\($namespace\\)) ]($style)"
 style = "bold fg:#89B4FA"
 symbol = "⎈ "
-disabled = false
+disabled = true
 detect_files = ["k8s"]
 detect_folders = ["k8s"]
 
@@ -290,21 +291,25 @@ symbol = " "
 format = "[$symbol($profile )($region )]($style)"
 style = "bold fg:#FAB387"
 expiration_symbol = "[EXP]"
+disabled = true
 
 [gcloud]
 symbol = "🌩️ "
 format = "[$symbol$account(@$domain) ($region )]($style)"
 style = "bold bright-blue"
+disabled = true
 
 [azure]
 symbol = "⛅ "
 format = "[$symbol($subscription )]($style)"
 style = "bold bright-blue"
+disabled = true
 
 [openstack]
 symbol = "☁️ "
 format = "[$symbol$cloud(\\($project\\)) ]($style)"
 style = "bold yellow"
+disabled = true
 
 # =====================================================
 # 🏗️ INFRAESTRUCTURA COMO CÓDIGO
@@ -473,27 +478,25 @@ style = "bold bright-yellow"
 # =====================================================
 
 [custom.metasploit]
-command = "msfconsole --version 2>/dev/null | head -1 | cut -d' ' -f2"
-when = "command -v msfconsole"
+command = 'printf %s "$MSF_VERSION"'
+when = 'test -n "$MSF_VERSION"'
 symbol = "🧨"
 style = "bold red"
 format = "[$symbol($output )]($style)"
-detect_files = ["msfconsole"]
 
 [custom.burp]
-command = "echo $BURP_VERSION"
-when = "test -n $BURP_VERSION"
+command = 'printf %s "$BURP_VERSION"'
+when = 'test -n "$BURP_VERSION"'
 symbol = "🔍"
 style = "bold orange"
 format = "[$symbol($output )]($style)"
 
 [custom.nmap]
-command = "nmap --version 2>/dev/null | head -1 | awk '{print $3}'"
-when = "command -v nmap"
+command = 'printf %s "$NMAP_VERSION"'
+when = 'test -n "$NMAP_VERSION"'
 symbol = "📡"
 style = "bold cyan"
 format = "[$symbol($output )]($style)"
-detect_files = ["nmap"]
 
 # =====================================================
 # 🎨 SHELLS Y EDITORES

@@ -37,9 +37,6 @@ cd Arch_Dream08
 
 # ⚡ Instalación (Recomendado)
 ./install.sh
-
-# ✅ Verificar que todo funcione
-./verify-ultra-fast.sh
 ```
 
 **¡Eso es todo!** Instalación completa en ~2 minutos.
@@ -67,15 +64,11 @@ cd Arch_Dream08
 ```bash
 # Instalación completa en ~2 minutos
 ./install.sh
-
-# Verificación inmediata
-./verify-ultra-fast.sh
 ```
 
 ### **📋 Comandos Simples**
 ```bash
 ./install.sh                     # Instalar todo
-./verify-ultra-fast.sh           # Verificar todo
 ```
 
 **¡Eso es todo!** No necesitas más comandos.
@@ -134,7 +127,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 ### **Verificar optimizaciones**
 ```bash
-./test-optimizations.sh
 ```
 
 ## 📁 Estructura
@@ -142,7 +134,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 ```
 Arch_Dream08/
 ├── install.sh                 # ⚡ Instalador principal
-├── verify-ultra-fast.sh       # ✅ Verificador ultra rápido
 ├── modules.json               # Configuración de módulos
 ├── lib/common.sh              # Funciones comunes
 ├── modules/                   # Configuraciones de módulos

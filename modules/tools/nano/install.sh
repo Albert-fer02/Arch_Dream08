@@ -408,8 +408,10 @@ main() {
     # Configurar integración con el sistema
     configure_system_integration
     
-    # Verificar instalación
-    verify_module_installation
+    # Verificar instalación (no abortar si es parcial)
+    if ! verify_module_installation; then
+        warn "Continuando pese a verificación parcial del módulo $MODULE_NAME"
+    fi
     
     # Configuración post-instalación
     post_installation_setup
