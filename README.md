@@ -1,4 +1,4 @@
-# �� Arch Dream Machine
+# Arch Dream Machine
 
 <div align="center">
 
@@ -20,7 +20,7 @@
 ## 🎯 ¿Qué hace?
 
 Configura automáticamente tu Arch Linux con configuraciones ultra optimizadas:
-- **Zsh + Oh My Zsh + Powerlevel10k** - Shell ultra optimizado (40% más rápido)
+- **Zsh + Starship + Zinit** - Shell ultra optimizado (rápido y minimal)
 - **Bash mejorado** - Configuración avanzada con herramientas modernas
 - **Kitty Terminal** - Terminal con aceleración GPU
 - **Fastfetch** - Información del sistema con temas
@@ -36,7 +36,7 @@ git clone https://github.com/Albert-fer02/Arch_Dream08.git
 cd Arch_Dream08
 
 # ⚡ Instalación (Recomendado)
-./install.sh
+./install.sh -y   # modo no interactivo
 ```
 
 **¡Eso es todo!** Instalación completa en ~2 minutos.
@@ -51,24 +51,28 @@ cd Arch_Dream08
 
 | Módulo | Descripción | Estado |
 |--------|-------------|--------|
-| `zsh` | Shell mejorado con Powerlevel10k | ✅ |
-| `kitty` | Terminal con aceleración GPU | ✅ |
-| `fastfetch` | Info del sistema con temas | ✅ |
-| `nano` | Editor con configuración | ✅ |
-| `git` | Git con aliases útiles | ✅ |
-| `neovim` | Editor avanzado | ✅ |
+| `core:zsh` | Zsh con Starship + Zinit (Red Team optimizado) | ✅ |
+| `core:bash` | Bash optimizado (prompt Starship/OMP opcional) | ✅ |
+| `terminal:kitty` | Terminal con aceleración GPU | ✅ |
+| `tools:fastfetch` | Info del sistema con temas | ✅ |
+| `tools:nano` | Editor con configuración | ✅ |
+| `development:nvim` | Neovim (LazyVim + plugins) | ✅ |
 
 ## 🎮 Uso
 
 ### **⚡ Instalación (Recomendado)**
 ```bash
 # Instalación completa en ~2 minutos
-./install.sh
+./install.sh -y
 ```
 
 ### **📋 Comandos Simples**
 ```bash
-./install.sh                     # Instalar todo
+./install.sh -y                            # Instalar todo (no interactivo)
+./install.sh --modules core:zsh,terminal:kitty   # Instalar solo módulos específicos
+./install.sh --skip tools:nano               # Saltar un módulo
+./install.sh --copy -y                       # Copiar archivos (sin symlinks)
+./install.sh --dry-run                       # Simular instalación
 ```
 
 **¡Eso es todo!** No necesitas más comandos.
@@ -88,15 +92,9 @@ cd Arch_Dream08
 
 ## 🔧 Mantenimiento
 
-```bash
-./arch-dream.sh
-# Opción 9 → Modo mantenimiento
-```
-
-- Limpiar cache de pacman
-- Remover paquetes huérfanos
-- Optimizar base de datos
-- Actualizar mirrorlist
+- Limpiar caché de pacman: `sudo pacman -Sc` (o usa alias `cleanup` en zsh)
+- Remover paquetes huérfanos: `pacman -Qtdq | sudo pacman -Rns -`
+- Actualizar sistema: `sysupdate`
 
 ## 🆘 Problemas Comunes
 
@@ -106,24 +104,13 @@ sudo pacman -S ttf-meslo-nerd-font-powerlevel10k
 ```
 
 ### **Zsh no funciona**
-```bash
-./arch-dream.sh verify zsh
-./arch-dream.sh install zsh
-```
+Ejecuta `exec zsh` tras la instalación o reinicia la terminal. Verifica `which zsh` y `echo $SHELL`.
 
-### **Oh My Zsh no se instala**
-```bash
-# El script ahora maneja esto automáticamente
-# Si hay problemas, instala manualmente:
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-```
+### **Starship no se inicializa**
+Verifica que `~/.config/starship.toml` existe y que `starship` está instalado (`pacman -Q starship`).
 
 ### **Terminal lento**
-```bash
-./arch-dream.sh
-# Opción 7 → Pruebas rápidas
-# Opción 9 → Modo mantenimiento
-```
+Prueba `btop`, limpia cachés (`clean-*-cache`), y desactiva plugins pesados.
 
 ### **Verificar optimizaciones**
 ```bash
@@ -140,7 +127,7 @@ Arch_Dream08/
 │   ├── core/                 # zsh, bash (ultra optimizados)
 │   ├── terminal/             # kitty
 │   ├── tools/                # fastfetch, nano
-│   └── development/          # git, neovim
+│   └── development/          # nvim
 ├── docs/                     # Documentación
 │   └── OPTIMIZATIONS.md      # Detalles de optimizaciones
 └── README.md                 # Este archivo

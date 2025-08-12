@@ -56,6 +56,7 @@ OPCIONES:
     -d, --dry-run       Simular instalación
     -v, --verbose       Modo verboso
     -c, --copy          Copiar archivos en lugar de symlinks
+    -y, --yes           No preguntar (modo no interactivo)
     -h, --help          Mostrar esta ayuda
 
 MÓDULOS DISPONIBLES:
@@ -106,6 +107,10 @@ parse_arguments() {
                 ;;
             -c|--copy)
                 export INSTALL_COPY_MODE=true
+                shift
+                ;;
+            -y|--yes)
+                export YES=true
                 shift
                 ;;
             -h|--help)
@@ -491,11 +496,6 @@ show_completion_message() {
     echo -e "  - Los backups se guardan en: $BACKUP_DIR"
     echo -e "  - Consulta la documentación en: $PROJECT_ROOT/README.md"
     echo
-    echo -e "${RED}🎯 Red Team ZSH:${COLOR_RESET}"
-    echo -e "  - Ejecuta: ./verify-redteam-zsh.sh para verificar ZSH Red Team"
-    echo -e "  - Usa: redteam-info para información de red"
-    echo -e "  - Configura: set-target <ip> para establecer objetivo"
-    echo
     echo -e "${PURPLE}🌟 ¡Disfruta tu nueva configuración!${COLOR_RESET}"
 }
 
@@ -537,7 +537,12 @@ main() {
         done
         # Si no se pasaron módulos válidos, ofrecer selección interactiva
         if [[ ${#modules_to_install[@]} -eq 0 ]]; then
-            mapfile -t modules_to_install < <(interactive_select_modules "${available_modules[@]}")
+            if [[ "${YES:-false}" == "true" ]]; then
+                # En modo no interactivo, instala todos para evitar bloqueo
+                modules_to_install=("${available_modules[@]}")
+            else
+                mapfile -t modules_to_install < <(interactive_select_modules "${available_modules[@]}")
+            fi
         fi
     fi
     

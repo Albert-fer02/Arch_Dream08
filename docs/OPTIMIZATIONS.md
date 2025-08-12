@@ -66,7 +66,7 @@ Este documento detalla las optimizaciones implementadas en las configuraciones d
 
 ### 🛠️ Mejoras de Interfaz
 - **Banner actualizado**: Información del sistema mejorada
-- **Versión actualizada**: v5.0.0 con optimizaciones
+- **Versión**: v3.0.0 (alineada con instalador)
 - **Información del sistema**: CPU cores y memoria
 
 ### 🚀 Funcionalidades Avanzadas

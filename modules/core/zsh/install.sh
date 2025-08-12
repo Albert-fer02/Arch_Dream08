@@ -173,15 +173,16 @@ configure_module_files() {
     # Crear symlinks para archivos de configuración
     create_symlink "$SCRIPT_DIR/zshrc" "$HOME/.zshrc" ".zshrc"
     
-    # Copiar configuración de Starship si no existe o es diferente
+    # Copiar configuración de Starship si existe en el módulo de bash
     local starship_source="$SCRIPT_DIR/../bash/starship.toml"
     local starship_dest="$STARSHIP_CONFIG_DIR/starship.toml"
-    
-    if [[ ! -f "$starship_dest" ]] || ! cmp -s "$starship_source" "$starship_dest"; then
-        cp "$starship_source" "$starship_dest"
-        success "✅ Configuración de Starship copiada"
-    else
-        success "✅ Configuración de Starship ya está actualizada"
+    if [[ -f "$starship_source" ]]; then
+        if [[ ! -f "$starship_dest" ]] || ! cmp -s "$starship_source" "$starship_dest"; then
+            cp "$starship_source" "$starship_dest"
+            success "✅ Configuración de Starship copiada"
+        else
+            success "✅ Configuración de Starship ya está actualizada"
+        fi
     fi
     
     # Asegurar archivos de inicio mínimos para evitar zsh-newuser-install

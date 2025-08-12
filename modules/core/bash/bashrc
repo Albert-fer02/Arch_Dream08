@@ -36,8 +36,11 @@ stty -ixon
 # Enable incremental history search with better performance
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
-bind '"\C-r": "\C-a hstr -- \C-j"'     # HSTR binding for Ctrl-r
-bind '"\C-xk": "\C-a hstr -k \C-j"'    # HSTR binding for kill history
+# HSTR keybindings (solo si hstr está instalado)
+if command -v hstr &> /dev/null; then
+  bind '"\C-r": "\C-a hstr -- \C-j"'     # HSTR binding for Ctrl-r
+  bind '"\C-xk": "\C-a hstr -k \C-j"'    # HSTR binding for kill history
+fi
 
 # =====================================================
 # ⚙️ ENVIRONMENT & PATH

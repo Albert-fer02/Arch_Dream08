@@ -47,15 +47,17 @@ setopt NUMERIC_GLOB_SORT NULL_GLOB AUTO_MENU AUTO_PARAM_SLASH
 # Editor Configuration
 export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 
-# Locale Configuration
-export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 LC_COLLATE=C
+# Locale Configuration (parametrizable)
+export ARCH_DREAM_LOCALE="${ARCH_DREAM_LOCALE:-en_US.UTF-8}"
+export LANG="$ARCH_DREAM_LOCALE"
+export LC_ALL="$ARCH_DREAM_LOCALE"
+export LC_COLLATE=C
 
 # PATH Configuration - Security tools priority
 typeset -U path
 path=(
     ~/.local/bin 
     ~/.cargo/bin 
-    /opt/homebrew/bin
     /usr/local/bin
     /usr/local/go/bin
     ~/go/bin
@@ -66,6 +68,8 @@ path=(
     /usr/sbin
     /sbin
 )
+# Añadir /opt/homebrew/bin solo si existe (entornos no-Arch)
+[[ -d /opt/homebrew/bin ]] && path+=(/opt/homebrew/bin)
 
 # Development environment
 export GOPATH="$HOME/go"
@@ -102,8 +106,7 @@ source "${ZINIT_HOME}/zinit.zsh"
 # 🔌 ZINIT PLUGINS - Red Team Productivity Suite
 # =====================================================
 
-# Add in zsh plugins
-zinit light zsh-users/zsh-syntax-highlighting
+# Add in zsh plugins (evitar duplicados de highlighting)
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light zdharma-continuum/fast-syntax-highlighting
@@ -112,14 +115,13 @@ zinit light zdharma-continuum/fast-syntax-highlighting
 zinit light rupa/z
 zinit light zdharma-continuum/history-search-multi-word
 
-# Auto-completion enhancements
-zinit light marlonrichert/zsh-autocomplete
+# Auto-completion enhancements (zsh-autocomplete puede solaparse con autosuggestions; omitirlo para rendimiento)
+# zinit light marlonrichert/zsh-autocomplete
 
 # Additional Red Team tools - using only zsh-z for directory jumping
 zinit light agkozak/zsh-z
 
-# Load completions
-autoload -Uz compinit && compinit
+# (compinit se inicializa más abajo en la sección INIT)
 
 # =====================================================
 # 🌟 STARSHIP PROMPT INITIALIZATION
@@ -409,10 +411,10 @@ b64d() { echo -n "$1" | base64 -d }
 urle() { python3 -c "import urllib.parse; print(urllib.parse.quote('$1'))" }
 urld() { python3 -c "import urllib.parse; print(urllib.parse.unquote('$1'))" }
 
-# Hash functions
-md5sum() { echo -n "$1" | md5sum | cut -d' ' -f1 }
-sha1sum() { echo -n "$1" | sha1sum | cut -d' ' -f1 }
-sha256sum() { echo -n "$1" | sha256sum | cut -d' ' -f1 }
+# Hash helpers (no sobreescribir binarios del sistema)
+md5s() { echo -n "$1" | command md5sum | cut -d' ' -f1 }
+sha1s() { echo -n "$1" | command sha1sum | cut -d' ' -f1 }
+sha256s() { echo -n "$1" | command sha256sum | cut -d' ' -f1 }
 
 # =====================================================
 # 🛠️ UTILITY FUNCTIONS
@@ -560,7 +562,6 @@ bash-silent() {
 # Quick alias
 alias bbash='bash-silent'
 alias vi="nvim"
-alias nano="nvim"
 
 # Quick access aliases
 alias zshrc="nvim ~/.zshrc"

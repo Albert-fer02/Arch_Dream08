@@ -213,8 +213,10 @@ check_disk_space() {
     if [ "$available_space" -lt "$min_space" ]; then
         warn "Poco espacio en disco: $(($available_space / 1024))MB disponible"
         warn "Uso actual: ${used_percent}%"
-        
-        if [[ "${FORCE_INSTALL:-false}" != "true" ]]; then
+        # Respetar modo no interactivo
+        if [[ "${FORCE_INSTALL:-false}" == "true" ]] || [[ "${YES:-false}" == "true" ]]; then
+            warn "Continuando pese a bajo espacio por FORCE_INSTALL/YES"
+        else
             read -p "¿Continuar? (y/N): " -n 1 -r
             echo
             [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
