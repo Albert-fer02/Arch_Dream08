@@ -1,94 +1,71 @@
+#            _
+#    _______| |__  _ __ ___
+#   |_ / __| '_ \| '__/ __|
+#  _ / /\__ \ | | | | | (__
+# (_)___|___/_| |_|_|  \___|
+#
 # =====================================================
-# 🚀 BASH Configuration - Arch Linux Optimized
+# 🚀 BASH Configuration - Ultra Performance Optimized
 # =====================================================
-# Optimized for performance and productivity
+# Configuración ultra-optimizada para productividad máxima
+# Features: Advanced cache, lazy loading, shared base configuration
 # =====================================================
 
-# Fix locale at startup
-export LANG=C.utf8
-export LC_ALL=C.utf8
+# =====================================================
+# ⚡ CORE INITIALIZATION
+# =====================================================
+
+# Load base configuration
+BASH_BASE_FILE="${BASH_SOURCE[0]%/*}/bash-base.sh"
+if [[ -f "$BASH_BASE_FILE" ]]; then
+    source "$BASH_BASE_FILE"
+    init_bash_base
+else
+    # Fallback initialization
+    export LANG="${ARCH_DREAM_LOCALE:-C.utf8}"
+    export LC_ALL="${ARCH_DREAM_LOCALE:-C.utf8}"
+    export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+fi
 
 # Source global definitions
-if [ -f /etc/bashrc ]; then
-    . /etc/bashrc
-fi
+[[ -f /etc/bashrc ]] && source /etc/bashrc
 
 # =====================================================
-# ⚡ PERFORMANCE OPTIMIZATIONS
+# 🎯 USER-SPECIFIC OPTIMIZATIONS
 # =====================================================
 
-# Sistema de caché para inicio rápido
-export BASH_STARTUP_CACHE="$HOME/.cache/bash_startup"
-mkdir -p "$BASH_STARTUP_CACHE"
-
-# Caché de PATH y comandos costosos
-if [ -f "$BASH_STARTUP_CACHE/path_cache" ] && [ $(( $(date +%s) - $(stat -c %Y "$BASH_STARTUP_CACHE/path_cache") )) -lt 3600 ]; then
-    source "$BASH_STARTUP_CACHE/path_cache"
-else
-    # Cálculos de PATH y exports
-    export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
-    echo "export PATH=\"$PATH\"" > "$BASH_STARTUP_CACHE/path_cache"
-fi
-
-# Disable flow control commands (keeps C-s from freezing everything)
-stty -ixon
-
-# Enable incremental history search with better performance
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
-# HSTR keybindings (solo si hstr está instalado)
-if command -v hstr &> /dev/null; then
-  bind '"\C-r": "\C-a hstr -- \C-j"'     # HSTR binding for Ctrl-r
-  bind '"\C-xk": "\C-a hstr -k \C-j"'    # HSTR binding for kill history
-fi
+# Directory shortcuts for user
+alias dl='cd ~/Downloads'
+alias dt='cd ~/Desktop' 
+alias dc='cd ~/Documents'
+alias dev='cd ~/Development'
+alias proj='cd ~/Projects'
+alias tmp='cd /tmp'
+alias tools='cd /opt'
+alias www='cd /var/www'
+alias logs='cd /var/log'
 
 # =====================================================
-# ⚙️ ENVIRONMENT & PATH
+# 🔧 LAZY LOADING SYSTEM
 # =====================================================
 
-# Editor Configuration
-export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+# Lazy load Node Version Manager
+nvm() {
+    export NVM_DIR="$HOME/.nvm"
+    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
 
-# Locale already configured at startup
+# Lazy load Rust environment
+load_rust() {
+    [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+}
 
-# PATH Configuration - Optimized order
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
-
-# XDG Base Directory Specification
-export XDG_CONFIG_HOME="$HOME/.config" 
-export XDG_DATA_HOME="$HOME/.local/share" 
-export XDG_CACHE_HOME="$HOME/.cache" 
-export XDG_STATE_HOME="$HOME/.local/state"
-
-# Development environment
-export GOPATH="$HOME/go"
-export PATH="$GOPATH/bin:$PATH"
-export NODE_ENV=development
-
-# =====================================================
-# 🎨 COLORS & PROMPT
-# =====================================================
-
-# Colors with better contrast
-export CLICOLOR=1
-export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
-
-# =====================================================
-# 🚀 STARSHIP PROMPT INITIALIZATION
-# =====================================================
-
-# Initialize Starship if available
-if command -v starship &> /dev/null; then
-    eval "$(starship init bash)"
-else
-    # Fallback prompt with git status
-    parse_git_branch() {
-        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-    }
-    
-    # Enhanced color prompt with git integration
-    PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]\$ '
-fi
+# Lazy load Bun
+load_bun() {
+    [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
+}
 
 # =====================================================
 # 🛠️ ENHANCED ALIASES
@@ -542,42 +519,81 @@ export NVM_DIR="$HOME/.nvm"
 [ -f ~/.bashrc.local ] && source ~/.bashrc.local
 
 # =====================================================
-# 🎯 RED TEAM BASH FUNCTIONS
+# 🎯 RED TEAM ENHANCED FUNCTIONS
 # =====================================================
 
-# Red Team information function
+# Get network information for Red Team operations
 redteam-info() {
-    echo "🎯 Red Team Bash Configuration Loaded"
-    echo "💡 Use 'sysinfo' to show system information"
-    echo "🎯 Use 'set-target <ip>' to set your target"
-    echo "🔧 Use 'sysupdate' for system updates"
-    echo "🧹 Use 'sysmaintenance' for system maintenance"
+    echo "🎯 Red Team Network Information"
+    echo "================================"
+    echo "🏠 Local IP: $(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo 'unknown')"
+    echo "🌐 Public IP: $(curl -s --max-time 3 ifconfig.me 2>/dev/null || echo 'unknown')"
+    echo "🔗 Gateway: $(ip route | grep default | awk '{print $3}')"
+    echo "📡 Interface: $(ip route get 8.8.8.8 2>/dev/null | awk '{print $5}' || echo 'unknown')"
+    echo "🖥️  Hostname: $(hostname)"
+    echo "👤 User: $(whoami)"
+    echo "⏰ Time: $(date)"
 }
 
-# Set target function
+# Set target for Red Team operations
 set-target() {
-    if [ -z "$1" ]; then
-        echo "❌ Usage: set-target <ip_address>"
+    if [[ -z "$1" ]]; then
+        echo "❌ Usage: set-target <ip_address_or_domain>"
         return 1
     fi
     export TARGET="$1"
+    export LOCAL_IP=$(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo 'unknown')
     echo "🎯 Target set to: $TARGET"
+    echo "🏠 Local IP: $LOCAL_IP"
 }
 
-# Show target function
+# Show current target
 show-target() {
-    if [ -n "$TARGET" ]; then
+    if [[ -n "$TARGET" ]]; then
         echo "🎯 Current target: $TARGET"
+        [[ -n "$LOCAL_IP" ]] && echo "🏠 Local IP: $LOCAL_IP"
     else
         echo "❌ No target set. Use 'set-target <ip>' to set one."
     fi
 }
 
-# Silent startup - No welcome messages
-export BASH_WELCOME_SHOWN=1
-alias vim="nvim"
+# Quick port scan
+portscan() {
+    if [[ -n "$1" ]]; then
+        echo "🔍 Scanning ports on $1..."
+        nmap -T4 -F "$1"
+    else
+        echo "Usage: portscan <target>"
+    fi
+}
 
-# Silent bash execution - no errors, no messages
+# Base64 encode/decode
+b64e() { echo -n "$1" | base64; }
+b64d() { echo -n "$1" | base64 -d; }
+
+# URL encode/decode  
+urle() { python3 -c "import urllib.parse; print(urllib.parse.quote('$1'))"; }
+urld() { python3 -c "import urllib.parse; print(urllib.parse.unquote('$1'))"; }
+
+# Hash helpers
+md5s() { echo -n "$1" | md5sum | cut -d' ' -f1; }
+sha1s() { echo -n "$1" | sha1sum | cut -d' ' -f1; }
+sha256s() { echo -n "$1" | sha256sum | cut -d' ' -f1; }
+
+# =====================================================
+# 🏁 FINAL CONFIGURATION
+# =====================================================
+
+# Editor aliases
+alias vim="nvim"
+alias vi="nvim"
+
+# Quick access aliases
+alias bashrc="nvim ~/.bashrc"
+alias reload="source ~/.bashrc"
+alias bashrc-edit="nvim ~/.bashrc && source ~/.bashrc"
+
+# Silent bash execution
 alias sbash='LANG=C.utf8 LC_ALL=C.utf8 bash 2> >(grep -v "setlocale" >&2)'
 alias silent-bash='LANG=C.utf8 LC_ALL=C.utf8 exec bash 2> >(grep -v "setlocale" >&2)'
 
@@ -590,5 +606,39 @@ alias ff-custom="fastfetch-random --config ~/.config/fastfetch/config.local.json
 alias nano="nano --rcfile ~/.config/nano/nanorc"
 alias nano-code="nano --rcfile ~/.config/nano/code.nanorc"
 alias nano-config="nano --rcfile ~/.config/nano/config.nanorc"
-alias nano-log="nano --rcfile ~/.config/nano/log.nanorc"
-alias nano-edit="nano --rcfile ~/.config/nano/nanorc.local"
+
+# Create local config if not exists
+if [[ ! -f "$HOME/.bashrc.local" ]]; then
+    cat > "$HOME/.bashrc.local" << 'EOF'
+# =====================================================
+# 🧩 CONFIGURACIÓN LOCAL DE BASH
+# =====================================================
+# Personalizaciones específicas del usuario
+# Este archivo NO se sobrescribe con actualizaciones
+# =====================================================
+
+# Variables de entorno personalizadas
+# export ARCH_DREAM_LOCALE="en_US.UTF-8"
+# export TARGET=""
+# export PROXY=""
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
+
+EOF
+fi
+
+# Load local customizations
+[[ -f "$HOME/.bashrc.local" ]] && source "$HOME/.bashrc.local"
+
+# Load environment loaders when needed
+alias rust='load_rust'
+alias cargo='load_rust && cargo'
+
+# Disable welcome messages
+export BASH_WELCOME_SHOWN=1

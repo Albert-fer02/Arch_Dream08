@@ -25,7 +25,7 @@ return {
       local function is_in_avante_window()
         local win = vim.api.nvim_get_current_win()
         local buf = vim.api.nvim_win_get_buf(win)
-        local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+        local ft = vim.bo[buf].filetype
 
         for _, avante_ft in ipairs(avante_filetypes) do
           if ft == avante_ft then
@@ -46,7 +46,7 @@ return {
           local target_win = nil
           for _, win in ipairs(vim.api.nvim_list_wins()) do
             local buf = vim.api.nvim_win_get_buf(win)
-            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+            local ft = vim.bo[buf].filetype
 
             local is_avante_ft = false
             for _, aft in ipairs(avante_filetypes) do
@@ -90,7 +90,7 @@ return {
 
         for _, win in ipairs(vim.api.nvim_list_wins()) do
           local buf = vim.api.nvim_win_get_buf(win)
-          local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+          local ft = vim.bo[buf].filetype
 
           -- Special handling for Ask and Select Files panels
           if ft == "AvanteAsk" or ft == "AvanteSelectedFiles" then
@@ -142,7 +142,7 @@ return {
         callback = function(args)
           local buf = args.buf
           if buf and vim.api.nvim_buf_is_valid(buf) then
-            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+            local ft = vim.bo[buf].filetype
 
             for _, avante_ft in ipairs(avante_filetypes) do
               if ft == avante_ft then

@@ -1,62 +1,69 @@
+#            _
+#    _______| |__  _ __ ___
+#   |_ / __| '_ \| '__/ __|
+#  _ / /\__ \ | | | | | (__
+# (_)___|___/_| |_|_|  \___|
+#
 # =====================================================
-# 🚀 ROOT BASH Configuration - Arch Linux Optimized
+# 🔴 ROOT BASH Configuration - Ultra Performance Optimized  
 # =====================================================
-# Optimized for superuser environment with p10k integration
+# Configuración ultra-optimizada para root con cache avanzado
+# Features: Shared base config, advanced cache, security defaults
 # =====================================================
 
-# Fix locale issues immediately - Complete override
-{
-    unset LANG LC_ALL LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT LC_IDENTIFICATION 2>/dev/null
-    export LANG=C.utf8
-    export LC_ALL=C.utf8
-} >/dev/null 2>&1
+# =====================================================
+# ⚡ ROOT CORE INITIALIZATION
+# =====================================================
 
-# Source global definitions
-if [ -f /etc/bashrc ]; then
-    . /etc/bashrc
+# Override for root-specific locale
+export ARCH_DREAM_LOCALE="${ARCH_DREAM_LOCALE:-C.utf8}"
+
+# Load base configuration
+BASH_BASE_FILE="${BASH_SOURCE[0]%/*}/bash-base.sh"
+if [[ -f "$BASH_BASE_FILE" ]]; then
+    source "$BASH_BASE_FILE"
+    init_bash_base
+else
+    # Fallback for root
+    export LANG="$ARCH_DREAM_LOCALE"
+    export LC_ALL="$ARCH_DREAM_LOCALE"
+    export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 fi
 
-# =====================================================
-# ⚡ PERFORMANCE OPTIMIZATIONS
-# =====================================================
-
-# Disable flow control commands (keeps C-s from freezing everything)
-stty -ixon
-
-# Enable incremental history search
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
+# Source global definitions
+[[ -f /etc/bashrc ]] && source /etc/bashrc
 
 # =====================================================
-# ⚙️ ENVIRONMENT & PATH
+# 🔴 ROOT-SPECIFIC CONFIGURATIONS
 # =====================================================
 
-# Editor Configuration
-export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+# Root environment variables
+export ROOT_MODE=1
+export FASTFETCH_DISABLE_AUTO=1
+export NEOFETCH_DISABLE_AUTO=1
 
-# Locale already configured at startup
+# Root-specific PATH (security tools priority)
+ROOT_PATHS=(
+    "/root/.local/bin"
+    "/root/.cargo/bin" 
+    "/usr/local/bin"
+    "/usr/local/go/bin"
+    "/root/go/bin"
+    "/root/.npm-global/bin"
+    "/root/.bun/bin"
+    "/usr/bin"
+    "/bin"
+    "/usr/sbin"
+    "/sbin"
+)
 
-# PATH Configuration - Optimized order
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+# Add security tools paths if they exist
+[[ -d /opt/metasploit-framework/bin ]] && ROOT_PATHS+=("/opt/metasploit-framework/bin")
+[[ -d /opt/burpsuite ]] && ROOT_PATHS+=("/opt/burpsuite")
+[[ -d /opt/nmap/bin ]] && ROOT_PATHS+=("/opt/nmap/bin")
 
-# XDG Base Directory Specification
-export XDG_CONFIG_HOME="/root/.config" 
-export XDG_DATA_HOME="/root/.local/share" 
-export XDG_CACHE_HOME="/root/.cache" 
-export XDG_STATE_HOME="/root/.local/state"
-
-# Development environment
-export GOPATH="/root/go"
-export PATH="$GOPATH/bin:$PATH"
-export NODE_ENV=development
-
-# =====================================================
-# 🎨 COLORS & PROMPT
-# =====================================================
-
-# Colors with better contrast
-export CLICOLOR=1
-export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+# Build PATH
+IFS=':' && export PATH="${ROOT_PATHS[*]}:$PATH" && unset IFS
 
 # =====================================================
 # 🚀 STARSHIP PROMPT INITIALIZATION (ROOT)
@@ -393,11 +400,113 @@ export NVM_DIR="/root/.nvm"
 # Load any additional custom configurations
 [ -f /root/.bashrc.local ] && source /root/.bashrc.local
 
-# Welcome message - Only show once per session
-if [ -z "$BASH_WELCOME_SHOWN" ]; then
-    echo "🔴 ROOT MODE: Be careful with your commands!"
-    echo "💡 Tip: Use 'exit' to return to normal user"
-    export BASH_WELCOME_SHOWN=1
+# =====================================================
+# 🔴 ROOT-SPECIFIC ALIASES 
+# =====================================================
+
+# Directory shortcuts for root
+alias dl='cd /root/Downloads'
+alias dt='cd /root/Desktop' 
+alias dc='cd /root/Documents'
+alias dev='cd /root/Development'
+alias proj='cd /root/Projects'
+alias tmp='cd /tmp'
+alias opt='cd /opt'
+alias etc='cd /etc'
+alias logs='cd /var/log'
+
+# =====================================================
+# 🔧 ROOT LAZY LOADING
+# =====================================================
+
+# Lazy load Node Version Manager for root
+nvm() {
+    export NVM_DIR="/root/.nvm"
+    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
+
+# Lazy load Rust environment for root
+load_rust() {
+    [[ -f "/root/.cargo/env" ]] && source "/root/.cargo/env"
+}
+
+# Lazy load Bun for root
+load_bun() {
+    [[ -s "/root/.bun/_bun" ]] && source "/root/.bun/_bun"
+}
+
+# =====================================================
+# 🏁 ROOT FINAL CONFIGURATION
+# =====================================================
+
+# Editor aliases
+alias vim="nvim"
+alias vi="nvim"
+
+# Quick access aliases
+alias bashrc="nvim /root/.bashrc"
+alias reload="source /root/.bashrc"
+alias bashrc-edit="nvim /root/.bashrc && source /root/.bashrc"
+
+# System aliases
+alias arch="cat /etc/arch-release"
+alias kernel="uname -r"
+alias uptime="uptime -p"
+alias memory="free -h"
+alias disk="df -h"
+alias processes="ps aux --sort=-%cpu | head -20"
+
+# Network aliases for root
+alias myip='curl -s ifconfig.me && echo'
+alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
+alias ports='lsof -i -P -n | grep LISTEN'
+alias ping='ping -c 5'
+
+# Create local config if not exists
+if [[ ! -f "/root/.bashrc.local" ]]; then
+    cat > "/root/.bashrc.local" << 'EOF'
+# =====================================================
+# 🔴 ROOT CONFIGURATION LOCAL
+# =====================================================
+# Personalizaciones específicas del usuario root
+# Este archivo NO se sobrescribe con actualizaciones
+# =====================================================
+
+# Variables de entorno personalizadas
+# export ARCH_DREAM_LOCALE="en_US.UTF-8"
+# export TARGET=""
+# export PROXY=""
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
+
+EOF
 fi
 
-alias vim="nvim" 
+# Load local customizations
+[[ -f "/root/.bashrc.local" ]] && source "/root/.bashrc.local"
+
+# Load environment loaders when needed
+alias rust='load_rust'
+alias cargo='load_rust && cargo'
+
+# Disable auto-launch tools in root mode
+if command -v fastfetch >/dev/null 2>&1; then
+    fastfetch() {
+        if [[ "$1" == "--auto" || "$1" == "-a" ]]; then
+            echo "🔴 Fastfetch auto-launch disabled in root mode"
+            return 0
+        fi
+        command fastfetch "$@"
+    }
+fi
+
+# Disable welcome messages
+export BASH_WELCOME_SHOWN=1 

@@ -147,10 +147,9 @@
     esac
   }
   
-  # Initialize theme detection and colors
-  detect_terminal_theme
-  get_adaptive_colors
-  get_terminal_specific_colors
+  # Load base configuration
+  [[ -f "${${(%):-%x}:h}/p10k-base.zsh" ]] && source "${${(%):-%x}:h}/p10k-base.zsh"
+  setup_p10k_base
 
   # =========================[ WARP AI TERMINAL DETECTION ]=========================
   # Detect if running in Warp AI terminal and apply specific optimizations
@@ -582,11 +581,10 @@
   export GITSTATUS_DAEMON_LOG_LEVEL=ERROR
   export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
 
-  # =========================[ ROOT_INDICATOR: ELEGANT ROOT INDICATOR ]=========================
-  # Elegant root indicator with fire icon - positioned before directory
-  function prompt_root_indicator() {
-    p10k segment -f red -i '🔥' -t '' -b ''
-  }
+  # =========================[ ROOT_INDICATOR: ROOT INDICATOR ]=========================
+  # Root indicator - positioned before directory
+  typeset -g POWERLEVEL9K_ROOT_INDICATOR_FOREGROUND=${P10K_ERROR_COLOR}
+  typeset -g POWERLEVEL9K_ROOT_INDICATOR_VISUAL_IDENTIFIER_EXPANSION='🔴'
 
   # =========================[ THEME RELOAD FUNCTION ]=========================
   # Function to reload theme with new colors

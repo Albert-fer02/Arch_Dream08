@@ -27,10 +27,10 @@ zstyle ':completion::complete:*' cache-path ~/.zsh/cache
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-# Optimize history for performance and security
+# Optimize history for performance and security (increased for Red Team)
 HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=50000
+SAVEHIST=50000
 setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE 
 setopt HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS INC_APPEND_HISTORY 
 setopt SHARE_HISTORY HIST_VERIFY HIST_REDUCE_BLANKS
@@ -356,12 +356,12 @@ alias edit='$EDITOR'
 # 🎯 RED TEAM SPECIFIC FUNCTIONS
 # =====================================================
 
-# Get network information for Red Team operations
+# Get network information for Red Team operations (optimized with cache)
 redteam-info() {
     echo "🎯 Red Team Network Information"
     echo "================================"
-    echo "🏠 Local IP: $(ip route get 8.8.8.8 | awk '{print $7}')"
-    echo "🌐 Public IP: $(curl -s ifconfig.me)"
+    echo "🏠 Local IP: $(get_cached_local_ip)"
+    echo "🌐 Public IP: $(get_cached_public_ip)"
     echo "🔗 Gateway: $(ip route | grep default | awk '{print $3}')"
     echo "📡 Interface: $(ip route get 8.8.8.8 | awk '{print $5}')"
     echo "🖥️  Hostname: $(hostname)"
@@ -369,12 +369,12 @@ redteam-info() {
     echo "⏰ Time: $(date)"
 }
 
-# Set target for Red Team operations
+# Set target for Red Team operations (optimized with cache)
 set-target() {
     if [[ -n "$1" ]]; then
         export TARGET="$1"
-        export LOCAL_IP=$(ip route get 8.8.8.8 | awk '{print $7}')
-        export PUBLIC_IP=$(curl -s ifconfig.me)
+        export LOCAL_IP=$(get_cached_local_ip)
+        export PUBLIC_IP=$(get_cached_public_ip)
         echo "🎯 Target set to: $TARGET"
         echo "🏠 Local IP: $LOCAL_IP"
         echo "🌐 Public IP: $PUBLIC_IP"
@@ -506,14 +506,21 @@ ZSH_HIGHLIGHT_STYLES[function]='fg=blue,bold'
 # 🏁 INITIALIZATION
 # =====================================================
 
-# Load completions
+# Load completions with cache optimization
 autoload -Uz compinit
-compinit -d ~/.zsh/compdump
+if [[ -n ~/.zsh/compdump(#qN.mh+24) ]]; then
+    compinit -d ~/.zsh/compdump
+else
+    compinit -C -d ~/.zsh/compdump
+fi
 
-# Load Node Version Manager (if exists)
-export NVM_DIR="$HOME/.nvm"
-[[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
-[[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+# Lazy load Node Version Manager (performance optimization)
+nvm() {
+    export NVM_DIR="$HOME/.nvm"
+    [[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
 
 # Bun completions
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
@@ -581,9 +588,45 @@ alias processes="ps aux --sort=-%cpu | head -20"
 # Use 'redteam-info' to show network information
 # Use 'set-target <ip>' to set your target
 
-# Export environment variables for Starship
-export LOCAL_IP=$(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo "unknown")
-export PUBLIC_IP=""  # Will be set when needed to avoid slow startup
+# =====================================================
+# 💾 PERFORMANCE CACHE SYSTEM
+# =====================================================
+
+# Cache directory
+ZSH_CACHE_DIR="$HOME/.zsh/cache"
+mkdir -p "$ZSH_CACHE_DIR"
+
+# Cache for network info (expires after 5 minutes)
+get_cached_local_ip() {
+    local cache_file="$ZSH_CACHE_DIR/local_ip"
+    local cache_time=300  # 5 minutes
+    
+    if [[ -f "$cache_file" ]] && [[ $(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0))) -lt $cache_time ]]; then
+        cat "$cache_file"
+    else
+        local ip=$(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo "unknown")
+        echo "$ip" > "$cache_file"
+        echo "$ip"
+    fi
+}
+
+# Cache for public IP (expires after 1 hour, only when needed)
+get_cached_public_ip() {
+    local cache_file="$ZSH_CACHE_DIR/public_ip"
+    local cache_time=3600  # 1 hour
+    
+    if [[ -f "$cache_file" ]] && [[ $(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0))) -lt $cache_time ]]; then
+        cat "$cache_file"
+    else
+        local ip=$(curl -s --max-time 3 ifconfig.me 2>/dev/null || echo "unknown")
+        echo "$ip" > "$cache_file"
+        echo "$ip"
+    fi
+}
+
+# Export cached variables (lazy loaded)
+export LOCAL_IP_CACHED=true  # Flag to indicate we use cache
+export PUBLIC_IP_CACHED=true  # Flag to indicate we use cache
 # Fastfetch aliases
 alias ff="fastfetch-random"
 alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"

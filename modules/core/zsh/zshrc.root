@@ -1,41 +1,76 @@
-# My Powerlevel10k Configuration
-# ---------------------------------------------------------------------
-# ╔═════════════════════════════════════════════════════════════
-# ║                     𓂀 DreamCoder 08 𓂀                     ║
-# ║                ⚡ Digital Dream Architect ⚡                 ║
-# ║                                                            ║
-# ║        Author: https://github.com/Albert-fer02             ║
-# ╚══════════════════════════════════════════════════════════════╝
-# ---------------------------------------------------------------------    
+#            _
+#    _______| |__  _ __ ___
+#   |_ / __| '_ \| '__/ __|
+#  _ / /\__ \ | | | | | (__
+# (_)___|___/_| |_|_|  \___|
+#
 # =====================================================
-# 🚀 ROOT ZSH Configuration - Arch Linux Optimized
+# 🔴 ROOT ZSH Configuration - Ultra Performance Optimized
 # =====================================================
-# Optimized for superuser environment with p10k integration
+# Configuración ultra-optimizada para root con Zinit y Starship
+# Features: Unified plugin manager, performance cache, secure defaults
 # =====================================================
 
 # =====================================================
-# ⚡ PERFORMANCE OPTIMIZATIONS
+# ⚡ ULTRA PERFORMANCE OPTIMIZATIONS
 # =====================================================
+
+# Compilation flags for performance
+export ARCHFLAGS="-arch x86_64"
+
+# Disable global RCS files for better security
+unsetopt GLOBAL_RCS
 
 # Disable flow control commands (keeps C-s from freezing everything)
 stty -ixon
 
+# Enable completion caching with optimized settings
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path /root/.zsh/cache
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+# Optimize history for performance and security (increased for Red Team)
+HISTFILE=/root/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE 
+setopt HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS INC_APPEND_HISTORY 
+setopt SHARE_HISTORY HIST_VERIFY HIST_REDUCE_BLANKS
+
+# Shell Options - Optimized for Red Team productivity
+setopt CORRECT CORRECT_ALL NOCLOBBER AUTO_CD AUTO_PUSHD 
+setopt PUSHD_IGNORE_DUPS PUSHD_SILENT GLOB_DOTS EXTENDED_GLOB 
+setopt NUMERIC_GLOB_SORT NULL_GLOB AUTO_MENU AUTO_PARAM_SLASH
+
 # =====================================================
-# ⚙️ ENVIRONMENT & PATH
+# 🎯 ROOT ENVIRONMENT VARIABLES
 # =====================================================
 
 # Editor Configuration
 export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
 
-# Disable gitstatusd messages
-export GITSTATUS_DAEMON_LOG_LEVEL=ERROR
-export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
+# Locale Configuration (parametrizable)
+export ARCH_DREAM_LOCALE="${ARCH_DREAM_LOCALE:-en_US.UTF-8}"
+export LANG="$ARCH_DREAM_LOCALE"
+export LC_ALL="$ARCH_DREAM_LOCALE"
+export LC_COLLATE=C
 
-# Locale Configuration (Peru)
-export LANG=es_PE.UTF-8 LC_ALL=es_PE.UTF-8 LC_COLLATE=C
-
-# PATH Configuration - Optimized order
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+# PATH Configuration - Security tools priority
+typeset -U path
+path=(
+    /root/.local/bin 
+    /root/.cargo/bin 
+    /usr/local/bin
+    /usr/local/go/bin
+    /root/go/bin
+    /root/.npm-global/bin
+    /root/.bun/bin
+    /usr/bin
+    /bin
+    /usr/sbin
+    /sbin
+)
 
 # XDG Base Directory Specification
 export XDG_CONFIG_HOME="/root/.config" 
@@ -45,70 +80,121 @@ export XDG_STATE_HOME="/root/.local/state"
 
 # Development environment
 export GOPATH="/root/go"
-export PATH="$GOPATH/bin:$PATH"
 export NODE_ENV=development
 
-# =====================================================
-# 🎨 OH-MY-ZSH CONFIGURATION
-# =====================================================
+# Security tools paths (only if they exist)
+[[ -d /opt/metasploit-framework/bin ]] && path+=(/opt/metasploit-framework/bin)
+[[ -d /opt/burpsuite ]] && path+=(/opt/burpsuite)
+[[ -d /opt/nmap/bin ]] && path+=(/opt/nmap/bin)
 
-# Path to your oh-my-zsh installation
-export ZSH="/root/.oh-my-zsh"
+# Root-specific environment
+export ROOT_MODE=1
+export FASTFETCH_DISABLE_AUTO=1
+export NEOFETCH_DISABLE_AUTO=1
 
-# Theme name
-ZSH_THEME="powerlevel10k/powerlevel10k"
-
-# Plugins
-plugins=(
-    git
-    sudo
-    extract
-    web-search
-    copypath
-    dirhistory
-    history
-    jsontools
-)
-
-# Source Oh My Zsh
-source $ZSH/oh-my-zsh.sh
+# Disable gitstatusd messages
+export GITSTATUS_DAEMON_LOG_LEVEL=ERROR
+export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
 
 # =====================================================
-# 🛠️ ENHANCED ALIASES
+# 🔧 ZINIT PLUGIN MANAGER SETUP
+# =====================================================
+
+# Set the directory we want to store zinit and plugins
+ZINIT_HOME="${XDG_DATA_HOME:-/root/.local/share}/zinit/zinit.git"
+
+# Download Zinit, if it's not there yet
+if [ ! -d "$ZINIT_HOME" ]; then
+   mkdir -p "$(dirname $ZINIT_HOME)"
+   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+# Source/Load zinit
+source "${ZINIT_HOME}/zinit.zsh"
+
+# =====================================================
+# 🔌 ZINIT PLUGINS - Red Team Productivity Suite
+# =====================================================
+
+# Add in zsh plugins
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit light zdharma-continuum/fast-syntax-highlighting
+
+# Navigation and productivity
+zinit light rupa/z
+zinit light zdharma-continuum/history-search-multi-word
+
+# Additional Red Team tools
+zinit light agkozak/zsh-z
+
+# =====================================================
+# 🌟 STARSHIP PROMPT INITIALIZATION
+# =====================================================
+
+# Initialize Starship prompt
+if command -v starship &>/dev/null; then
+    eval "$(starship init zsh)"
+else
+    echo "⚠️  Starship not found. Installing..."
+fi
+
+# =====================================================
+# 🎨 FZF CONFIGURATION - Red Team Enhanced
+# =====================================================
+
+export FZF_DEFAULT_OPTS="
+--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
+--color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
+--color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
+--height=60% --layout=reverse --border --margin=1 --padding=1
+--preview-window=right:60%:wrap
+--bind='ctrl-u:preview-page-up,ctrl-d:preview-page-down'
+--bind='ctrl-/:toggle-preview'
+--bind='ctrl-y:execute-silent(echo {} | xclip -selection clipboard)'
+"
+
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+
+# =====================================================
+# 🛠️ MODERN COMMAND REPLACEMENTS
 # =====================================================
 
 # File Operations with modern tools
-if command -v eza &> /dev/null; then
-    alias ls='eza --icons --group-directories-first --git'
-    alias ll='eza -l --icons --group-directories-first --git --time-style=long-iso'
-    alias la='eza -la --icons --group-directories-first --git'
-    alias tree='eza --tree --level=3 --icons --git-ignore'
-    alias ltree='eza --tree --level=4 --icons --long --git-ignore'
-else
-    alias ls='ls --color=auto --group-directories-first'
-    alias ll='ls -alF --color=auto --group-directories-first'
-    alias la='ls -A --color=auto --group-directories-first'
-    alias l='ls -CF --color=auto'
-fi
+command -v bat &> /dev/null && { 
+    alias cat='bat --style=plain --paging=never' 
+    alias ccat='bat --style=full' 
+    export BAT_THEME="Catppuccin Frappe" 
+}
 
-# Modern replacements
-if command -v bat &> /dev/null; then
-    alias cat='bat --style=plain --paging=never'
-    alias ccat='bat --style=full'
-    export BAT_THEME="Catppuccin Frappe"
-fi
+command -v eza &> /dev/null && { 
+    alias ls='eza --icons --group-directories-first --git' 
+    alias ll='eza -l --icons --group-directories-first --git --time-style=long-iso --smart-group' 
+    alias la='eza -la --icons --group-directories-first --git --time-style=long-iso' 
+    alias tree='eza --tree --level=3 --icons --git-ignore' 
+    alias ltree='eza --tree --level=4 --icons --long --git-ignore' 
+    alias lt='eza --tree --level=2 --icons --git-ignore'
+    alias lta='eza --tree --level=2 --icons --git-ignore --all'
+} || { 
+    alias ll='ls -alF --color=auto --group-directories-first' 
+    alias la='ls -A --color=auto --group-directories-first' 
+}
 
-if command -v rg &> /dev/null; then
-    alias grep='rg --smart-case --hidden --glob "!**/.git/*" --glob "!**/node_modules/*"'
-    alias rga='rg --no-ignore --hidden'
+command -v rg &> /dev/null && { 
+    alias grep='rg --smart-case --hidden --glob "!**/.git/*" --glob "!**/node_modules/*"' 
+    alias rga='rg --no-ignore --hidden' 
     alias rgi='rg --case-insensitive'
-fi
+    alias rgf='rg --files --glob'
+}
 
-if command -v fd &> /dev/null; then
-    alias find='fd'
-    alias fda='fd --no-ignore --hidden'
+command -v fd &> /dev/null && { 
+    alias find='fd' 
+    alias fda='fd --no-ignore --hidden' 
     alias fdi='fd --case-insensitive'
-fi
+    alias fde='fd --extension'
+}
 
 # Navigation shortcuts
 alias ..='cd ..'
@@ -173,20 +259,13 @@ elif command -v paru &> /dev/null; then
     alias auru='paru -Syu'
 fi
 
-# System monitoring
-if command -v btop &> /dev/null; then
-    alias top='btop'
-elif command -v htop &> /dev/null; then
-    alias top='htop'
-fi
-
-if command -v duf &> /dev/null; then
-    alias df='duf'
-fi
-
-if command -v dust &> /dev/null; then
-    alias du='dust'
-fi
+# System Monitoring
+command -v duf &> /dev/null && alias df='duf'
+command -v dust &> /dev/null && alias du='dust'
+command -v btop &> /dev/null && alias top='btop' || alias top='htop'
+command -v delta &> /dev/null && alias diff='delta'
+command -v xh &> /dev/null && alias http='xh'
+command -v procs &> /dev/null && alias pps='procs'
 
 # Safety aliases
 alias rm='rm -i'
@@ -311,21 +390,174 @@ ZSH_HIGHLIGHT_STYLES[builtin]='fg=yellow,bold'
 ZSH_HIGHLIGHT_STYLES[function]='fg=blue,bold'
 
 # =====================================================
+# 🎯 RED TEAM SPECIFIC FUNCTIONS
+# =====================================================
+
+# Get network information for Red Team operations
+redteam-info() {
+    echo "🎯 Red Team Network Information"
+    echo "================================"
+    echo "🏠 Local IP: $(ip route get 8.8.8.8 | awk '{print $7}')"
+    echo "🌐 Public IP: $(curl -s ifconfig.me)"
+    echo "🔗 Gateway: $(ip route | grep default | awk '{print $3}')"
+    echo "📡 Interface: $(ip route get 8.8.8.8 | awk '{print $5}')"
+    echo "🖥️  Hostname: $(hostname)"
+    echo "👤 User: $(whoami)"
+    echo "⏰ Time: $(date)"
+}
+
+# Set target for Red Team operations
+set-target() {
+    if [[ -n "$1" ]]; then
+        export TARGET="$1"
+        export LOCAL_IP=$(ip route get 8.8.8.8 | awk '{print $7}')
+        export PUBLIC_IP=$(curl -s ifconfig.me)
+        echo "🎯 Target set to: $TARGET"
+        echo "🏠 Local IP: $LOCAL_IP"
+        echo "🌐 Public IP: $PUBLIC_IP"
+    else
+        echo "Usage: set-target <target_ip_or_domain>"
+    fi
+}
+
+# Quick port scan
+portscan() {
+    if [[ -n "$1" ]]; then
+        echo "🔍 Scanning ports on $1..."
+        nmap -T4 -F "$1"
+    else
+        echo "Usage: portscan <target>"
+    fi
+}
+
+# Quick directory enumeration
+direnum() {
+    if [[ -n "$1" ]]; then
+        echo "📁 Enumerating directories on $1..."
+        gobuster dir -u "$1" -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50
+    else
+        echo "Usage: direnum <url>"
+    fi
+}
+
+# Base64 encode/decode
+b64e() { echo -n "$1" | base64 }
+b64d() { echo -n "$1" | base64 -d }
+
+# URL encode/decode
+urle() { python3 -c "import urllib.parse; print(urllib.parse.quote('$1'))" }
+urld() { python3 -c "import urllib.parse; print(urllib.parse.unquote('$1'))" }
+
+# Hash helpers
+md5s() { echo -n "$1" | command md5sum | cut -d' ' -f1 }
+sha1s() { echo -n "$1" | command sha1sum | cut -d' ' -f1 }
+sha256s() { echo -n "$1" | command sha256sum | cut -d' ' -f1 }
+
+# =====================================================
+# 🛠️ UTILITY FUNCTIONS
+# =====================================================
+
+# Extract function for various archive types
+extract() {
+    [[ -f "$1" ]] || { echo "'$1' is not a valid file"; return 1 }
+    case "$1" in
+        *.tar.bz2) tar xjf "$1" ;;
+        *.tar.gz)  tar xzf "$1" ;;
+        *.bz2)     bunzip2 "$1" ;;
+        *.rar)     unrar x "$1" ;;
+        *.gz)      gunzip "$1"  ;;
+        *.tar)     tar xf "$1"  ;;
+        *.tbz2)    tar xjf "$1" ;;
+        *.tgz)     tar xzf "$1" ;;
+        *.zip)     unzip "$1"   ;;
+        *.Z)       uncompress "$1" ;;
+        *.7z)      7z x "$1"    ;;
+        *.xz)      unxz "$1"    ;;
+        *.exe)     cabextract "$1" ;;
+        *.deb)     ar x "$1" && tar xf data.tar.* ;;
+        *.rpm)     rpm2cpio "$1" | cpio -idmv ;;
+        *)         echo "'$1': unrecognized file compression" ;;
+    esac
+}
+
+# Create directory and cd into it
+mkcd() { mkdir -p "$1" && cd "$1" }
+
+# Quick backup of a file
+backup() { cp "$1" "$1.backup.$(date +%Y%m%d_%H%M%S)" }
+
+# Quick password generator
+passgen() { openssl rand -base64 "${1:-12}" | tr -d "=+/" | cut -c1-${1:-12} }
+
+# Quick calculator
+calc() { echo "$*" | bc -l }
+
+# Quick system update
+sysupdate() {
+    echo "🔄 Updating system..."
+    pacman -Syu
+    if command -v yay &> /dev/null; then
+        echo "🔄 Updating AUR packages..."
+        yay -Sua
+    elif command -v paru &> /dev/null; then
+        echo "🔄 Updating AUR packages..."
+        paru -Sua
+    fi
+    echo "✅ System updated!"
+}
+
+# =====================================================
+# 🎨 COMPLETION ENHANCEMENTS
+# =====================================================
+
+# Case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# Better completion for kill command
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+
+# SSH completion
+zstyle ':completion:*:ssh:*' hosts off
+zstyle ':completion:*:scp:*' hosts off
+
+# =====================================================
+# 🔌 PLUGIN CONFIGURATIONS
+# =====================================================
+
+# Autosuggestions
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666,bold"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+# Syntax highlighting
+typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+ZSH_HIGHLIGHT_STYLES[command]='fg=green,bold'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=cyan,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=yellow,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=blue,bold'
+
+# =====================================================
 # 🏁 INITIALIZATION
 # =====================================================
 
-# Load completions
+# Load completions with cache optimization
 autoload -Uz compinit
-compinit -d /root/.zsh/compdump
+if [[ -n /root/.zsh/compdump(#qN.mh+24) ]]; then
+    compinit -d /root/.zsh/compdump
+else
+    compinit -C -d /root/.zsh/compdump
+fi
 
-# Load zsh-autosuggestions and zsh-syntax-highlighting from system paths
-[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# Load Node Version Manager (if exists)
-export NVM_DIR="/root/.nvm"
-[[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
-[[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+# Lazy load Node Version Manager (performance optimization)
+nvm() {
+    export NVM_DIR="/root/.nvm"
+    [[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
 
 # Bun completions
 [[ -s "/root/.bun/_bun" ]] && source "/root/.bun/_bun"
@@ -333,34 +565,75 @@ export NVM_DIR="/root/.nvm"
 # Rust environment
 [[ -f "/root/.cargo/env" ]] && source "/root/.cargo/env"
 
-# FZF key bindings
-[[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
-[[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
+# FZF key bindings - Use system package first, then fallback
+if [[ -f /usr/share/fzf/key-bindings.zsh ]] && [[ -f /usr/share/fzf/completion.zsh ]]; then
+    source /usr/share/fzf/key-bindings.zsh
+    source /usr/share/fzf/completion.zsh
+elif command -v fzf &>/dev/null; then
+    export FZF_COMPLETION_TRIGGER='**'
+fi
 
 # Load any additional custom configurations
 [[ -f /root/.zshrc.local ]] && source /root/.zshrc.local
 
-# Source Powerlevel10k configuration
-[[ -f /root/.p10k.zsh ]] && source /root/.p10k.zsh
-
-# Welcome message disabled for cleaner experience
-# if [[ -z "$ZSH_WELCOME_SHOWN" ]]; then
-#     echo "🔴 ROOT MODE: Be careful with your commands!"
-#     echo "💡 Tip: Use 'exit' to return to normal user"
-#     export ZSH_WELCOME_SHOWN=1
-# fi
-
 # =====================================================
-# 🚫 DISABLE FASTFETCH AUTO-LAUNCH FOR ROOT
+# 🏁 FINAL CONFIGURATION
 # =====================================================
 
-# Disable Fastfetch auto-launch in root mode
-export FASTFETCH_DISABLE_AUTO=1
-export NEOFETCH_DISABLE_AUTO=1
+# Editor aliases
+alias vim="nvim"
+alias vi="nvim"
 
-# Override any potential auto-launch configurations
+# Quick access aliases
+alias zshrc="nvim /root/.zshrc"
+alias reload="source /root/.zshrc"
+alias zshrc-edit="nvim /root/.zshrc && source /root/.zshrc"
+
+# System aliases
+alias arch="cat /etc/arch-release"
+alias kernel="uname -r"
+alias uptime="uptime -p"
+alias memory="free -h"
+alias disk="df -h"
+alias processes="ps aux --sort=-%cpu | head -20"
+
+# Network aliases
+alias myip='curl -s ifconfig.me && echo'
+alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
+alias ports='lsof -i -P -n | grep LISTEN'
+alias ping='ping -c 5'
+
+# Red Team functions loaded silently
+# Use 'redteam-info' to show network information
+# Use 'set-target <ip>' to set your target
+
+# Create local config if not exists
+if [[ ! -f "/root/.zshrc.local" ]]; then
+    cat > "/root/.zshrc.local" << 'EOF'
+# =====================================================
+# 🔴 ROOT CONFIGURATION LOCAL - RED TEAM
+# =====================================================
+# Personalizaciones específicas del usuario root
+# Este archivo NO se sobrescribe con actualizaciones
+# =====================================================
+
+# Variables de entorno personalizadas
+# export TARGET=""
+# export PROXY=""
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
+
+EOF
+fi
+
+# Disable any auto-launch tools in root mode
 if command -v fastfetch >/dev/null 2>&1; then
-    # Create a wrapper that prevents auto-launch
     fastfetch() {
         if [[ "$1" == "--auto" || "$1" == "-a" ]]; then
             echo "🔴 Fastfetch auto-launch disabled in root mode"
@@ -368,6 +641,4 @@ if command -v fastfetch >/dev/null 2>&1; then
         fi
         command fastfetch "$@"
     }
-fi
-
-alias vim="nvim" 
+fi 

@@ -156,10 +156,9 @@
     esac
   }
   
-  # Initialize theme detection and colors
-  detect_terminal_theme
-  get_adaptive_colors
-  get_terminal_specific_colors
+  # Load base configuration
+  [[ -f "${${(%):-%x}:h}/p10k-base.zsh" ]] && source "${${(%):-%x}:h}/p10k-base.zsh"
+  setup_p10k_base
 
   # =========================[ WARP AI TERMINAL DETECTION ]=========================
   # Detect if running in Warp AI terminal and apply specific optimizations
