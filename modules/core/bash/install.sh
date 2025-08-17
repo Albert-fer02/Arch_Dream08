@@ -25,8 +25,8 @@ source "$SCRIPT_DIR/../../../lib/common.sh"
 # 🔧 CONFIGURACIÓN DEL MÓDULO
 # =====================================================
 
-MODULE_NAME="Bash Configuration"
-MODULE_DESCRIPTION="Configuración avanzada de Bash con prompt moderno y utilidades"
+MODULE_NAME="Bash Unified Configuration"
+MODULE_DESCRIPTION="Configuración avanzada de Bash con arquitectura unificada y Starship"
 MODULE_DEPENDENCIES=("bash" "git" "curl" "wget")
 MODULE_FILES=("bashrc" "bashrc.root")
 
@@ -133,21 +133,18 @@ configure_prompt_theme_files() {
     # Configurar archivos de tema/plantilla para el prompt elegido
     case "$BASH_PROMPT" in
         starship|auto)
-            # En auto podría no estar instalado, pero enlazamos si existe el archivo de tema del módulo
-            local src_starship="$SCRIPT_DIR/starship.toml"
+            # Usar configuración centralizada de Starship
+            local src_starship="$SCRIPT_DIR/../../../lib/starship.toml"
             local dst_starship="$XDG_CONFIG_HOME/starship.toml"
             if [[ -f "$src_starship" ]]; then
                 mkdir -p "$(dirname "$dst_starship")"
                 create_symlink "$src_starship" "$dst_starship" "starship.toml"
+            else
+                warn "⚠️  Configuración centralizada de Starship no encontrada"
             fi
             ;;
         oh-my-posh)
-            local src_omp="$SCRIPT_DIR/oh-my-posh.dreamcoder.json"
-            local dst_omp="$OMP_CONFIG_FILE"
-            if [[ -f "$src_omp" ]]; then
-                mkdir -p "$(dirname "$dst_omp")"
-                create_symlink "$src_omp" "$dst_omp" "oh-my-posh theme"
-            fi
+            warn "⚠️  Oh My Posh configuración eliminada, usando Starship como estándar"
             ;;
     esac
 }

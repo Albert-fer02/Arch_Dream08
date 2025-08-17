@@ -1,363 +1,37 @@
-#            _
-#    _______| |__  _ __ ___
-#   |_ / __| '_ \| '__/ __|
-#  _ / /\__ \ | | | | | (__
-# (_)___|___/_| |_|_|  \___|
-#
+#!/bin/bash
 # =====================================================
-# 🔴 ROOT BASH Configuration - Ultra Performance Optimized  
+# 🔴 ROOT BASH Configuration - Arch Dream Unified
 # =====================================================
-# Configuración ultra-optimizada para root con cache avanzado
-# Features: Shared base config, advanced cache, security defaults
+# Configuración optimizada para root usando arquitectura unificada
+# Features: Shared base, security-focused, Starship prompt
 # =====================================================
 
 # =====================================================
-# ⚡ ROOT CORE INITIALIZATION
+# ⚡ CORE INITIALIZATION
 # =====================================================
 
-# Override for root-specific locale
-export ARCH_DREAM_LOCALE="${ARCH_DREAM_LOCALE:-C.utf8}"
-
-# Load base configuration
-BASH_BASE_FILE="${BASH_SOURCE[0]%/*}/bash-base.sh"
-if [[ -f "$BASH_BASE_FILE" ]]; then
-    source "$BASH_BASE_FILE"
-    init_bash_base
+# Load unified shell base configuration
+SHELL_BASE_FILE="${BASH_SOURCE[0]%/*}/../../../lib/shell-base.sh"
+if [[ -f "$SHELL_BASE_FILE" ]]; then
+    source "$SHELL_BASE_FILE"
+    init_shell_base
 else
-    # Fallback for root
-    export LANG="$ARCH_DREAM_LOCALE"
-    export LC_ALL="$ARCH_DREAM_LOCALE"
+    echo "⚠️  Warning: Unified shell base not found, using fallback configuration"
+    # Fallback basic configuration for root
     export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+    export LANG="${ARCH_DREAM_LOCALE:-C.utf8}"
+    export LC_ALL="$LANG"
+    export ROOT_MODE=1
 fi
 
 # Source global definitions
 [[ -f /etc/bashrc ]] && source /etc/bashrc
 
 # =====================================================
-# 🔴 ROOT-SPECIFIC CONFIGURATIONS
+# 🔴 ROOT-SPECIFIC OPTIMIZATIONS
 # =====================================================
 
-# Root environment variables
-export ROOT_MODE=1
-export FASTFETCH_DISABLE_AUTO=1
-export NEOFETCH_DISABLE_AUTO=1
-
-# Root-specific PATH (security tools priority)
-ROOT_PATHS=(
-    "/root/.local/bin"
-    "/root/.cargo/bin" 
-    "/usr/local/bin"
-    "/usr/local/go/bin"
-    "/root/go/bin"
-    "/root/.npm-global/bin"
-    "/root/.bun/bin"
-    "/usr/bin"
-    "/bin"
-    "/usr/sbin"
-    "/sbin"
-)
-
-# Add security tools paths if they exist
-[[ -d /opt/metasploit-framework/bin ]] && ROOT_PATHS+=("/opt/metasploit-framework/bin")
-[[ -d /opt/burpsuite ]] && ROOT_PATHS+=("/opt/burpsuite")
-[[ -d /opt/nmap/bin ]] && ROOT_PATHS+=("/opt/nmap/bin")
-
-# Build PATH
-IFS=':' && export PATH="${ROOT_PATHS[*]}:$PATH" && unset IFS
-
-# =====================================================
-# 🚀 STARSHIP PROMPT INITIALIZATION (ROOT)
-# =====================================================
-
-# Initialize Starship if available
-if command -v starship &> /dev/null; then
-    eval "$(starship init bash)"
-else
-    # Fallback prompt with git status for root
-    parse_git_branch() {
-        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-    }
-    
-    # Enhanced color prompt with git integration (root style)
-    PS1='\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(parse_git_branch)\[\033[00m\]# '
-fi
-
-# =====================================================
-# 🛠️ ENHANCED ALIASES
-# =====================================================
-
-# File Operations with modern tools
-if command -v eza &> /dev/null; then
-    alias ls='eza --icons --group-directories-first --git'
-    alias ll='eza -l --icons --group-directories-first --git --time-style=long-iso'
-    alias la='eza -la --icons --group-directories-first --git'
-    alias tree='eza --tree --level=3 --icons --git-ignore'
-    alias ltree='eza --tree --level=4 --icons --long --git-ignore'
-else
-    alias ls='ls --color=auto --group-directories-first'
-    alias ll='ls -alF --color=auto --group-directories-first'
-    alias la='ls -A --color=auto --group-directories-first'
-    alias l='ls -CF --color=auto'
-fi
-
-# Modern replacements
-if command -v bat &> /dev/null; then
-    alias cat='bat --style=plain --paging=never'
-    alias ccat='bat --style=full'
-    export BAT_THEME="Catppuccin Frappe"
-fi
-
-if command -v rg &> /dev/null; then
-    alias grep='rg --smart-case --hidden --glob "!**/.git/*" --glob "!**/node_modules/*"'
-    alias rga='rg --no-ignore --hidden'
-    alias rgi='rg --case-insensitive'
-fi
-
-if command -v fd &> /dev/null; then
-    alias find='fd'
-    alias fda='fd --no-ignore --hidden'
-    alias fdi='fd --case-insensitive'
-fi
-
-# Navigation shortcuts
-alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~'
-alias -- -='cd -'
-
-# Directory shortcuts
-alias dl='cd /root/Downloads' dt='cd /root/Desktop' dc='cd /root/Documents' 
-alias dev='cd /root/Development' proj='cd /root/Projects' tmp='cd /tmp'
-
-# Git aliases - Enhanced
-alias g='git' gs='git status --short --branch' ga='git add' gaa='git add --all'
-alias gc='git commit --verbose' gcm='git commit -m' gca='git commit -am'
-alias gp='git push' gpl='git pull' gl='git log --oneline --graph --decorate --all -10'
-alias gd='git diff' gdc='git diff --cached' gco='git checkout' gb='git branch'
-alias gba='git branch -a' gbd='git branch -d' gm='git merge' gr='git rebase'
-alias gst='git stash' gstp='git stash pop' gf='git fetch' gcl='git clone'
-
-# Arch Linux specific aliases
-alias pac='pacman' pacr='pacman -R' pacu='pacman -Syu'
-alias pacq='pacman -Q' pacqi='pacman -Qi' pacql='pacman -Ql'
-alias pacqo='pacman -Qo' pacc='pacman -Sc' paccc='pacman -Scc'
-
-# AUR helper detection
-if command -v yay &> /dev/null; then
-    alias aur='yay' aurs='yay -Ss' auri='yay -S' auru='yay -Syu'
-elif command -v paru &> /dev/null; then
-    alias aur='paru' aurs='paru -Ss' auri='paru -S' auru='paru -Syu'
-fi
-
-# System monitoring
-if command -v btop &> /dev/null; then
-    alias top='btop'
-elif command -v htop &> /dev/null; then
-    alias top='htop'
-fi
-
-if command -v duf &> /dev/null; then
-    alias df='duf'
-fi
-
-if command -v dust &> /dev/null; then
-    alias du='dust'
-fi
-
-# Safety aliases
-alias rm='rm -i' cp='cp -i' mv='mv -i' mkdir='mkdir -p'
-
-# Network aliases
-alias myip='curl -s ifconfig.me && echo'
-alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
-alias ports='lsof -i -P -n | grep LISTEN'
-alias ping='ping -c 5'
-
-# Development aliases
-alias py='python' py3='python3' pip='pip3' venv='python -m venv'
-alias n='npm' ni='npm install' nid='npm install --save-dev'
-alias nrb='npm run build' nrd='npm run dev'
-
-# =====================================================
-# 🚀 ADVANCED FUNCTIONS
-# =====================================================
-
-# Extract function - Enhanced
-extract() {
-    if [ -f "$1" ]; then
-        case "$1" in
-            *.tar.bz2) tar xjf "$1" ;;
-            *.tar.gz)  tar xzf "$1" ;;
-            *.bz2)     bunzip2 "$1" ;;
-            *.rar)     unrar x "$1" ;;
-            *.gz)      gunzip "$1"  ;;
-            *.tar)     tar xf "$1"  ;;
-            *.tbz2)    tar xjf "$1" ;;
-            *.tgz)     tar xzf "$1" ;;
-            *.zip)     unzip "$1"   ;;
-            *.Z)       uncompress "$1" ;;
-            *.7z)      7z x "$1"    ;;
-            *.xz)      unxz "$1"    ;;
-            *.exe)     cabextract "$1" ;;
-            *.deb)     ar x "$1" && tar xf data.tar.* ;;
-            *.rpm)     rpm2cpio "$1" | cpio -idmv ;;
-            *)         echo "'$1': unrecognized file compression" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
-}
-
-# Create directory and cd into it
-mkcd() {
-    mkdir -p "$1" && cd "$1"
-}
-
-# Quick backup with timestamp
-backup() {
-    cp "$1" "$1.backup.$(date +%Y%m%d_%H%M%S)"
-}
-
-# Enhanced system information
-sysinfo() {
-    echo "=== System Information ==="
-    echo "Hostname: $(hostname)"
-    echo "Kernel: $(uname -r)"
-    echo "Uptime: $(uptime -p)"
-    echo "Load Average: $(uptime | awk -F'load average:' '{print $2}')"
-    echo "Memory Usage: $(free -h | awk '/^Mem:/ {printf "%s/%s (%.1f%%)", $3, $2, $3/$2*100}')"
-    echo "Disk Usage: $(df -h / | awk 'NR==2 {printf "%s/%s (%s)", $3, $2, $5}')"
-    echo "CPU Temperature: $(sensors 2>/dev/null | grep 'Core 0' | awk '{print $3}' || echo 'N/A')"
-}
-
-# Quick directory size
-dirsize() {
-    du -sh "$1" 2>/dev/null || echo "Directory not found"
-}
-
-# Find files by extension
-findext() {
-    find . -name "*.$1" -type f
-}
-
-# Count files by extension
-countext() {
-    find . -name "*.$1" -type f | wc -l
-}
-
-# Quick search in files
-search() {
-    grep -r "$1" . --exclude-dir={.git,node_modules,.cache}
-}
-
-# Create a new project directory
-newproj() {
-    if [ $# -eq 1 ]; then
-        mkcd "$1" && echo "Project '$1' created and entered"
-    else
-        echo "Usage: newproj <project_name>"
-    fi
-}
-
-# Quick note taking
-note() {
-    local note_file="/root/notes/$(date +%Y%m%d).md"
-    mkdir -p "$(dirname "$note_file")"
-    if [ $# -eq 0 ]; then
-        $EDITOR "$note_file"
-    else
-        echo "$(date '+%H:%M'): $*" >> "$note_file"
-        echo "Note added: $*"
-    fi
-}
-
-# Quick todo
-todo() {
-    local todo_file="/root/todo.md"
-    if [ $# -eq 0 ]; then
-        $EDITOR "$todo_file"
-    else
-        echo "- [ ] $*" >> "$todo_file"
-        echo "Todo added: $*"
-    fi
-}
-
-# Quick calculator
-calc() {
-    echo "$*" | bc -l
-}
-
-# Quick URL shortener
-shorten() {
-    curl -s "http://tinyurl.com/api-create.php?url=$1"
-}
-
-# Quick QR code generator
-qr() {
-    echo "$1" | curl -F-=\<- qrenco.de
-}
-
-# Quick password generator
-passgen() {
-    openssl rand -base64 "${1:-12}" | tr -d "=+/" | cut -c1-${1:-12}
-}
-
-# System update function
-sysupdate() {
-    echo "🔄 Updating system..."
-    pacman -Syu
-    if command -v yay &> /dev/null; then
-        echo "🔄 Updating AUR packages..."
-        yay -Sua
-    elif command -v paru &> /dev/null; then
-        echo "🔄 Updating AUR packages..."
-        paru -Sua
-    fi
-    echo "✅ System updated!"
-}
-
-# System maintenance
-sysmaintenance() {
-    echo "🔧 Running system maintenance..."
-    pacman -Sc --noconfirm
-    journalctl --vacuum-time=7d
-    pacman -Rns $(pacman -Qtdq) 2>/dev/null || true
-    echo "✅ System maintenance completed!"
-}
-
-# Git functions
-gac() {
-    git add --all && git commit -m "$1"
-}
-
-gacp() {
-    git add --all && git commit -m "$1" && git push
-}
-
-gundo() {
-    git reset --soft HEAD~1
-}
-
-gamend() {
-    git commit --amend --no-edit
-}
-
-# =====================================================
-# 🔧 COMPLETION
-# =====================================================
-
-# Enable programmable completion features
-if ! shopt -oq posix; then
-    if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-    elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
-    fi
-fi
-
-# =====================================================
-# 📋 HISTORY
-# =====================================================
-
-# History configuration - Optimized
+# History configuration - Optimized for root
 HISTCONTROL=ignoreboth:erasedups
 HISTSIZE=5000
 HISTFILESIZE=10000
@@ -366,10 +40,6 @@ HISTIGNORE="ls:ll:la:cd:pwd:clear:history:exit"
 
 # Append to the history file, don't overwrite it
 shopt -s histappend
-
-# =====================================================
-# 🎯 PRODUCTIVITY
-# =====================================================
 
 # Check the window size after each command
 shopt -s checkwinsize
@@ -383,16 +53,50 @@ case "$TERM" in
 esac
 
 # =====================================================
-# 🏁 INITIALIZATION
+# 🔧 COMPLETION SYSTEM
 # =====================================================
 
-# Load Node Version Manager (if exists)
-export NVM_DIR="/root/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# Enable programmable completion features
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
 
-# Rust environment
-[ -f "/root/.cargo/env" ] && source "/root/.cargo/env"
+# =====================================================
+# 🚀 ENVIRONMENT INTEGRATIONS
+# =====================================================
+
+# FZF key bindings and completion
+if command -v fzf &> /dev/null; then
+    # Use system package if available
+    if [[ -f /usr/share/fzf/key-bindings.bash ]] && [[ -f /usr/share/fzf/completion.bash ]]; then
+        source /usr/share/fzf/key-bindings.bash
+        source /usr/share/fzf/completion.bash
+    fi
+    
+    # FZF configuration
+    export FZF_DEFAULT_OPTS="
+    --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
+    --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
+    --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
+    --height=60% --layout=reverse --border --margin=1 --padding=1
+    --preview-window=right:60%:wrap
+    --bind='ctrl-u:preview-page-up,ctrl-d:preview-page-down'
+    --bind='ctrl-/:toggle-preview'
+    --bind='ctrl-y:execute-silent(echo {} | xclip -selection clipboard)'
+    "
+    
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+fi
+
+# =====================================================
+# 🔧 DEVELOPMENT INTEGRATIONS
+# =====================================================
 
 # Bun completions
 [ -s "/root/.bun/_bun" ] && source "/root/.bun/_bun"
@@ -400,75 +104,11 @@ export NVM_DIR="/root/.nvm"
 # Load any additional custom configurations
 [ -f /root/.bashrc.local ] && source /root/.bashrc.local
 
-# =====================================================
-# 🔴 ROOT-SPECIFIC ALIASES 
-# =====================================================
-
-# Directory shortcuts for root
-alias dl='cd /root/Downloads'
-alias dt='cd /root/Desktop' 
-alias dc='cd /root/Documents'
-alias dev='cd /root/Development'
-alias proj='cd /root/Projects'
-alias tmp='cd /tmp'
-alias opt='cd /opt'
-alias etc='cd /etc'
-alias logs='cd /var/log'
-
-# =====================================================
-# 🔧 ROOT LAZY LOADING
-# =====================================================
-
-# Lazy load Node Version Manager for root
-nvm() {
-    export NVM_DIR="/root/.nvm"
-    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
-    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
-    nvm "$@"
-}
-
-# Lazy load Rust environment for root
-load_rust() {
-    [[ -f "/root/.cargo/env" ]] && source "/root/.cargo/env"
-}
-
-# Lazy load Bun for root
-load_bun() {
-    [[ -s "/root/.bun/_bun" ]] && source "/root/.bun/_bun"
-}
-
-# =====================================================
-# 🏁 ROOT FINAL CONFIGURATION
-# =====================================================
-
-# Editor aliases
-alias vim="nvim"
-alias vi="nvim"
-
-# Quick access aliases
-alias bashrc="nvim /root/.bashrc"
-alias reload="source /root/.bashrc"
-alias bashrc-edit="nvim /root/.bashrc && source /root/.bashrc"
-
-# System aliases
-alias arch="cat /etc/arch-release"
-alias kernel="uname -r"
-alias uptime="uptime -p"
-alias memory="free -h"
-alias disk="df -h"
-alias processes="ps aux --sort=-%cpu | head -20"
-
-# Network aliases for root
-alias myip='curl -s ifconfig.me && echo'
-alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
-alias ports='lsof -i -P -n | grep LISTEN'
-alias ping='ping -c 5'
-
 # Create local config if not exists
 if [[ ! -f "/root/.bashrc.local" ]]; then
     cat > "/root/.bashrc.local" << 'EOF'
 # =====================================================
-# 🔴 ROOT CONFIGURATION LOCAL
+# 🔴 ROOT CONFIGURATION LOCAL - BASH
 # =====================================================
 # Personalizaciones específicas del usuario root
 # Este archivo NO se sobrescribe con actualizaciones
@@ -490,12 +130,9 @@ if [[ ! -f "/root/.bashrc.local" ]]; then
 EOF
 fi
 
-# Load local customizations
-[[ -f "/root/.bashrc.local" ]] && source "/root/.bashrc.local"
-
-# Load environment loaders when needed
-alias rust='load_rust'
-alias cargo='load_rust && cargo'
+# =====================================================
+# 🔧 ROOT SECURITY OPTIMIZATIONS
+# =====================================================
 
 # Disable auto-launch tools in root mode
 if command -v fastfetch >/dev/null 2>&1; then
@@ -509,4 +146,8 @@ if command -v fastfetch >/dev/null 2>&1; then
 fi
 
 # Disable welcome messages
-export BASH_WELCOME_SHOWN=1 
+export BASH_WELCOME_SHOWN=1
+
+# Mark shell as loaded
+export BASH_ROOT_CONFIG_LOADED=true
+[[ -n "${ARCH_DREAM_DEBUG:-}" ]] && echo "✅ Root Bash configuration loaded successfully"

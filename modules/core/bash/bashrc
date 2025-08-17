@@ -1,478 +1,33 @@
-#            _
-#    _______| |__  _ __ ___
-#   |_ / __| '_ \| '__/ __|
-#  _ / /\__ \ | | | | | (__
-# (_)___|___/_| |_|_|  \___|
-#
+#!/bin/bash
 # =====================================================
-# 🚀 BASH Configuration - Ultra Performance Optimized
+# 🚀 BASH Configuration - Arch Dream Unified
 # =====================================================
-# Configuración ultra-optimizada para productividad máxima
-# Features: Advanced cache, lazy loading, shared base configuration
+# Configuración ultra-optimizada usando arquitectura unificada
+# Features: Shared base, Starship prompt, modern tools
 # =====================================================
 
 # =====================================================
 # ⚡ CORE INITIALIZATION
 # =====================================================
 
-# Load base configuration
-BASH_BASE_FILE="${BASH_SOURCE[0]%/*}/bash-base.sh"
-if [[ -f "$BASH_BASE_FILE" ]]; then
-    source "$BASH_BASE_FILE"
-    init_bash_base
+# Load unified shell base configuration
+SHELL_BASE_FILE="${BASH_SOURCE[0]%/*}/../../../lib/shell-base.sh"
+if [[ -f "$SHELL_BASE_FILE" ]]; then
+    source "$SHELL_BASE_FILE"
+    init_shell_base
 else
-    # Fallback initialization
-    export LANG="${ARCH_DREAM_LOCALE:-C.utf8}"
-    export LC_ALL="${ARCH_DREAM_LOCALE:-C.utf8}"
+    echo "⚠️  Warning: Unified shell base not found, using fallback configuration"
+    # Fallback basic configuration
     export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
+    export LANG="${ARCH_DREAM_LOCALE:-C.utf8}"
+    export LC_ALL="$LANG"
 fi
 
 # Source global definitions
 [[ -f /etc/bashrc ]] && source /etc/bashrc
 
 # =====================================================
-# 🎯 USER-SPECIFIC OPTIMIZATIONS
-# =====================================================
-
-# Directory shortcuts for user
-alias dl='cd ~/Downloads'
-alias dt='cd ~/Desktop' 
-alias dc='cd ~/Documents'
-alias dev='cd ~/Development'
-alias proj='cd ~/Projects'
-alias tmp='cd /tmp'
-alias tools='cd /opt'
-alias www='cd /var/www'
-alias logs='cd /var/log'
-
-# =====================================================
-# 🔧 LAZY LOADING SYSTEM
-# =====================================================
-
-# Lazy load Node Version Manager
-nvm() {
-    export NVM_DIR="$HOME/.nvm"
-    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
-    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
-    nvm "$@"
-}
-
-# Lazy load Rust environment
-load_rust() {
-    [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-}
-
-# Lazy load Bun
-load_bun() {
-    [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
-}
-
-# =====================================================
-# 🛠️ ENHANCED ALIASES
-# =====================================================
-
-# File Operations with modern tools
-if command -v eza &> /dev/null; then
-    alias ls='eza --icons --group-directories-first --git'
-    alias ll='eza -l --icons --group-directories-first --git --time-style=long-iso'
-    alias la='eza -la --icons --group-directories-first --git'
-    alias tree='eza --tree --level=3 --icons --git-ignore'
-    alias ltree='eza --tree --level=4 --icons --long --git-ignore'
-else
-    alias ls='ls --color=auto --group-directories-first'
-    alias ll='ls -alF --color=auto --group-directories-first'
-    alias la='ls -A --color=auto --group-directories-first'
-    alias l='ls -CF --color=auto'
-fi
-
-# Modern replacements
-if command -v bat &> /dev/null; then
-    alias cat='bat --style=plain --paging=never'
-    alias ccat='bat --style=full'
-    export BAT_THEME="Catppuccin Frappe"
-fi
-
-if command -v rg &> /dev/null; then
-    alias grep='rg --smart-case --hidden --glob "!**/.git/*" --glob "!**/node_modules/*"'
-    alias rga='rg --no-ignore --hidden'
-    alias rgi='rg --case-insensitive'
-fi
-
-if command -v fd &> /dev/null; then
-    alias find='fd'
-    alias fda='fd --no-ignore --hidden'
-    alias fdi='fd --case-insensitive'
-fi
-
-# Navigation shortcuts
-alias ..='cd ..' ...='cd ../..' ....='cd ../../..' ~='cd ~'
-alias -- -='cd -'
-
-# Directory shortcuts
-alias dl='cd ~/Downloads' dt='cd ~/Desktop' dc='cd ~/Documents' 
-alias dev='cd ~/Development' proj='cd ~/Projects' tmp='cd /tmp'
-
-# Git aliases - Enhanced
-alias g='git' gs='git status --short --branch' ga='git add' gaa='git add --all'
-alias gc='git commit --verbose' gcm='git commit -m' gca='git commit -am'
-alias gp='git push' gpl='git pull' gl='git log --oneline --graph --decorate --all -10'
-alias gd='git diff' gdc='git diff --cached' gco='git checkout' gb='git branch'
-alias gba='git branch -a' gbd='git branch -d' gm='git merge' gr='git rebase'
-alias gst='git stash' gstp='git stash pop' gf='git fetch' gcl='git clone'
-
-# Arch Linux specific aliases
-alias pac='sudo pacman' pacr='sudo pacman -R' pacu='sudo pacman -Syu'
-alias pacq='pacman -Q' pacqi='pacman -Qi' pacql='pacman -Ql'
-alias pacqo='pacman -Qo' pacc='sudo pacman -Sc' paccc='sudo pacman -Scc'
-
-# AUR helper detection
-if command -v yay &> /dev/null; then
-    alias aur='yay' aurs='yay -Ss' auri='yay -S' auru='yay -Syu'
-elif command -v paru &> /dev/null; then
-    alias aur='paru' aurs='paru -Ss' auri='paru -S' auru='paru -Syu'
-fi
-
-# System monitoring
-if command -v btop &> /dev/null; then
-    alias top='btop'
-elif command -v htop &> /dev/null; then
-    alias top='htop'
-fi
-
-if command -v duf &> /dev/null; then
-    alias df='duf'
-fi
-
-if command -v dust &> /dev/null; then
-    alias du='dust'
-fi
-
-# Safety aliases
-alias rm='rm -i' cp='cp -i' mv='mv -i' mkdir='mkdir -p'
-
-# Network aliases
-alias myip='curl -s ifconfig.me && echo'
-alias localip="ip route get 8.8.8.8 | awk '{print \$7}'"
-alias ports='sudo lsof -i -P -n | grep LISTEN'
-alias ping='ping -c 5'
-
-# Development aliases
-alias py='python' py3='python3' pip='pip3' venv='python -m venv'
-alias n='npm' ni='npm install' nid='npm install --save-dev'
-alias nrb='npm run build' nrd='npm run dev'
-
-# =====================================================
-# 🚀 ADVANCED FUNCTIONS
-# =====================================================
-
-# Extract function - Enhanced
-extract() {
-    if [ -f "$1" ]; then
-        case "$1" in
-            *.tar.bz2) tar xjf "$1" ;;
-            *.tar.gz)  tar xzf "$1" ;;
-            *.bz2)     bunzip2 "$1" ;;
-            *.rar)     unrar x "$1" ;;
-            *.gz)      gunzip "$1"  ;;
-            *.tar)     tar xf "$1"  ;;
-            *.tbz2)    tar xjf "$1" ;;
-            *.tgz)     tar xzf "$1" ;;
-            *.zip)     unzip "$1"   ;;
-            *.Z)       uncompress "$1" ;;
-            *.7z)      7z x "$1"    ;;
-            *.xz)      unxz "$1"    ;;
-            *.exe)     cabextract "$1" ;;
-            *.deb)     ar x "$1" && tar xf data.tar.* ;;
-            *.rpm)     rpm2cpio "$1" | cpio -idmv ;;
-            *)         echo "'$1': unrecognized file compression" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
-}
-
-# Create directory and cd into it
-mkcd() {
-    mkdir -p "$1" && cd "$1"
-}
-
-# Quick backup with timestamp
-backup() {
-    cp "$1" "$1.backup.$(date +%Y%m%d_%H%M%S)"
-}
-
-# Enhanced system information
-sysinfo() {
-    echo "=== System Information ==="
-    echo "Hostname: $(hostname)"
-    echo "Kernel: $(uname -r)"
-    echo "Uptime: $(uptime -p)"
-    echo "Load Average: $(uptime | awk -F'load average:' '{print $2}')"
-    echo "Memory Usage: $(free -h | awk '/^Mem:/ {printf "%s/%s (%.1f%%)", $3, $2, $3/$2*100}')"
-    echo "Disk Usage: $(df -h / | awk 'NR==2 {printf "%s/%s (%s)", $3, $2, $5}')"
-    echo "CPU Temperature: $(sensors 2>/dev/null | grep 'Core 0' | awk '{print $3}' || echo 'N/A')"
-}
-
-# Quick directory size
-dirsize() {
-    du -sh "$1" 2>/dev/null || echo "Directory not found"
-}
-
-# Find files by extension
-findext() {
-    find . -name "*.$1" -type f
-}
-
-# Count files by extension
-countext() {
-    find . -name "*.$1" -type f | wc -l
-}
-
-# Quick search in files
-search() {
-    grep -r "$1" . --exclude-dir={.git,node_modules,.cache}
-}
-
-# Create a new project directory
-newproj() {
-    if [ $# -eq 1 ]; then
-        mkcd "$1" && echo "Project '$1' created and entered"
-    else
-        echo "Usage: newproj <project_name>"
-    fi
-}
-
-# Quick note taking
-note() {
-    local note_file="$HOME/notes/$(date +%Y%m%d).md"
-    mkdir -p "$(dirname "$note_file")"
-    if [ $# -eq 0 ]; then
-        $EDITOR "$note_file"
-    else
-        echo "$(date '+%H:%M'): $*" >> "$note_file"
-        echo "Note added: $*"
-    fi
-}
-
-# Quick todo
-todo() {
-    local todo_file="$HOME/todo.md"
-    if [ $# -eq 0 ]; then
-        $EDITOR "$todo_file"
-    else
-        echo "- [ ] $*" >> "$todo_file"
-        echo "Todo added: $*"
-    fi
-}
-
-# Quick calculator
-calc() {
-    echo "$*" | bc -l
-}
-
-# Quick URL shortener
-shorten() {
-    curl -s "http://tinyurl.com/api-create.php?url=$1"
-}
-
-# Quick QR code generator
-qr() {
-    echo "$1" | curl -F-=\<- qrenco.de
-}
-
-# Quick password generator
-passgen() {
-    openssl rand -base64 "${1:-12}" | tr -d "=+/" | cut -c1-${1:-12}
-}
-
-# System update function
-sysupdate() {
-    echo "🔄 Updating system..."
-    sudo pacman -Syu
-    if command -v yay &> /dev/null; then
-        echo "🔄 Updating AUR packages..."
-        yay -Sua
-    elif command -v paru &> /dev/null; then
-        echo "🔄 Updating AUR packages..."
-        paru -Sua
-    fi
-    echo "✅ System updated!"
-}
-
-# System maintenance avanzado
-sysmaintenance() {
-    echo "🔧 Ejecutando mantenimiento del sistema..."
-    
-    echo "📦 Limpiando caché de paquetes..."
-    sudo pacman -Sc --noconfirm
-    yay -Sc --noconfirm 2>/dev/null || true
-    paru -Sc --noconfirm 2>/dev/null || true
-    
-    echo "📝 Optimizando logs del sistema..."
-    sudo journalctl --vacuum-time=7d
-    
-    echo "🧹 Eliminando paquetes huérfanos..."
-    sudo pacman -Rns $(pacman -Qtdq) 2>/dev/null || true
-    
-    echo "💾 Limpiando caches de desarrollo..."
-    rm -rf ~/.cache/pip/* ~/.npm/_cacache/* ~/.cargo/registry/cache/* 2>/dev/null || true
-    
-    echo "🗑️ Limpiando archivos temporales..."
-    rm -rf ~/.local/share/Trash/*/* 2>/dev/null || true
-    find ~/Downloads -type f -mtime +30 -delete 2>/dev/null || true
-    
-    echo "🔄 Actualizando base de datos de archivos..."
-    sudo updatedb
-    
-    echo "♻️ Limpiando cache de systemd..."
-    sudo systemctl restart systemd-journald
-    
-    echo "🧮 Verificando sistema de archivos..."
-    df -h / /home
-    
-    echo "✅ Mantenimiento del sistema completado!"
-}
-
-# Funciones avanzadas de desarrollo
-# Git workflow mejorado
-gac() {
-    if [ -z "$1" ]; then
-        echo "❌ Error: Debes proporcionar un mensaje de commit"
-        echo "Uso: gac \"mensaje del commit\""
-        return 1
-    fi
-    git add --all && git commit -m "$1"
-}
-
-gacp() {
-    if [ -z "$1" ]; then
-        echo "❌ Error: Debes proporcionar un mensaje de commit"
-        echo "Uso: gacp \"mensaje del commit\""
-        return 1
-    fi
-    git add --all && git commit -m "$1" && git push
-}
-
-gundo() {
-    git reset --soft HEAD~1
-    echo "✅ Último commit deshecho (cambios preservados)"
-}
-
-gamend() {
-    git commit --amend --no-edit
-    echo "✅ Cambios agregados al último commit"
-}
-
-# Funciones de desarrollo
-create-project() {
-    if [ -z "$1" ] || [ -z "$2" ]; then
-        echo "❌ Error: Debes especificar nombre y tipo de proyecto"
-        echo "Uso: create-project nombre-proyecto tipo"
-        echo "Tipos disponibles: node, react, vue, python, go"
-        return 1
-    fi
-
-    case "$2" in
-        node)
-            mkdir -p "$1" && cd "$1"
-            npm init -y
-            echo "node_modules/" > .gitignore
-            git init
-            ;;
-        react)
-            npx create-react-app "$1"
-            cd "$1"
-            ;;
-        vue)
-            npm create vue@latest "$1"
-            cd "$1"
-            npm install
-            ;;
-        python)
-            mkdir -p "$1" && cd "$1"
-            python -m venv .venv
-            source .venv/bin/activate
-            echo ".venv/" > .gitignore
-            echo "__pycache__/" >> .gitignore
-            pip install --upgrade pip
-            ;;
-        go)
-            mkdir -p "$1" && cd "$1"
-            go mod init "$1"
-            mkdir -p cmd pkg internal
-            echo "bin/" > .gitignore
-            ;;
-        *)
-            echo "❌ Tipo de proyecto no soportado"
-            return 1
-            ;;
-    esac
-    echo "✅ Proyecto $1 ($2) creado exitosamente"
-}
-
-# Gestión de entornos virtuales Python
-venv-create() {
-    python -m venv .venv
-    source .venv/bin/activate
-    pip install --upgrade pip
-    if [ -f "requirements.txt" ]; then
-        pip install -r requirements.txt
-    fi
-    echo "✅ Entorno virtual creado y activado"
-}
-
-venv-save() {
-    if [ -d ".venv" ]; then
-        pip freeze > requirements.txt
-        echo "✅ Dependencias guardadas en requirements.txt"
-    else
-        echo "❌ No se encontró un entorno virtual"
-    fi
-}
-
-# Node.js y npm
-node-cleanup() {
-    echo "🧹 Limpiando node_modules..."
-    find . -name "node_modules" -type d -prune -exec rm -rf {} +
-    echo "🧹 Limpiando package-lock.json..."
-    find . -name "package-lock.json" -type f -prune -exec rm {} +
-    echo "✅ Limpieza completada"
-}
-
-# Docker helpers
-docker-cleanup() {
-    echo "🧹 Limpiando contenedores detenidos..."
-    docker container prune -f
-    echo "🧹 Limpiando imágenes sin usar..."
-    docker image prune -f
-    echo "🧹 Limpiando volúmenes sin usar..."
-    docker volume prune -f
-    echo "✅ Limpieza de Docker completada"
-}
-
-# Kubernetes helpers
-k8s-context() {
-    echo "📦 Contextos disponibles:"
-    kubectl config get-contexts
-    echo "📦 Contexto actual:"
-    kubectl config current-context
-}
-
-# =====================================================
-# 🔧 COMPLETION
-# =====================================================
-
-# Enable programmable completion features
-if ! shopt -oq posix; then
-    if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-    elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
-    fi
-fi
-
-# =====================================================
-# 📋 HISTORY
+# 🎯 BASH-SPECIFIC OPTIMIZATIONS
 # =====================================================
 
 # History configuration - Optimized
@@ -484,10 +39,6 @@ HISTIGNORE="ls:ll:la:cd:pwd:clear:history:exit"
 
 # Append to the history file, don't overwrite it
 shopt -s histappend
-
-# =====================================================
-# 🎯 PRODUCTIVITY
-# =====================================================
 
 # Check the window size after each command
 shopt -s checkwinsize
@@ -501,117 +52,76 @@ case "$TERM" in
 esac
 
 # =====================================================
-# 🏁 INITIALIZATION
+# 🔧 COMPLETION SYSTEM
 # =====================================================
 
-# Load Node Version Manager (if exists)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# Enable programmable completion features
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
 
-# Rust environment
-[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+# =====================================================
+# 🚀 ENVIRONMENT INTEGRATIONS
+# =====================================================
+
+# FZF key bindings and completion
+if command -v fzf &> /dev/null; then
+    # Use system package if available
+    if [[ -f /usr/share/fzf/key-bindings.bash ]] && [[ -f /usr/share/fzf/completion.bash ]]; then
+        source /usr/share/fzf/key-bindings.bash
+        source /usr/share/fzf/completion.bash
+    fi
+    
+    # FZF configuration
+    export FZF_DEFAULT_OPTS="
+    --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
+    --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
+    --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
+    --height=60% --layout=reverse --border --margin=1 --padding=1
+    --preview-window=right:60%:wrap
+    --bind='ctrl-u:preview-page-up,ctrl-d:preview-page-down'
+    --bind='ctrl-/:toggle-preview'
+    --bind='ctrl-y:execute-silent(echo {} | xclip -selection clipboard)'
+    "
+    
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+fi
+
+# =====================================================
+# 🔧 DEVELOPMENT INTEGRATIONS
+# =====================================================
 
 # Bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
+# Initialize fastfetch (system info display) - only if not in tmux/screen/vscode
+if [[ $- == *i* ]]; then
+    if [[ -z "$FASTFETCH_SHOWN" && -z "${TMUX:-}${STY:-}" && -z "${VSCODE_INJECTION:-}${TERM_PROGRAM:-}" ]]; then
+        if command -v fastfetch &> /dev/null; then
+            fastfetch
+        fi
+        export FASTFETCH_SHOWN=1
+    fi
+fi
+
+# =====================================================
+# 🏁 FINAL INITIALIZATION
+# =====================================================
+
 # Load any additional custom configurations
 [ -f ~/.bashrc.local ] && source ~/.bashrc.local
-
-# =====================================================
-# 🎯 RED TEAM ENHANCED FUNCTIONS
-# =====================================================
-
-# Get network information for Red Team operations
-redteam-info() {
-    echo "🎯 Red Team Network Information"
-    echo "================================"
-    echo "🏠 Local IP: $(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo 'unknown')"
-    echo "🌐 Public IP: $(curl -s --max-time 3 ifconfig.me 2>/dev/null || echo 'unknown')"
-    echo "🔗 Gateway: $(ip route | grep default | awk '{print $3}')"
-    echo "📡 Interface: $(ip route get 8.8.8.8 2>/dev/null | awk '{print $5}' || echo 'unknown')"
-    echo "🖥️  Hostname: $(hostname)"
-    echo "👤 User: $(whoami)"
-    echo "⏰ Time: $(date)"
-}
-
-# Set target for Red Team operations
-set-target() {
-    if [[ -z "$1" ]]; then
-        echo "❌ Usage: set-target <ip_address_or_domain>"
-        return 1
-    fi
-    export TARGET="$1"
-    export LOCAL_IP=$(ip route get 8.8.8.8 2>/dev/null | awk '{print $7}' || echo 'unknown')
-    echo "🎯 Target set to: $TARGET"
-    echo "🏠 Local IP: $LOCAL_IP"
-}
-
-# Show current target
-show-target() {
-    if [[ -n "$TARGET" ]]; then
-        echo "🎯 Current target: $TARGET"
-        [[ -n "$LOCAL_IP" ]] && echo "🏠 Local IP: $LOCAL_IP"
-    else
-        echo "❌ No target set. Use 'set-target <ip>' to set one."
-    fi
-}
-
-# Quick port scan
-portscan() {
-    if [[ -n "$1" ]]; then
-        echo "🔍 Scanning ports on $1..."
-        nmap -T4 -F "$1"
-    else
-        echo "Usage: portscan <target>"
-    fi
-}
-
-# Base64 encode/decode
-b64e() { echo -n "$1" | base64; }
-b64d() { echo -n "$1" | base64 -d; }
-
-# URL encode/decode  
-urle() { python3 -c "import urllib.parse; print(urllib.parse.quote('$1'))"; }
-urld() { python3 -c "import urllib.parse; print(urllib.parse.unquote('$1'))"; }
-
-# Hash helpers
-md5s() { echo -n "$1" | md5sum | cut -d' ' -f1; }
-sha1s() { echo -n "$1" | sha1sum | cut -d' ' -f1; }
-sha256s() { echo -n "$1" | sha256sum | cut -d' ' -f1; }
-
-# =====================================================
-# 🏁 FINAL CONFIGURATION
-# =====================================================
-
-# Editor aliases
-alias vim="nvim"
-alias vi="nvim"
-
-# Quick access aliases
-alias bashrc="nvim ~/.bashrc"
-alias reload="source ~/.bashrc"
-alias bashrc-edit="nvim ~/.bashrc && source ~/.bashrc"
-
-# Silent bash execution
-alias sbash='LANG=C.utf8 LC_ALL=C.utf8 bash 2> >(grep -v "setlocale" >&2)'
-alias silent-bash='LANG=C.utf8 LC_ALL=C.utf8 exec bash 2> >(grep -v "setlocale" >&2)'
-
-# Fastfetch aliases
-alias ff="fastfetch-random"
-alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"
-alias ff-custom="fastfetch-random --config ~/.config/fastfetch/config.local.jsonc"
-
-# Nano aliases
-alias nano="nano --rcfile ~/.config/nano/nanorc"
-alias nano-code="nano --rcfile ~/.config/nano/code.nanorc"
-alias nano-config="nano --rcfile ~/.config/nano/config.nanorc"
 
 # Create local config if not exists
 if [[ ! -f "$HOME/.bashrc.local" ]]; then
     cat > "$HOME/.bashrc.local" << 'EOF'
 # =====================================================
-# 🧩 CONFIGURACIÓN LOCAL DE BASH
+# 🧩 CONFIGURACIÓN LOCAL DE BASH - ARCH DREAM
 # =====================================================
 # Personalizaciones específicas del usuario
 # Este archivo NO se sobrescribe con actualizaciones
@@ -633,12 +143,13 @@ if [[ ! -f "$HOME/.bashrc.local" ]]; then
 EOF
 fi
 
-# Load local customizations
-[[ -f "$HOME/.bashrc.local" ]] && source "$HOME/.bashrc.local"
-
-# Load environment loaders when needed
-alias rust='load_rust'
-alias cargo='load_rust && cargo'
+# =====================================================
+# 🔧 PERFORMANCE OPTIMIZATIONS
+# =====================================================
 
 # Disable welcome messages
 export BASH_WELCOME_SHOWN=1
+
+# Mark shell as loaded
+export BASH_CONFIG_LOADED=true
+[[ -n "${ARCH_DREAM_DEBUG:-}" ]] && echo "✅ Bash configuration loaded successfully"
