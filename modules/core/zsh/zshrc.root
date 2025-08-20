@@ -39,16 +39,20 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 # Optimize history for performance and security (root-specific paths)
 HISTFILE=/root/.zsh_history
-HISTSIZE=50000
-SAVEHIST=50000
+HISTSIZE=100000
+SAVEHIST=100000
 setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE 
 setopt HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS INC_APPEND_HISTORY 
-setopt SHARE_HISTORY HIST_VERIFY HIST_REDUCE_BLANKS
+setopt SHARE_HISTORY HIST_VERIFY HIST_REDUCE_BLANKS HIST_FCNTL_LOCK
+setopt BANG_HIST EXTENDED_HISTORY
 
 # Shell Options - Optimized for root productivity
 setopt CORRECT CORRECT_ALL NOCLOBBER AUTO_CD AUTO_PUSHD 
 setopt PUSHD_IGNORE_DUPS PUSHD_SILENT GLOB_DOTS EXTENDED_GLOB 
 setopt NUMERIC_GLOB_SORT NULL_GLOB AUTO_MENU AUTO_PARAM_SLASH
+setopt COMPLETE_IN_WORD ALWAYS_TO_END MENU_COMPLETE AUTO_LIST
+setopt LIST_PACKED LIST_TYPES COMPLETE_ALIASES NO_BEEP
+setopt INTERACTIVE_COMMENTS HASH_LIST_ALL PRINT_EXIT_VALUE
 
 # =====================================================
 # 🔧 ZINIT PLUGIN MANAGER SETUP (ROOT)
@@ -75,10 +79,16 @@ zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light zdharma-continuum/fast-syntax-highlighting
 
-# Navigation and productivity
+# Navigation and productivity plugins
 zinit light rupa/z
 zinit light zdharma-continuum/history-search-multi-word
 zinit light agkozak/zsh-z
+zinit light MichaelAquilina/zsh-you-should-use
+zinit light wfxr/forgit
+zinit light changyuheng/zsh-interactive-cd
+
+# Additional productivity plugins (lightweight for root)
+zinit light zsh-users/zsh-history-substring-search
 
 # =====================================================
 # 🎨 COMPLETION ENHANCEMENTS
@@ -100,10 +110,14 @@ zstyle ':completion:*:scp:*' hosts off
 # 🔌 PLUGIN CONFIGURATIONS
 # =====================================================
 
-# Autosuggestions - Enhanced
+# Autosuggestions - Enhanced for root
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666,bold"
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_STRATEGY=(history completion match_prev_cmd)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_USE_ASYNC=true
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(end-of-line vi-end-of-line vi-add-eol)
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(forward-char forward-word)
 
 # Syntax highlighting - Enhanced
 typeset -A ZSH_HIGHLIGHT_STYLES
@@ -117,19 +131,64 @@ ZSH_HIGHLIGHT_STYLES[function]='fg=blue,bold'
 # 🏁 INITIALIZATION
 # =====================================================
 
-# Load completions with cache optimization
+# =====================================================
+# ⚡ ROOT PERFORMANCE OPTIMIZATIONS
+# =====================================================
+
+# Load completions with advanced cache optimization
 autoload -Uz compinit
 ZSH_CACHE_DIR="/root/.zsh"
 mkdir -p "$ZSH_CACHE_DIR"
 
+# Only rebuild completions if they're older than 24 hours
 if [[ -n $ZSH_CACHE_DIR/compdump(#qN.mh+24) ]]; then
     compinit -d "$ZSH_CACHE_DIR/compdump"
 else
     compinit -C -d "$ZSH_CACHE_DIR/compdump"
 fi
 
+# Compile zsh files for faster loading (root-specific)
+{
+    local zcompare zcompare_file
+    setopt extendedglob local_options
+    
+    if [[ -s /root/.zshrc && (! -s /root/.zshrc.zwc || /root/.zshrc -nt /root/.zshrc.zwc) ]]; then
+        zcompile /root/.zshrc
+    fi
+    
+    for zcompare_file in /root/.zshrc.local /root/.z*(N); do
+        if [[ -s $zcompare_file && (! -s ${zcompare_file}.zwc || $zcompare_file -nt ${zcompare_file}.zwc) ]]; then
+            zcompile $zcompare_file
+        fi
+    done
+} &!
+
+# Root-specific module loading
+zmodload zsh/complist
+zmodload -i zsh/parameter
+zmodload zsh/stat
+
 # Bun completions
 [[ -s "/root/.bun/_bun" ]] && source "/root/.bun/_bun"
+
+# Enhanced FZF configuration for root
+export FZF_DEFAULT_OPTS="
+--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
+--color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
+--color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
+--height=60% --layout=reverse --border --margin=1 --padding=1
+--preview-window=right:60%:wrap --info=inline
+--bind='ctrl-u:preview-page-up,ctrl-d:preview-page-down'
+--bind='ctrl-/:toggle-preview,alt-/:change-preview-window(down|hidden|)'
+--bind='ctrl-y:execute-silent(echo {} | xclip -selection clipboard)'
+--multi --cycle
+"
+
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .cache'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .cache'
+export FZF_COMPLETION_TRIGGER='**'
+export FZF_COMPLETION_OPTS='--border --info=inline'
 
 # FZF key bindings - Use system package first, then fallback
 if [[ -f /usr/share/fzf/key-bindings.zsh ]] && [[ -f /usr/share/fzf/completion.zsh ]]; then
@@ -138,6 +197,117 @@ if [[ -f /usr/share/fzf/key-bindings.zsh ]] && [[ -f /usr/share/fzf/completion.z
 elif command -v fzf &>/dev/null; then
     export FZF_COMPLETION_TRIGGER='**'
 fi
+
+# Key bindings for enhanced navigation
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^H' backward-kill-word
+bindkey '^[[3;5~' kill-word
+
+# History search bindings
+bindkey '^R' history-incremental-search-backward
+bindkey '^S' history-incremental-search-forward
+
+# =====================================================
+# 🔴 ROOT PRODUCTIVITY ENHANCEMENTS
+# =====================================================
+
+# Root-specific aliases for enhanced productivity
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias -- -='cd -'
+
+# Enhanced file operations for root
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias rm='rm -I'
+alias mkdir='mkdir -pv'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -l --icons --group-directories-first'
+alias la='eza -la --icons --group-directories-first'
+alias tree='eza --tree --icons'
+
+# System monitoring aliases
+alias htop='btop'
+alias top='btop'
+alias ps='procs'
+alias du='dust'
+alias df='duf'
+alias grep='rg'
+alias find='fd'
+alias cat='bat'
+alias diff='delta'
+
+# Root-specific system aliases
+alias services='systemctl list-units --type=service'
+alias logs='journalctl -f'
+alias syslogs='journalctl -p 3 -xb'
+alias reload-systemd='systemctl daemon-reload'
+alias netstat='ss -tuln'
+
+# Enhanced security aliases for root
+alias chmod-secure='chmod 600'
+alias chmod-exec='chmod 755'
+alias chown-root='chown root:root'
+alias backup-config='tar czf /root/backup-$(date +%Y%m%d-%H%M%S).tar.gz'
+
+# Quick system maintenance functions for root
+sysupdate() {
+    echo "🔄 Updating system..."
+    pacman -Syu
+    echo "✅ System updated"
+}
+
+cleanup() {
+    echo "🧹 Cleaning system..."
+    pacman -Rns $(pacman -Qtdq) 2>/dev/null || echo "No orphaned packages"
+    pacman -Sc
+    journalctl --vacuum-time=2weeks
+    echo "✅ System cleaned"
+}
+
+# Root system monitoring function
+rootinfo() {
+    echo "🔴 Root System Information:"
+    echo "  Active Services: $(systemctl list-units --type=service --state=active | wc -l)"
+    echo "  Failed Services: $(systemctl list-units --type=service --state=failed | wc -l)"
+    echo "  Processes: $(ps aux | wc -l)"
+    echo "  Load: $(uptime | awk -F'load average:' '{print $2}')"
+    echo "  Memory: $(free -h | awk 'NR==2{printf "%.1fG/%.1fG (%.0f%%)", $3/1024, $2/1024, $3*100/$2}')"
+    echo "  Disk: $(df -h / | awk 'NR==2{printf "%s/%s (%s)", $3, $2, $5}')"
+    echo "  Last Login: $(last -1 | head -1 | awk '{print $3, $4, $5, $6}')"
+}
+
+# Quick config editing for root
+rootconfig() {
+    case "$1" in
+        zsh|zshrc)      $EDITOR /root/.zshrc ;;
+        zshlocal)       $EDITOR /root/.zshrc.local ;;
+        hosts)          $EDITOR /etc/hosts ;;
+        fstab)          $EDITOR /etc/fstab ;;
+        ssh)            $EDITOR /etc/ssh/sshd_config ;;
+        pacman)         $EDITOR /etc/pacman.conf ;;
+        *)              echo "Available: zsh, zshlocal, hosts, fstab, ssh, pacman" ;;
+    esac
+}
+
+# Enhanced service management
+sctl() {
+    case "$1" in
+        start)   systemctl start "$2" ;;
+        stop)    systemctl stop "$2" ;;
+        restart) systemctl restart "$2" ;;
+        status)  systemctl status "$2" ;;
+        enable)  systemctl enable "$2" ;;
+        disable) systemctl disable "$2" ;;
+        reload)  systemctl reload "$2" ;;
+        *)       echo "Usage: sctl {start|stop|restart|status|enable|disable|reload} service" ;;
+    esac
+}
 
 # Load any additional custom configurations
 [[ -f /root/.zshrc.local ]] && source /root/.zshrc.local
