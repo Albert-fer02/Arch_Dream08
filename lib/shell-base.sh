@@ -31,6 +31,7 @@ init_shell_base() {
     load_modern_tools
     load_shared_aliases
     load_shared_functions
+    setup_bash_history
     load_starship_config
 }
 
@@ -124,14 +125,24 @@ load_path_configuration() {
 # =====================================================
 
 load_modern_tools() {
-    # Bat (better cat)
+    # Essential fallback aliases
+    alias ll='ls -alF --color=auto --group-directories-first'
+    alias la='ls -A --color=auto --group-directories-first'
+    alias ls='ls --color=auto --group-directories-first'
+}
+
+# Lazy loading functions for modern tools
+setup_bat() {
     if command -v bat &> /dev/null; then
         export BAT_THEME="Catppuccin Frappe"
         alias cat='bat --style=plain --paging=never'
         alias ccat='bat --style=full'
+        return 0
     fi
+    return 1
+}
 
-    # Eza (better ls)
+setup_eza() {
     if command -v eza &> /dev/null; then
         alias ls='eza --icons --group-directories-first --git'
         alias ll='eza -l --icons --group-directories-first --git --time-style=long-iso --smart-group'
@@ -140,35 +151,102 @@ load_modern_tools() {
         alias ltree='eza --tree --level=4 --icons --long --git-ignore'
         alias lt='eza --tree --level=2 --icons --git-ignore'
         alias lta='eza --tree --level=2 --icons --git-ignore --all'
-    else
-        alias ll='ls -alF --color=auto --group-directories-first'
-        alias la='ls -A --color=auto --group-directories-first'
-        alias ls='ls --color=auto --group-directories-first'
+        return 0
     fi
+    return 1
+}
 
-    # Ripgrep (better grep)
+setup_ripgrep() {
     if command -v rg &> /dev/null; then
         alias grep='rg --smart-case --hidden --glob "!**/.git/*" --glob "!**/node_modules/*"'
         alias rga='rg --no-ignore --hidden'
         alias rgi='rg --case-insensitive'
         alias rgf='rg --files --glob'
+        return 0
     fi
+    return 1
+}
 
-    # Fd (better find)
+setup_fd() {
     if command -v fd &> /dev/null; then
         alias find='fd'
         alias fda='fd --no-ignore --hidden'
         alias fdi='fd --case-insensitive'
         alias fde='fd --extension'
+        return 0
     fi
+    return 1
+}
 
-    # System monitoring
+setup_system_monitoring() {
     command -v duf &> /dev/null && alias df='duf'
     command -v dust &> /dev/null && alias du='dust'
     command -v btop &> /dev/null && alias top='btop' || command -v htop &> /dev/null && alias top='htop'
     command -v delta &> /dev/null && alias diff='delta'
     command -v xh &> /dev/null && alias http='xh'
     command -v procs &> /dev/null && alias pps='procs'
+}
+
+# Lazy loading wrappers - safe function definitions
+use_bat() {
+    unset -f use_bat
+    setup_bat
+    cat "$@"
+}
+
+use_eza() {
+    unset -f use_eza
+    setup_eza
+    ls "$@"
+}
+
+use_ripgrep() {
+    unset -f use_ripgrep
+    setup_ripgrep
+    grep "$@"
+}
+
+use_fd() {
+    unset -f use_fd
+    setup_fd
+    find "$@"
+}
+
+# Smart command wrappers that activate on first use
+smart_cat() {
+    if command -v bat &> /dev/null; then
+        setup_bat
+        cat "$@"
+    else
+        command cat "$@"
+    fi
+}
+
+smart_ls() {
+    if command -v eza &> /dev/null; then
+        setup_eza
+        ls "$@"
+    else
+        command ls --color=auto --group-directories-first "$@"
+    fi
+}
+
+smart_grep() {
+    if command -v rg &> /dev/null; then
+        setup_ripgrep
+        grep "$@"
+    else
+        command grep --color=auto "$@"
+    fi
+}
+
+smart_find() {
+    if command -v fd &> /dev/null; then
+        setup_fd
+        find "$@"
+    else
+        command find "$@"
+    fi
 }
 
 # =====================================================
@@ -324,6 +402,28 @@ load_shared_aliases() {
     alias ff="fastfetch"
     alias ff-dream="fastfetch --config ~/.config/fastfetch/themes/dreamcoder.jsonc"
     alias ff-custom="fastfetch --config ~/.config/fastfetch/config.local.jsonc"
+}
+
+# =====================================================
+# 📋 BASH HISTORY CONFIGURATION
+# =====================================================
+
+setup_bash_history() {
+    # Only setup bash history for bash shells
+    if [[ "$IS_BASH" == "true" ]]; then
+        export HISTCONTROL=ignoreboth:erasedups
+        export HISTSIZE=10000
+        export HISTFILESIZE=20000
+        export HISTTIMEFORMAT="%Y-%m-%d %T "
+        export HISTIGNORE="ls:ll:la:cd:pwd:clear:history:exit:bg:fg:jobs"
+        
+        # Enable history options if in bash
+        if [[ -n "$BASH_VERSION" ]]; then
+            shopt -s histappend
+            # Update history after each command
+            export PROMPT_COMMAND="history -a; history -c; history -r; ${PROMPT_COMMAND:-}"
+        fi
+    fi
 }
 
 # =====================================================
@@ -568,6 +668,9 @@ shell_base_loaded() {
     # Optionally show load message in non-production environments
     [[ -n "${ARCH_DREAM_DEBUG:-}" ]] && echo "✅ Shell base configuration loaded for $CURRENT_SHELL"
 }
+
+# Auto-initialize if sourced directly
+init_shell_base
 
 # Mark as loaded
 shell_base_loaded

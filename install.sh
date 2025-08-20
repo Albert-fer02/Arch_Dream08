@@ -1,116 +1,456 @@
 #!/bin/bash
 # =====================================================
-# 🧩 ARCH DREAM MACHINE - INSTALADOR UNIFICADO
+# 🚀 ARCH DREAM - INSTALADOR PRINCIPAL V5.0
 # =====================================================
-# Script de instalación principal para todos los módulos
-# Versión 3.0 - Instalación inteligente y modular
+# Instalador ultra-optimizado para Arch Linux
+# Arquitectura modular con gestión inteligente de dependencias
 # =====================================================
 
 set -euo pipefail
 IFS=$'\n\t'
 
-# Cargar biblioteca común
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/common.sh"
-
 # =====================================================
 # 🔧 CONFIGURACIÓN GLOBAL
 # =====================================================
 
-PROJECT_NAME="Arch Dream Machine"
-PROJECT_VERSION="3.0.0"
-PROJECT_AUTHOR="DreamCoder 08"
-PROJECT_DESCRIPTION="Sistema de configuración completo para Arch Linux"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_VERSION="5.0.0"
+LOCKFILE="/tmp/arch-dream-install.lock"
+LOG_FILE="/tmp/arch-dream-install.log"
 
-# Directorios del proyecto
-PROJECT_ROOT="$SCRIPT_DIR"
-MODULES_DIR="$PROJECT_ROOT/modules"
-CONFIG_DIR="$HOME/.config/arch-dream"
-BACKUP_DIR="$HOME/.backups/arch-dream"
-
-# Opciones de instalación
+# Variables de control
 INSTALL_ALL=false
-INSTALL_MODULES=()
-SKIP_MODULES=()
-FORCE_INSTALL=false
+SELECTED_MODULES=()
 DRY_RUN=false
-VERBOSE=false
+FORCE_INSTALL=false
+PARALLEL_INSTALL=false
+BACKUP_CONFIGS=true
+QUIET_MODE=false
+VERBOSE_MODE=false
 
 # =====================================================
-# 🔧 FUNCIONES DE AYUDA Y CONFIGURACIÓN
+# 🎨 SISTEMA DE COLORES Y LOGGING
 # =====================================================
+
+# Colores ANSI
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+BLUE='\033[0;34m'; CYAN='\033[0;36m'; PURPLE='\033[0;35m'
+BOLD='\033[1m'; NC='\033[0m'
+
+# Funciones de logging optimizadas
+log() { 
+    local msg="[$(date '+%H:%M:%S')] $*"
+    echo -e "${CYAN}[INFO]${NC} $msg" | tee -a "$LOG_FILE"
+}
+
+success() { 
+    local msg="[$(date '+%H:%M:%S')] $*"
+    echo -e "${GREEN}[OK]${NC} $msg" | tee -a "$LOG_FILE"
+}
+
+warn() { 
+    local msg="[$(date '+%H:%M:%S')] $*"
+    echo -e "${YELLOW}[WARN]${NC} $msg" | tee -a "$LOG_FILE"
+}
+
+error() { 
+    local msg="[$(date '+%H:%M:%S')] $*"
+    echo -e "${RED}[ERROR]${NC} $msg" | tee -a "$LOG_FILE" >&2
+}
+
+debug() {
+    [[ "$VERBOSE_MODE" == "true" ]] && {
+        local msg="[$(date '+%H:%M:%S')] $*"
+        echo -e "${PURPLE}[DEBUG]${NC} $msg" | tee -a "$LOG_FILE"
+    }
+}
+
+# =====================================================
+# 🔒 GESTIÓN DE PROCESOS Y LOCKING
+# =====================================================
+
+cleanup() {
+    local exit_code=$?
+    [[ -f "$LOCKFILE" ]] && rm -f "$LOCKFILE"
+    
+    if [[ $exit_code -ne 0 && "${DRY_RUN:-}" != "true" ]]; then
+        error "Instalación fallida. Log: $LOG_FILE"
+        [[ -f "$LOG_FILE" ]] && tail -5 "$LOG_FILE" >&2
+    fi
+}
+
+acquire_lock() {
+    if [[ -f "$LOCKFILE" ]]; then
+        local pid=$(cat "$LOCKFILE" 2>/dev/null || echo "")
+        if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+            error "Otra instalación en proceso (PID: $pid)"
+            exit 1
+        else
+            rm -f "$LOCKFILE"
+        fi
+    fi
+    
+    echo $$ > "$LOCKFILE"
+    trap cleanup EXIT INT TERM
+}
+
+# =====================================================
+# 🔧 VERIFICACIONES DEL SISTEMA
+# =====================================================
+
+system_check() {
+    log "🔍 Verificando sistema Arch Linux..."
+    
+    # Verificar Arch Linux
+    [[ -f /etc/arch-release ]] || {
+        error "❌ Este instalador requiere Arch Linux"
+        exit 1
+    }
+    
+    # Verificar herramientas esenciales
+    local missing_tools=()
+    for tool in git sudo pacman curl; do
+        command -v "$tool" &>/dev/null || missing_tools+=("$tool")
+    done
+    
+    [[ ${#missing_tools[@]} -eq 0 ]] || {
+        error "❌ Herramientas faltantes: ${missing_tools[*]}"
+        log "💡 Instala con: sudo pacman -S ${missing_tools[*]}"
+        exit 1
+    }
+    
+    # Verificar conexión a internet
+    ping -c 1 -W 3 archlinux.org &>/dev/null || warn "⚠️  Sin conexión a repositorios de Arch"
+    
+    # Verificar espacio en disco (mínimo 2GB)
+    local available_space=$(df "$HOME" | awk 'NR==2 {print $4}')
+    [[ $available_space -gt 2097152 ]] || {
+        error "❌ Espacio insuficiente: $(($available_space/1024))MB disponible, 2GB requerido"
+        exit 1
+    }
+    
+    # Verificar permisos sudo
+    [[ "$DRY_RUN" == "true" ]] || {
+        log "🔐 Se requieren permisos sudo..."
+        sudo -v || {
+            error "❌ Permisos sudo requeridos"
+            exit 1
+        }
+    }
+    
+    # Actualizar bases de datos de pacman
+    [[ "$DRY_RUN" == "true" ]] || {
+        log "📦 Actualizando bases de datos de pacman..."
+        sudo pacman -Sy --noconfirm &>/dev/null || warn "No se pudo actualizar pacman"
+    }
+    
+    success "✅ Sistema verificado correctamente"
+}
+
+# =====================================================
+# 📦 GESTIÓN DE MÓDULOS OPTIMIZADA
+# =====================================================
+
+discover_modules() {
+    find "$SCRIPT_DIR/modules" -name "install.sh" 2>/dev/null | \
+    sed "s|$SCRIPT_DIR/modules/||g; s|/install.sh||g; s|/|:|g" | \
+    sort -V
+}
+
+validate_module() {
+    local module="$1"
+    local module_path="$SCRIPT_DIR/modules/${module/:/\/}"
+    
+    [[ -f "$module_path/install.sh" ]] || return 1
+    bash -n "$module_path/install.sh" || return 1
+    [[ -x "$module_path/install.sh" ]] || return 1
+    return 0
+}
+
+backup_existing_configs() {
+    [[ "$BACKUP_CONFIGS" != "true" ]] && return 0
+    
+    local timestamp=$(date +%Y%m%d_%H%M%S)
+    local backup_dir="$HOME/.arch-dream-backup-$timestamp"
+    
+    log "💾 Creando backup de configuraciones..."
+    mkdir -p "$backup_dir" || {
+        warn "No se pudo crear directorio de backup"
+        return 0
+    }
+    
+    local configs=(".bashrc" ".zshrc" ".vimrc" ".config/nvim" ".config/kitty")
+    local backed_up=0
+    
+    for config in "${configs[@]}"; do
+        [[ -e "$HOME/$config" ]] && {
+            cp -r "$HOME/$config" "$backup_dir/" 2>/dev/null && ((backed_up++))
+        }
+    done
+    
+    if [[ $backed_up -gt 0 ]]; then
+        success "✅ Backup creado: $backup_dir ($backed_up archivos)"
+        echo "$backup_dir" > "$HOME/.arch-dream-last-backup"
+    else
+        log "ℹ️  No se encontraron configuraciones para respaldar"
+        rmdir "$backup_dir" 2>/dev/null || true
+    fi
+}
+
+install_module() {
+    local module="$1"
+    local module_path="$SCRIPT_DIR/modules/${module/:/\/}"
+    
+    validate_module "$module" || {
+        error "❌ Módulo inválido: $module"
+        return 1
+    }
+    
+    log "📦 Instalando: $module"
+    
+    [[ "$DRY_RUN" == "true" ]] && {
+        success "🔍 DRY RUN: $module sería instalado"
+        return 0
+    }
+    
+    local install_start=$(date +%s)
+    
+    if timeout 300 bash -c "cd '$module_path' && bash install.sh" &>>"$LOG_FILE"; then
+        local install_time=$(($(date +%s) - install_start))
+        success "✅ $module instalado (${install_time}s)"
+        
+        # Marcar como instalado
+        mkdir -p "$HOME/.config/arch-dream/installed"
+        echo "$(date)" > "$HOME/.config/arch-dream/installed/$module"
+        return 0
+    else
+        local install_time=$(($(date +%s) - install_start))
+        error "❌ Fallo al instalar $module (${install_time}s)"
+        
+        tail -5 "$LOG_FILE" | while read line; do
+            error "    $line"
+        done
+        return 1
+    fi
+}
+
+install_modules_parallel() {
+    local modules=("$@")
+    local pids=()
+    local max_jobs=3
+    local job_count=0
+    
+    log "🚀 Instalación paralela de ${#modules[@]} módulos..."
+    
+    for module in "${modules[@]}"; do
+        [[ $job_count -ge $max_jobs ]] && {
+            wait "${pids[0]}"
+            pids=("${pids[@]:1}")
+            ((job_count--))
+        }
+        
+        install_module "$module" &
+        pids+=($!)
+        ((job_count++))
+    done
+    
+    for pid in "${pids[@]}"; do
+        wait "$pid"
+    done
+}
+
+# =====================================================
+# 🎯 RESOLUCIÓN DE DEPENDENCIAS INTELIGENTE
+# =====================================================
+
+resolve_dependencies() {
+    local requested_modules=("$@")
+    local resolved_modules=()
+    local processed=()
+    
+    resolve_module() {
+        local module="$1"
+        
+        [[ " ${processed[@]} " =~ " $module " ]] && return
+        processed+=("$module")
+        
+        # Buscar dependencias de módulos
+        local module_path="$SCRIPT_DIR/modules/${module/:/\/}"
+        if [[ -f "$module_path/install.sh" ]]; then
+            local deps=$(grep '^MODULE_DEPENDENCIES=' "$module_path/install.sh" 2>/dev/null | \
+                        sed 's/MODULE_DEPENDENCIES=(\([^)]*\))/\1/' | tr -d '"' || echo "")
+            
+            if [[ -n "$deps" ]]; then
+                IFS=' ' read -ra dep_array <<< "$deps"
+                for dep in "${dep_array[@]}"; do
+                    [[ -n "$dep" && "$dep" =~ ^[a-z]+:[a-z]+ ]] && resolve_module "$dep"
+                done
+            fi
+        fi
+        
+        [[ " ${resolved_modules[@]} " =~ " $module " ]] || resolved_modules+=("$module")
+    }
+    
+    for module in "${requested_modules[@]}"; do
+        resolve_module "$module"
+    done
+    
+    printf '%s\n' "${resolved_modules[@]}"
+}
+
+# =====================================================
+# 🎨 INTERFAZ DE USUARIO MEJORADA
+# =====================================================
+
+show_banner() {
+    echo -e "${BOLD}${CYAN}"
+    cat << 'EOF'
+╔═══════════════════════════════════════════════════════════╗
+║                 🚀 ARCH DREAM MACHINE                    ║
+║                   Instalador v5.0                        ║
+║              Ultra-optimizado para Arch Linux            ║
+╚═══════════════════════════════════════════════════════════╝
+EOF
+    echo -e "${NC}"
+}
 
 show_help() {
     cat << EOF
-🧩 $PROJECT_NAME v$PROJECT_VERSION
+🚀 Arch Dream Machine v$PROJECT_VERSION
 
-$PROJECT_DESCRIPTION
-
-Uso: $0 [OPCIONES] [MÓDULOS...]
-
-OPCIONES:
+${BOLD}OPCIONES:${NC}
     -a, --all           Instalar todos los módulos
-    -m, --modules       Lista de módulos específicos
-    -s, --skip          Módulos a saltar
-    -f, --force         Instalación forzada
-    -d, --dry-run       Simular instalación
-    -v, --verbose       Modo verboso
-    -c, --copy          Copiar archivos en lugar de symlinks
-    -y, --yes           No preguntar (modo no interactivo)
+    -l, --list          Listar módulos disponibles
+    -f, --force         Forzar reinstalación (no preguntar)
+    -d, --dry-run       Simular instalación (no hacer cambios)
+    -p, --parallel      Instalación paralela (experimental)
+    -b, --no-backup     No crear backup de configuraciones
+    -q, --quiet         Modo silencioso
+    -v, --verbose       Modo verbose
     -h, --help          Mostrar esta ayuda
 
-MÓDULOS DISPONIBLES:
-$(
-    available=$(discover_modules 2>/dev/null || true);
-    for m in $available; do
-        echo "    $m";
-    done
-)
+${BOLD}MÓDULOS:${NC}
+    core:*              Configuraciones de shell (zsh, bash)
+    development:*       Herramientas de desarrollo (nvim, web)
+    terminal:*          Configuraciones de terminal (kitty)
+    tools:*             Utilidades (fastfetch, nano)
+    themes:*            Temas visuales (dracula)
 
-EJEMPLOS:
-    $0 --all                    # Instalar todo
-    $0 core:zsh terminal:kitty # Solo Zsh y Kitty
-    $0 --skip core:bash        # Todo excepto Bash
-    $0 --dry-run               # Simular instalación
+${BOLD}EJEMPLOS:${NC}
+    $0 --all                        # Instalar todo
+    $0 core:zsh development:nvim     # Módulos específicos
+    $0 --dry-run --all               # Simular instalación completa
+    $0 --parallel development:*     # Instalación paralela de desarrollo
+    $0 --force --no-backup core:zsh # Reinstalar sin backup
 
+${BOLD}VARIABLES DE ENTORNO:${NC}
+    CI=true                         # Modo no interactivo
+    ARCH_DREAM_PARALLEL=true        # Forzar instalación paralela
+    ARCH_DREAM_LOG_LEVEL=debug      # Nivel de logging
 EOF
 }
 
-parse_arguments() {
+interactive_selection() {
+    local available_modules=()
+    mapfile -t available_modules < <(discover_modules)
+    
+    echo -e "${YELLOW}📋 Módulos disponibles (${#available_modules[@]} total):${NC}" >&2
+    
+    local categories=()
+    local current_cat=""
+    
+    for i in "${!available_modules[@]}"; do
+        local module="${available_modules[$i]}"
+        local cat="${module%%:*}"
+        
+        [[ "$cat" != "$current_cat" ]] && {
+            [[ -n "$current_cat" ]] && echo >&2
+            echo -e "${BOLD}  ${cat}:${NC}" >&2
+            current_cat="$cat"
+            categories+=("$cat")
+        }
+        
+        printf "    %2d) %s\n" "$((i+1))" "$module" >&2
+    done
+    
+    echo >&2
+    echo -e "${CYAN}💡 Opciones especiales:${NC}" >&2
+    echo -e "  • ${BOLD}all${NC} - Todos los módulos" >&2
+    echo -e "  • ${BOLD}cat:*${NC} - Toda una categoría (ej: core:*, development:*)" >&2
+    echo >&2
+    
+    read -p "Selección (números, 'all', o 'cat:*'): " selection >&2
+    
+    case "$selection" in
+        "all")
+            printf '%s\n' "${available_modules[@]}"
+            ;;
+        *:*)
+            local pattern="${selection%:*}"
+            for module in "${available_modules[@]}"; do
+                [[ "$module" =~ ^${pattern}: ]] && echo "$module"
+            done
+            ;;
+        *)
+            IFS=',' read -ra indices <<< "$selection"
+            for idx in "${indices[@]}"; do
+                idx=$(echo "$idx" | xargs)
+                [[ "$idx" =~ ^[0-9]+$ && $idx -ge 1 && $idx -le ${#available_modules[@]} ]] && {
+                    echo "${available_modules[$((idx-1))]}"
+                }
+            done
+            ;;
+    esac
+}
+
+# =====================================================
+# 🔧 FUNCIÓN PRINCIPAL OPTIMIZADA
+# =====================================================
+
+main() {
+    # Inicializar logging
+    > "$LOG_FILE"
+    log "Iniciando Arch Dream Installer v$PROJECT_VERSION"
+    
+    # Adquirir lock
+    acquire_lock
+    
+    # Parsear argumentos
     while [[ $# -gt 0 ]]; do
         case $1 in
             -a|--all)
                 INSTALL_ALL=true
                 shift
                 ;;
-            -m|--modules)
-                shift
-                IFS=',' read -ra INSTALL_MODULES <<< "$1"
-                shift
-                ;;
-            -s|--skip)
-                shift
-                IFS=',' read -ra SKIP_MODULES <<< "$1"
-                shift
+            -l|--list)
+                echo "📋 Módulos disponibles:"
+                discover_modules | sed 's/^/  - /'
+                exit 0
                 ;;
             -f|--force)
                 FORCE_INSTALL=true
+                export FORCE_INSTALL=true
                 shift
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
                 shift
                 ;;
+            -p|--parallel)
+                PARALLEL_INSTALL=true
+                shift
+                ;;
+            -b|--no-backup)
+                BACKUP_CONFIGS=false
+                shift
+                ;;
+            -q|--quiet)
+                QUIET_MODE=true
+                exec > /dev/null
+                shift
+                ;;
             -v|--verbose)
-                VERBOSE=true
-                shift
-                ;;
-            -c|--copy)
-                export INSTALL_COPY_MODE=true
-                shift
-                ;;
-            -y|--yes)
-                export YES=true
+                VERBOSE_MODE=true
                 shift
                 ;;
             -h|--help)
@@ -123,459 +463,136 @@ parse_arguments() {
                 exit 1
                 ;;
             *)
-                INSTALL_MODULES+=("$1")
+                SELECTED_MODULES+=("$1")
                 shift
                 ;;
         esac
     done
     
-    # Si no se especificaron módulos, instalar todos
-    if [[ ${#INSTALL_MODULES[@]} -eq 0 ]] && [[ "$INSTALL_ALL" != "true" ]]; then
-        INSTALL_ALL=true
-    fi
-}
-
-# =====================================================
-# 🧩 SELECCIÓN INTERACTIVA DE MÓDULOS
-# =====================================================
-
-interactive_select_modules() {
-    local available_modules=("$@")
-    local count=${#available_modules[@]}
-
-    echo -e "${BOLD}${BLUE}Selecciona módulos a instalar${COLOR_RESET}"
-    echo -e "${CYAN}Introduce números separados por coma, 'all' para todos o 'none' para ninguno.${COLOR_RESET}"
-    for i in "${!available_modules[@]}"; do
-        printf "  %2d) %s\n" "$((i+1))" "${available_modules[$i]}"
-    done
-    echo
-    read -p "Selección [all]: " selection
-    selection=${selection:-all}
-
-    local chosen=()
-    if [[ "$selection" == "all" ]]; then
-        chosen=("${available_modules[@]}")
-    elif [[ "$selection" == "none" ]]; then
-        chosen=()
-    else
-        IFS=',' read -ra indices <<< "$selection"
-        for idx in "${indices[@]}"; do
-            idx=$(echo "$idx" | xargs)
-            if [[ "$idx" =~ ^[0-9]+$ ]] && (( idx>=1 && idx<=count )); then
-                chosen+=("${available_modules[$((idx-1))]}")
-            else
-                warn "Índice inválido: $idx (saltando)"
-            fi
-        done
-    fi
-
-    for m in "${chosen[@]}"; do
-        printf '%s\n' "$m"
-    done
-}
-
-# =====================================================
-# 🔧 FUNCIONES DE ANÁLISIS DEL SISTEMA
-# =====================================================
-
-analyze_system() {
-    log "🔍 Analizando sistema..."
+    # Variables de entorno
+    [[ "${ARCH_DREAM_PARALLEL:-}" == "true" ]] && PARALLEL_INSTALL=true
+    [[ "${CI:-}" == "true" ]] && FORCE_INSTALL=true
     
-    # Información del sistema
-    local os_info=$(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)
-    local kernel=$(uname -r)
-    local arch=$(uname -m)
-    local shell=$(basename -- "$SHELL")
+    show_banner
+    system_check
     
-    success "Sistema: $os_info"
-    success "Kernel: $kernel"
-    success "Arquitectura: $arch"
-    success "Shell actual: $shell"
-    
-    # Verificar recursos del sistema
-    check_system_resources
-    
-    # Verificar dependencias base
-    check_base_dependencies
-    
-    # Verificar espacio en disco
-    check_disk_space 2097152  # 2GB mínimo
-    
-    success "✅ Análisis del sistema completado"
-}
-
-check_system_resources() {
-    log "📊 Verificando recursos del sistema..."
-    
-    # Memoria RAM (cálculo seguro con awk)
-    local total_mem_gb=$(free -b | awk 'NR==2{printf "%.1f", $2/1024/1024/1024}')
-    local avail_mem_gb=$(free -b | awk 'NR==2{printf "%.1f", $7/1024/1024/1024}')
-    local mem_usage_pct=$(free -b | awk 'NR==2{printf "%.0f", (1 - $7/$2) * 100}')
-    
-    if [[ "$mem_usage_pct" -gt 90 ]]; then
-        warn "⚠️  Uso de memoria alto: ${mem_usage_pct}%"
-    else
-        success "✓ Memoria RAM: ${avail_mem_gb}GB libre de ${total_mem_gb}GB"
-    fi
-    
-    # CPU
-    local cpu_cores=$(nproc)
-    local cpu_load=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')
-    
-    success "✓ CPU: $cpu_cores núcleos, carga: $cpu_load"
-    
-    # Espacio en disco
-    local disk_usage=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
-    if [[ $disk_usage -gt 90 ]]; then
-        warn "⚠️  Uso de disco alto: ${disk_usage}%"
-    else
-        success "✓ Disco: ${disk_usage}% usado"
-    fi
-}
-
-check_base_dependencies() {
-    log "🔧 Verificando dependencias base..."
-    
-    local base_deps=("pacman" "sudo" "git" "curl" "wget")
-    local missing_deps=()
-    
-    for dep in "${base_deps[@]}"; do
-        if command -v "$dep" &>/dev/null; then
-            success "✓ $dep"
-        else
-            missing_deps+=("$dep")
-        fi
-    done
-    
-    if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        error "❌ Dependencias faltantes: ${missing_deps[*]}"
-        error "Instala las dependencias base antes de continuar"
-        exit 1
-    fi
-    
-    success "✅ Todas las dependencias base están disponibles"
-}
-
-# =====================================================
-# 🔧 FUNCIONES DE GESTIÓN DE MÓDULOS
-# =====================================================
-
-discover_modules() {
-    local available_modules=()
-
-    # Buscar módulos en el directorio modules
-    for category_dir in "$MODULES_DIR"/*; do
-        if [[ -d "$category_dir" ]]; then
-            local category=$(basename "$category_dir")
-            for module_dir in "$category_dir"/*; do
-                if [[ -d "$module_dir" ]] && [[ -f "$module_dir/install.sh" ]]; then
-                    local module=$(basename "$module_dir")
-                    available_modules+=("$category:$module")
-                fi
-            done
-        fi
-    done
-
-    # Emitir solo la lista, una por línea, para consumo programático
-    for m in "${available_modules[@]}"; do
-        printf '%s\n' "$m"
-    done
-}
-
-resolve_dependencies() {
-    local modules=("$@")
-    local resolved_modules=()
-    local dependency_graph=()
-    # No emitir logs por stdout para evitar contaminar la salida capturada
-    # Crear grafo de dependencias
-    for module in "${modules[@]}"; do
-        local module_path="$MODULES_DIR/${module/:/\/}"
-        if [[ -f "$module_path/install.sh" ]]; then
-            # Leer dependencias del módulo
-            local deps=$(grep -o 'MODULE_DEPENDENCIES=([^)]*)' "$module_path/install.sh" 2>/dev/null | sed 's/MODULE_DEPENDENCIES=(\([^)]*\))/\1/' || echo "")
-            if [[ -n "$deps" ]]; then
-                dependency_graph+=("$module:$deps")
-            fi
-        fi
-        resolved_modules+=("$module")
-    done
-    
-    # Ordenar por dependencias
-    local ordered_modules=()
-    local processed=()
-    
-    while [[ ${#resolved_modules[@]} -gt 0 ]]; do
-        local current_module="${resolved_modules[0]}"
-        resolved_modules=("${resolved_modules[@]:1}")
-        
-        if [[ ! " ${processed[@]} " =~ " ${current_module} " ]]; then
-            ordered_modules+=("$current_module")
-            processed+=("$current_module")
-        fi
-    done
-    
-    for m in "${ordered_modules[@]}"; do
-        printf '%s\n' "$m"
-    done
-}
-
-# =====================================================
-# 🔧 FUNCIONES DE INSTALACIÓN
-# =====================================================
-
-install_module() {
-    local module="$1"
-    local module_path="$MODULES_DIR/${module/:/\/}"
-    
-    if [[ ! -d "$module_path" ]]; then
-        error "Módulo no encontrado: $module"
-        return 1
-    fi
-    
-    if [[ ! -f "$module_path/install.sh" ]]; then
-        error "Script de instalación no encontrado: $module"
-        return 1
-    fi
-    
-    log "🚀 Instalando módulo: $module"
-    
-    if [[ "$DRY_RUN" == "true" ]]; then
-        success "DRY RUN: Simulando instalación de $module"
-        return 0
-    fi
-    
-    # Cambiar al directorio del módulo
-    cd "$module_path"
-    
-    # Ejecutar script de instalación
-    if bash install.sh; then
-        success "✅ Módulo $module instalado correctamente"
-        return 0
-    else
-        error "❌ Fallo al instalar módulo $module"
-        return 1
-    fi
-}
-
-install_modules() {
-    local modules=("$@")
-    local total_modules=${#modules[@]}
-    local installed_modules=()
-    local failed_modules=()
-    
-    log "🚀 Iniciando instalación de $total_modules módulos..."
-    
-    for i in "${!modules[@]}"; do
-        local module="${modules[$i]}"
-        
-        # Verificar si se debe saltar
-        if [[ " ${SKIP_MODULES[@]} " =~ " ${module} " ]]; then
-            warn "⏭️  Saltando módulo: $module"
-            continue
-        fi
-        
-        show_progress $((i + 1)) $total_modules "Instalando $module"
-        
-        if install_module "$module"; then
-            installed_modules+=("$module")
-        else
-            failed_modules+=("$module")
-            
-            if [[ "$FORCE_INSTALL" != "true" ]]; then
-                error "❌ Instalación falló. Usa --force para continuar"
-                return 1
-            fi
-        fi
-    done
-    
-    echo  # Nueva línea después de la barra de progreso
-    
-    # Resumen de instalación
-    show_installation_summary "$total_modules" "${#installed_modules[@]}" "${#failed_modules[@]}" "${installed_modules[@]}" "${failed_modules[@]}"
-}
-
-show_installation_summary() {
-    local total="$1"
-    local installed="$2"
-    local failed="$3"
-    shift 3
-    local installed_modules=("${@:1:$installed}")
-    shift $installed
-    local failed_modules=("${@:1:$failed}")
-    
-    echo
-    echo -e "${BOLD}${BLUE}📊 RESUMEN DE INSTALACIÓN${COLOR_RESET}"
-    echo -e "${CYAN}┌─────────────────────────────────────────────────────────────┐${COLOR_RESET}"
-    echo -e "${CYAN}│${COLOR_RESET} Total de módulos: $total"
-    echo -e "${CYAN}│${COLOR_RESET} Instalados: ${GREEN}$installed${COLOR_RESET}"
-    echo -e "${CYAN}│${COLOR_RESET} Fallidos: ${RED}$failed${COLOR_RESET}"
-    echo -e "${CYAN}└─────────────────────────────────────────────────────────────┘${COLOR_RESET}"
-    
-    if [[ $installed -gt 0 ]]; then
-        echo
-        echo -e "${GREEN}✅ Módulos instalados exitosamente:${COLOR_RESET}"
-        for module in "${installed_modules[@]}"; do
-            echo -e "  - $module"
-        done
-    fi
-    
-    if [[ $failed -gt 0 ]]; then
-        echo
-        echo -e "${RED}❌ Módulos que fallaron:${COLOR_RESET}"
-        for module in "${failed_modules[@]}"; do
-            echo -e "  - $module"
-        done
-    fi
-}
-
-# =====================================================
-# 🔧 FUNCIONES DE CONFIGURACIÓN POST-INSTALACIÓN
-# =====================================================
-
-post_installation_setup() {
-    log "🔧 Configurando sistema post-instalación..."
-    
-    # Crear directorios de configuración
-    mkdir -p "$CONFIG_DIR" "$BACKUP_DIR"
-    
-    # Configurar shell por defecto si Zsh está instalado
-    if command -v zsh &>/dev/null && [[ "$SHELL" != "/bin/zsh" ]]; then
-        if confirm "¿Cambiar shell por defecto a Zsh?" true; then
-            log "Cambiando shell por defecto a Zsh..."
-            chsh -s /bin/zsh
-            success "✅ Shell cambiado a Zsh. Reinicia la sesión para aplicar"
-        fi
-    fi
-    
-    # Crear archivo de configuración global
-    create_global_config
-    
-    # Mostrar mensaje de finalización
-    show_completion_message
-}
-
-create_global_config() {
-    local config_file="$CONFIG_DIR/config.sh"
-    
-    cat > "$config_file" << EOF
-# Arch Dream Machine - Configuración Global
-# Generado automáticamente el $(date)
-
-export ARCH_DREAM_VERSION="$PROJECT_VERSION"
-export ARCH_DREAM_CONFIG_DIR="$CONFIG_DIR"
-export ARCH_DREAM_BACKUP_DIR="$BACKUP_DIR"
-
-# Función para recargar configuración
-reload_arch_dream() {
-    source "$config_file"
-    echo "✅ Configuración de Arch Dream Machine recargada"
-}
-
-# Función para mostrar estado
-arch_dream_status() {
-    echo "🧩 Arch Dream Machine v$PROJECT_VERSION"
-    echo "📁 Config: $CONFIG_DIR"
-    echo "💾 Backups: $BACKUP_DIR"
-}
-EOF
-    
-    success "✅ Configuración global creada: $config_file"
-}
-
-show_completion_message() {
-    echo
-    echo -e "${BOLD}${GREEN}🎉 ¡INSTALACIÓN COMPLETADA!${COLOR_RESET}"
-    echo
-    echo -e "${CYAN}🚀 Próximos pasos:${COLOR_RESET}"
-    echo -e "  1. Reinicia tu terminal o ejecuta: exec zsh"
-    echo -e "  2. Personaliza tu configuración en: $CONFIG_DIR"
-    echo -e "  3. Ejecuta: arch_dream_status para ver el estado"
-    echo
-    echo -e "${YELLOW}💡 Consejos:${COLOR_RESET}"
-    echo -e "  - Usa 'reload_arch_dream' para recargar configuración"
-    echo -e "  - Los backups se guardan en: $BACKUP_DIR"
-    echo -e "  - Consulta la documentación en: $PROJECT_ROOT/README.md"
-    echo
-    echo -e "${PURPLE}🌟 ¡Disfruta tu nueva configuración!${COLOR_RESET}"
-}
-
-# =====================================================
-# 🔧 FUNCIÓN PRINCIPAL
-# =====================================================
-
-main() {
-    # Mostrar banner
-    show_banner "$PROJECT_NAME v$PROJECT_VERSION" "$PROJECT_DESCRIPTION"
-    
-    # Parsear argumentos
-    parse_arguments "$@"
-    
-    # Inicializar biblioteca
-    init_library
-    
-    # Analizar sistema
-    analyze_system
-    
-    # Descubrir módulos disponibles
-    local available_modules=()
-    # Capturar salida limpia de discover_modules sin mezclar logs
-    mapfile -t available_modules < <(discover_modules)
+    # Crear backup si es necesario
+    [[ "$DRY_RUN" != "true" ]] && backup_existing_configs
     
     # Determinar módulos a instalar
     local modules_to_install=()
+    
     if [[ "$INSTALL_ALL" == "true" ]]; then
-        modules_to_install=("${available_modules[@]}")
-    else
-        # Validar que los módulos solicitados existan en la lista disponible
-        for m in "${INSTALL_MODULES[@]}"; do
-            for a in "${available_modules[@]}"; do
-                if [[ "$m" == "$a" ]]; then
-                    modules_to_install+=("$m")
-                    break
+        mapfile -t modules_to_install < <(discover_modules)
+    elif [[ ${#SELECTED_MODULES[@]} -gt 0 ]]; then
+        # Expandir wildcards (ej: core:*)
+        for pattern in "${SELECTED_MODULES[@]}"; do
+            if [[ "$pattern" == *:* ]]; then
+                local category="${pattern%:*}"
+                local module_part="${pattern#*:}"
+                
+                if [[ "$module_part" == "*" ]]; then
+                    local matches=()
+                    mapfile -t matches < <(discover_modules | grep "^${category}:")
+                    [[ ${#matches[@]} -gt 0 ]] && modules_to_install+=("${matches[@]}")
+                else
+                    modules_to_install+=("$pattern")
                 fi
-            done
-        done
-        # Si no se pasaron módulos válidos, ofrecer selección interactiva
-        if [[ ${#modules_to_install[@]} -eq 0 ]]; then
-            if [[ "${YES:-false}" == "true" ]]; then
-                # En modo no interactivo, instala todos para evitar bloqueo
-                modules_to_install=("${available_modules[@]}")
             else
-                mapfile -t modules_to_install < <(interactive_select_modules "${available_modules[@]}")
+                modules_to_install+=("$pattern")
             fi
-        fi
+        done
+    else
+        mapfile -t modules_to_install < <(interactive_selection)
     fi
+    
+    [[ ${#modules_to_install[@]} -eq 0 ]] && {
+        error "❌ No se seleccionaron módulos"
+        exit 1
+    }
     
     # Resolver dependencias
-    local ordered_modules=()
-    mapfile -t ordered_modules < <(resolve_dependencies "${modules_to_install[@]}")
+    log "🔗 Resolviendo dependencias..."
+    local resolved_modules=()
+    mapfile -t resolved_modules < <(resolve_dependencies "${modules_to_install[@]}")
     
-    if [[ ${#ordered_modules[@]} -eq 0 ]]; then
-        error "No se encontraron módulos para instalar"
-        exit 1
-    fi
+    # Mostrar plan de instalación
+    echo -e "${YELLOW}📋 Plan de instalación (${#resolved_modules[@]} módulos):${NC}"
+    for module in "${resolved_modules[@]}"; do
+        if [[ " ${modules_to_install[@]} " =~ " $module " ]]; then
+            echo -e "  • $module"
+        else
+            echo -e "  • $module ${CYAN}(dependencia)${NC}"
+        fi
+    done
+    echo
     
-    # Confirmar instalación (omitir si --yes o variables de CI)
-    if [[ "$DRY_RUN" != "true" ]] && [[ "$FORCE_INSTALL" != "true" ]] && [[ "${CI:-false}" != "true" ]] && [[ "${YES:-false}" != "true" ]]; then
-        echo -e "${YELLOW}📋 Módulos a instalar:${COLOR_RESET}"
-        for module in "${ordered_modules[@]}"; do
-            echo -e "  - $module"
-        done
-        echo
-        
-        if ! confirm "¿Continuar con la instalación?" true; then
+    # Confirmación final
+    [[ "$DRY_RUN" != "true" && "$FORCE_INSTALL" != "true" ]] && {
+        read -p "¿Continuar con la instalación? [y/N]: " -n 1 -r && echo
+        [[ $REPLY =~ ^[Yy]$ ]] || {
             log "Instalación cancelada por el usuario"
             exit 0
-        fi
-    fi
+        }
+    }
     
     # Instalar módulos
-    install_modules "${ordered_modules[@]}"
+    local start_time=$(date +%s)
+    local installed=0
+    local failed=0
     
-    # Configuración post-instalación
-    post_installation_setup
+    if [[ "$PARALLEL_INSTALL" == "true" && ${#resolved_modules[@]} -gt 1 ]]; then
+        install_modules_parallel "${resolved_modules[@]}"
+        
+        if [[ "$DRY_RUN" == "true" ]]; then
+            installed=${#resolved_modules[@]}
+            failed=0
+        else
+            for module in "${resolved_modules[@]}"; do
+                [[ -f "$HOME/.config/arch-dream/installed/$module" ]] && ((installed++)) || ((failed++))
+            done
+        fi
+    else
+        for module in "${resolved_modules[@]}"; do
+            if install_module "$module"; then
+                ((installed++))
+            else
+                ((failed++))
+                [[ "$FORCE_INSTALL" != "true" ]] && break
+            fi
+        done
+    fi
     
-    success "🎉 Instalación completada exitosamente!"
+    local total_time=$(($(date +%s) - start_time))
+    
+    # Resumen final mejorado
+    echo
+    echo -e "${BOLD}${BLUE}📊 RESUMEN DE INSTALACIÓN${NC}"
+    echo -e "${CYAN}┌─────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${CYAN}│${NC} Total de módulos: ${#resolved_modules[@]}"
+    echo -e "${CYAN}│${NC} Instalados: ${GREEN}$installed${NC}"
+    echo -e "${CYAN}│${NC} Fallidos: ${RED}$failed${NC}"
+    echo -e "${CYAN}│${NC} Tiempo total: ${total_time}s"
+    echo -e "${CYAN}│${NC} Log completo: $LOG_FILE"
+    echo -e "${CYAN}└─────────────────────────────────────────────────────────┘${NC}"
+    
+    if [[ $failed -eq 0 ]]; then
+        echo -e "${GREEN}🎉 ¡INSTALACIÓN COMPLETADA EXITOSAMENTE!${NC}"
+        echo
+        echo -e "${YELLOW}🚀 Próximos pasos:${NC}"
+        echo -e "  1. Reinicia tu terminal: ${CYAN}exec \$SHELL${NC}"
+        echo -e "  2. Usa el CLI: ${CYAN}./arch-dream status${NC}"
+        echo -e "  3. Explora las nuevas funcionalidades"
+        
+        [[ -f "$HOME/.arch-dream-last-backup" ]] && {
+            echo
+            echo -e "${CYAN}💾 Backup disponible en: $(cat "$HOME/.arch-dream-last-backup")${NC}"
+        }
+    else
+        echo -e "${YELLOW}⚠️  INSTALACIÓN COMPLETADA CON $failed ERRORES${NC}"
+        echo -e "${CYAN}📋 Revisa el log: $LOG_FILE${NC}"
+        exit 1
+    fi
 }
 
 # Ejecutar función principal

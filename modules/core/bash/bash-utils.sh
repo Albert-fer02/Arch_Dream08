@@ -10,9 +10,19 @@
 # 🔧 LOCALE AND ENVIRONMENT UTILITIES
 # =====================================================
 
-# Clean locale setup function
+# Clean locale setup function with dependency validation
 setup_clean_locale() {
-    local locale="${ARCH_DREAM_LOCALE:-C.utf8}"
+    local locale="${ARCH_DREAM_LOCALE:-en_US.UTF-8}"
+    
+    # Validate locale is available on system
+    if ! locale -a 2>/dev/null | grep -q "${locale%.*}"; then
+        # Fallback to C.utf8 if primary locale not available
+        locale="C.utf8"
+        if ! locale -a 2>/dev/null | grep -q "C.utf8"; then
+            # Final fallback to POSIX
+            locale="C"
+        fi
+    fi
     
     # Unset all locale variables
     unset LANG LC_ALL LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY \
@@ -22,6 +32,7 @@ setup_clean_locale() {
     # Set clean locale
     export LANG="$locale"
     export LC_ALL="$locale"
+    export ARCH_DREAM_LOCALE="$locale"
 }
 
 # Silent environment setup
@@ -141,6 +152,78 @@ setup_dev_env() {
             echo "Generic development environment setup"
             ;;
     esac
+}
+
+# =====================================================
+# 🔍 DEPENDENCY VALIDATION UTILITIES
+# =====================================================
+
+# Validate FZF dependencies
+validate_fzf_deps() {
+    local issues=()
+    
+    # Check if fzf is installed
+    if ! command -v fzf &> /dev/null; then
+        issues+=("FZF not installed")
+        return 1
+    fi
+    
+    # Check fd dependency
+    if ! command -v fd &> /dev/null; then
+        issues+=("fd not installed (required for FZF_DEFAULT_COMMAND)")
+        echo "Warning: fd not found. Install with: pacman -S fd"
+    fi
+    
+    # Check FZF integration files
+    if [[ ! -f /usr/share/fzf/key-bindings.bash ]] || [[ ! -f /usr/share/fzf/completion.bash ]]; then
+        issues+=("FZF bash integration files missing")
+        echo "Warning: FZF bash integration not found. Reinstall fzf package."
+    fi
+    
+    if [[ ${#issues[@]} -gt 0 ]]; then
+        echo "FZF validation issues found:"
+        printf "  - %s\n" "${issues[@]}"
+        return 1
+    fi
+    
+    echo "✓ FZF dependencies validated"
+    return 0
+}
+
+# Validate development tools
+validate_dev_tools() {
+    local missing=()
+    
+    # Essential tools
+    local tools=("git" "curl" "wget" "unzip" "tar")
+    for tool in "${tools[@]}"; do
+        if ! command -v "$tool" &> /dev/null; then
+            missing+=("$tool")
+        fi
+    done
+    
+    # Optional development tools
+    local optional=("nvim" "code" "node" "npm" "cargo" "python3")
+    local optional_missing=()
+    for tool in "${optional[@]}"; do
+        if ! command -v "$tool" &> /dev/null; then
+            optional_missing+=("$tool")
+        fi
+    done
+    
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Missing essential tools:"
+        printf "  - %s\n" "${missing[@]}"
+        return 1
+    fi
+    
+    if [[ ${#optional_missing[@]} -gt 0 ]]; then
+        echo "Optional tools not found:"
+        printf "  - %s\n" "${optional_missing[@]}"
+    fi
+    
+    echo "✓ Development tools validated"
+    return 0
 }
 
 # =====================================================
@@ -264,6 +347,12 @@ main() {
         diagnose)
             diagnose_bash
             ;;
+        validate-fzf)
+            validate_fzf_deps
+            ;;
+        validate-tools)
+            validate_dev_tools
+            ;;
         help|*)
             cat << 'EOF'
 Bash Utilities - Unified Script Collection
@@ -282,6 +371,8 @@ Actions:
   clean-cache          Clean bash cache
   reset                Reset bash environment
   diagnose             Show bash configuration diagnostics
+  validate-fzf         Validate FZF and dependencies
+  validate-tools       Validate development tools
   help                 Show this help message
 
 Examples:
@@ -298,6 +389,7 @@ EOF
 export -f setup_clean_locale setup_silent_env exec_bash_clean exec_bash_silent
 export -f exec_bash_wrapper source_bashrc_silent create_silent_bashrc
 export -f setup_dev_env clean_bash_cache reset_bash_env diagnose_bash
+export -f validate_fzf_deps validate_dev_tools
 
 # Execute main function if script is run directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

@@ -1,19 +1,20 @@
 # =====================================================
 # 🚀 STARSHIP PROMPT - ARCH DREAM UNIFIED
 # =====================================================
-# Configuración unificada optimizada para Bash y Zsh
+# Configuración optimizada para Arch Linux
+# Compatible con Kitty Terminal y Warp AI
 # Diseño moderno, eficiente y altamente funcional
 # =====================================================
 
-# Configuración optimizada y unificada
+# Diseño inspirado en Powerlevel10k - Productivo y Minimalista
 format = """
-╭─ $os$username$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill
-╰─ $character"""
+$os$username$directory$git_branch$git_status$python$nodejs$rust$golang$docker_context$package$fill$cmd_duration$jobs
+$character"""
 
-right_format = "$cmd_duration $jobs"
+right_format = "$battery"
 
 add_newline = true
-command_timeout = 300
+command_timeout = 1000
 scan_timeout = 30
 continuation_prompt = "❯ "
 
@@ -27,7 +28,7 @@ style = "fg:#45475A"
 # =====================================================
 
 [os]
-format = "[$symbol]($style)"
+format = "[$symbol]($style) "
 style = "bold fg:#CBA6F7"
 disabled = false
 
@@ -80,15 +81,16 @@ Windows = "🪟"
 [username]
 style_user = "bold fg:#89B4FA"
 style_root = "bold fg:#F38BA8"
-format = "[$user](bold fg:#CDD6F4) "
+format = "[$user]($style) "
 disabled = false
 show_always = true
 
 [hostname]
 ssh_only = true
-format = "[ $hostname](bold bright-yellow) "
+format = "[@$hostname]($style) "
 disabled = false
-style = "bold bright-yellow"
+style = "bold fg:#A6E3A1"
+trim_at = ".local"
 
 # =====================================================
 # 📁 DIRECTORIO - Navegación inteligente
@@ -98,12 +100,14 @@ style = "bold bright-yellow"
 style = "bold fg:#89B4FA"
 format = "[$path]($style)[$read_only]($read_only_style) "
 truncation_length = 3
-truncation_symbol = "…"
-read_only = "[RO]"
-read_only_style = "fg:#F38BA8"
+truncation_symbol = ""
+read_only = ""
+read_only_style = "bold fg:#F38BA8"
 home_symbol = "~"
 use_logical_path = true
 fish_style_pwd_dir_length = 1
+before_repo_root_style = "bold fg:#6C7086"
+repo_root_style = "bold fg:#89B4FA"
 
 [directory.substitutions]
 "Documents" = "docs"
@@ -135,11 +139,11 @@ fish_style_pwd_dir_length = 1
 # =====================================================
 
 [git_branch]
-symbol = "󰄪 "
-format = "[$symbol$branch(:$remote_branch)]($style) "
+symbol = " "
+format = "[$symbol$branch]($style) "
 style = "bold fg:#A6E3A1"
-truncation_length = 12
-truncation_symbol = "…"
+truncation_length = 10
+truncation_symbol = ""
 
 [git_commit]
 commit_hash_length = 7
@@ -169,19 +173,19 @@ format = "([+$added]($added_style) )([-$deleted]($deleted_style) )"
 disabled = true
 
 [git_status]
-format = "([$all_status$ahead_behind]($style))"
-style = "fg:#F9E2AF"
-ahead = "↑${count}"
-diverged = "⇅${ahead_count}⇅${behind_count}"
-behind = "↓${count}"
-up_to_date = "✓"
-untracked = "[?${count}](fg:#FAB387)"
-modified = "[!${count}](fg:#F38BA8)"
-staged = "[+${count}](fg:#A6E3A1)"
-renamed = "[~${count}](fg:#89B4FA)"
-deleted = "[-${count}](fg:#F38BA8)"
-stashed = "[*${count}](fg:#CBA6F7)"
-conflicted = "[x${count}](fg:#F38BA8)"
+format = "[$all_status$ahead_behind]($style) "
+style = "bold fg:#F9E2AF"
+ahead = "⇡${count}"
+diverged = "⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+up_to_date = ""
+untracked = "?${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✘${count}"
+stashed = "*${count}"
+conflicted = "=${count}"
 ignore_submodules = true
 disabled = false
 
@@ -199,36 +203,36 @@ vicmd_symbol = "[❮](bold fg:#F9E2AF)"
 # =====================================================
 
 [python]
-symbol = "󰪔 "
+symbol = " "
 format = "[$symbol$version]($style) "
 style = "bold fg:#FAB387"
-pyenv_version_name = true
-python_binary = ["./venv/bin/python", "python", "python3"]
+pyenv_version_name = false
+python_binary = ["python3", "python"]
 detect_extensions = ["py"]
-detect_files = ["requirements.txt", ".python-version", "pyproject.toml", "Pipfile", "tox.ini", "setup.py", "__init__.py"]
-detect_folders = [".venv", "venv", ".env"]
+detect_files = ["requirements.txt", "pyproject.toml", "Pipfile"]
+detect_folders = [".venv", "venv"]
 
 [nodejs]
-symbol = "󰩏 "
+symbol = " "
 format = "[$symbol$version]($style) "
 style = "bold fg:#A6E3A1"
-detect_files = ["package.json", ".nvmrc"]
+detect_files = ["package.json"]
 detect_folders = ["node_modules"]
-detect_extensions = ["js", "mjs", "cjs", "ts"]
+detect_extensions = ["js", "ts"]
 
 [rust]
-symbol = "󰪌 "
+symbol = " "
 format = "[$symbol$version]($style) "
 style = "bold fg:#F38BA8"
 detect_extensions = ["rs"]
 detect_files = ["Cargo.toml"]
 
 [golang]
-symbol = "󰩟 "
+symbol = " "
 format = "[$symbol$version]($style) "
 style = "bold fg:#89B4FA"
 detect_extensions = ["go"]
-detect_files = ["go.mod", "go.sum", "glide.yaml", "Gopkg.yml", "Gopkg.lock", ".go-version"]
+detect_files = ["go.mod"]
 
 [java]
 symbol = "󰩄 "
@@ -260,12 +264,12 @@ style = "bold fg:#89B4FA"
 # =====================================================
 
 [docker_context]
-symbol = "󰨏 "
+symbol = " "
 format = "[$symbol$context]($style) "
 style = "bold fg:#89B4FA"
 only_with_files = true
-detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
-detect_folders = [".devcontainer"]
+detect_files = ["Dockerfile", "docker-compose.yml"]
+detect_folders = []
 
 [kubernetes]
 format = "[$symbol$context( \\($namespace\\)) ]($style)"
@@ -338,7 +342,7 @@ style = "bold bright-cyan"
 # =====================================================
 
 [package]
-symbol = "󰖪 "
+symbol = " "
 format = "[$symbol$version]($style) "
 style = "bold fg:#89B4FA"
 display_private = false
@@ -368,18 +372,19 @@ style = "bold fg:#FAB387"
 
 [memory_usage]
 symbol = " "
-format = "[$symbol${ram}]($style)"
-threshold = 75
+format = "[$symbol$ram]($style) "
+threshold = 80
 style = "fg:#F38BA8"
 disabled = false
 
 [battery]
-full_symbol = " "
-charging_symbol = " "
-discharging_symbol = " "
-unknown_symbol = " "
-empty_symbol = " "
-disabled = true
+full_symbol = "󰁹 "
+charging_symbol = "󰂄 "
+discharging_symbol = "󰁾 "
+unknown_symbol = "󰁽 "
+empty_symbol = "󰂎 "
+disabled = false
+format = "[$symbol$percentage]($style) "
 
 [[battery.display]]
 threshold = 15
@@ -399,8 +404,8 @@ style = "green"
 
 [jobs]
 symbol = " "
-format = "[$symbol$number ]($style)"
-style = "bold fg:#89B4FA"
+format = "[$symbol$number]($style) "
+style = "fg:#89B4FA"
 number_threshold = 1
 symbol_threshold = 1
 
@@ -409,19 +414,66 @@ symbol_threshold = 1
 # =====================================================
 
 [time]
-disabled = true
-format = " [$time]($style)"
-style = "fg:#CDD6F4"
+disabled = false
+format = "[$time]($style) "
+style = "fg:#6C7086"
 time_format = "%H:%M"
 utc_time_offset = "local"
 
 [cmd_duration]
 min_time = 2000
-format = "[󰥓 $duration]($style)"
+format = "[ $duration]($style) "
 style = "fg:#F9E2AF"
 show_milliseconds = false
 show_notifications = false
-min_time_to_notify = 45000
+min_time_to_notify = 30000
+
+# =====================================================
+# 🖥️ COMPATIBILIDAD CON TERMINALES MODERNOS
+# =====================================================
+# Optimizado para Kitty Terminal y Warp AI
+# Mejoras específicas para Arch Linux
+
+# Configuración específica para Arch Linux
+[custom.arch_updates]
+command = "checkupdates 2>/dev/null | wc -l"
+when = "command -v checkupdates >/dev/null 2>&1"
+symbol = "󰄨 "
+style = "bold yellow"
+format = "[$symbol$output]($style) "
+shell = ["bash", "--noprofile", "--norc"]
+disabled = true
+
+# AUR helper detection
+[custom.aur_helper]
+command = '''
+if command -v yay >/dev/null 2>&1; then echo "yay"
+elif command -v paru >/dev/null 2>&1; then echo "paru"
+elif command -v trizen >/dev/null 2>&1; then echo "trizen"
+else echo ""
+fi
+'''
+when = "command -v yay >/dev/null 2>&1 || command -v paru >/dev/null 2>&1 || command -v trizen >/dev/null 2>&1"
+symbol = "󰮯 "
+style = "bold cyan"
+format = "[$symbol$output]($style) "
+shell = ["bash", "--noprofile", "--norc"]
+disabled = true
+
+# Detección de terminal para optimización específica
+[custom.terminal_info]
+command = '''
+if [ "$TERM_PROGRAM" = "WarpTerminal" ]; then echo "warp"
+elif [ "$KITTY_WINDOW_ID" != "" ]; then echo "kitty"
+else echo ""
+fi
+'''
+when = 'test "$TERM_PROGRAM" = "WarpTerminal" || test -n "$KITTY_WINDOW_ID"'
+symbol = "󰧨 "
+style = "bold purple"
+format = "[$symbol$output]($style) "
+shell = ["bash", "--noprofile", "--norc"]
+disabled = true
 
 # =====================================================
 # 🔐 VARIABLES PERSONALIZADAS RED TEAM PRO
@@ -450,14 +502,14 @@ style = "bold bright-red"
 variable = "TARGET"
 symbol = "🎯"
 format = "[$symbol$env_value ]($style)"
-style = "bold black bg:bright-red"
+style = "bold bright-white bg:red"
 
 # Proxy/Tunnel activo
 [env_var.PROXY]
 variable = "PROXY"
-symbol = "🚇"
+symbol = "🔒"
 format = "[$symbol$env_value ]($style)"
-style = "bold bright-purple"
+style = "bold bright-cyan"
 
 # VPN Status
 [env_var.VPN_STATUS]
@@ -534,15 +586,8 @@ disabled = false
 # 💻 MÓDULOS ADICIONALES OPTIMIZADOS
 # =====================================================
 
-# Shell indicator (disabled for performance)
+# Shell indicator (disabled for minimalism)
 [shell]
-fish_indicator = "fish"
-powershell_indicator = "pwsh"
-unknown_indicator = "shell"
-zsh_indicator = "zsh"
-bash_indicator = "bash"
-style = "bold fg:#89B4FA"
-format = "[$indicator]($style) "
 disabled = true
 
 # Database connections (commented out - not standard starship modules)
@@ -569,11 +614,11 @@ disabled = true
 # ⚠️ OPTIMIZACIONES DE RENDIMIENTO
 # =====================================================
 
-# Módulos adicionales con iconos powerlevel10k
+# Módulos adicionales optimizados
 [bun]
-symbol = " "
+symbol = "󰓥 "
 format = "[$symbol$version]($style) "
-style = "bold fg:#FAB387"
+style = "fg:#FAB387"
 disabled = false
 
 [buf]

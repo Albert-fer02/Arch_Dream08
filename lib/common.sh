@@ -274,6 +274,11 @@ install_package() {
     fi
     
     # Instalar sin preguntar y evitando reinstalar si ya está
+    if ! sudo -n true 2>/dev/null; then
+        warn "⚠️  Sin permisos sudo para instalar $description"
+        return 1
+    fi
+    
     if ! sudo pacman -S --noconfirm --needed "$package"; then
         error "Fallo al instalar $description"
         return 1
@@ -462,6 +467,13 @@ confirm() {
         return 0
     fi
     
+    # En modo no interactivo, usar el valor por defecto
+    if [[ "${YES:-false}" == "true" ]] || [[ "${CI:-false}" == "true" ]] || [[ ! -t 0 ]]; then
+        debug "Modo no interactivo, usando valor por defecto: $default"
+        [[ "$default" == "true" ]]
+        return $?
+    fi
+    
     local prompt=""
     if [[ "$default" == "true" ]]; then
         prompt="$message (Y/n): "
@@ -573,7 +585,8 @@ init_library() {
     # En modo simulación, saltar checks que requieren sudo o conexión
     if [[ "${DRY_RUN:-false}" == "true" ]]; then
         warn "DRY-RUN: omitiendo verificación de sudo e internet"
-    else
+    elif [[ -t 0 ]]; then
+        # Solo verificar sudo si hay terminal interactiva
         # Verificar permisos
         if ! check_sudo; then
             error "No se pudieron obtener permisos sudo"
@@ -583,6 +596,15 @@ init_library() {
         if ! check_internet; then
             error "Sin conexión a internet"
             exit 1
+        fi
+    else
+        # En modo no interactivo, solo verificar si ya tenemos sudo
+        if ! sudo -n true 2>/dev/null; then
+            warn "⚠️  Ejecutando sin permisos sudo - algunas operaciones pueden fallar"
+        fi
+        # Verificar conexión básica
+        if ! check_internet; then
+            warn "⚠️  Sin conexión a internet - instalaciones pueden fallar"
         fi
     fi
 

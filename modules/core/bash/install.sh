@@ -25,9 +25,9 @@ source "$SCRIPT_DIR/../../../lib/common.sh"
 # 🔧 CONFIGURACIÓN DEL MÓDULO
 # =====================================================
 
-MODULE_NAME="Bash Unified Configuration"
-MODULE_DESCRIPTION="Configuración avanzada de Bash con arquitectura unificada y Starship"
-MODULE_DEPENDENCIES=("bash" "git" "curl" "wget")
+MODULE_NAME="Bash Optimized Configuration"
+MODULE_DESCRIPTION="Configuración ultra-optimizada de Bash con lazy loading y performance mejorado"
+MODULE_DEPENDENCIES=("bash" "git")
 MODULE_FILES=("bashrc" "bashrc.root")
 
 # Flags de comportamiento (pueden sobreescribirse por entorno)
@@ -133,18 +133,22 @@ configure_prompt_theme_files() {
     # Configurar archivos de tema/plantilla para el prompt elegido
     case "$BASH_PROMPT" in
         starship|auto)
-            # Usar configuración centralizada de Starship
+            # Usar configuración centralizada de Starship (manejada por shell-base.sh)
             local src_starship="$SCRIPT_DIR/../../../lib/starship.toml"
             local dst_starship="$XDG_CONFIG_HOME/starship.toml"
             if [[ -f "$src_starship" ]]; then
                 mkdir -p "$(dirname "$dst_starship")"
                 create_symlink "$src_starship" "$dst_starship" "starship.toml"
+                success "✓ Starship configurado desde shell-base.sh"
             else
                 warn "⚠️  Configuración centralizada de Starship no encontrada"
             fi
             ;;
         oh-my-posh)
             warn "⚠️  Oh My Posh configuración eliminada, usando Starship como estándar"
+            ;;
+        native)
+            success "✓ Prompt nativo configurado en shell-base.sh"
             ;;
     esac
 }
@@ -163,17 +167,25 @@ configure_module_files() {
         if [[ ! -f "$HOME/.bashrc.local" ]]; then
             cat > "$HOME/.bashrc.local" << 'EOF'
 # =====================================================
-# 🧩 CONFIGURACIÓN LOCAL DE BASH
+# 🧩 CONFIGURACIÓN LOCAL DE BASH - OPTIMIZADA
 # =====================================================
 # Personalizaciones específicas del usuario (no se sobrescribe)
+# Configuración ultra-ligera para performance máximo
 
-# Ejemplos:
-# export BASH_PROMPT="starship"   # oh-my-posh | starship | native
+# Variables de entorno personalizadas
+# export ARCH_DREAM_LOCALE="en_US.UTF-8"
+
+# Herramientas opcionales (lazy loading automático)
+# export BASH_PROMPT="starship"   # starship | native
 # export BASH_ENABLE_FZF=true
-# export BASH_ENABLE_ZOXIDE=true
-# export BASH_ENABLE_DIRENV=true
-# export BASH_ENABLE_ATUIN=true
-# export BASH_ENABLE_BLE=false
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
 EOF
             success "✓ Archivo local creado: ~/.bashrc.local"
         fi

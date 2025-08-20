@@ -1,9 +1,9 @@
 #!/bin/bash
 # =====================================================
-# 🚀 BASH Configuration - Arch Dream Unified
+# 🚀 BASH Configuration - Arch Dream Optimized
 # =====================================================
 # Configuración ultra-optimizada usando arquitectura unificada
-# Features: Shared base, Starship prompt, modern tools
+# Features: Shell base unificado, lazy loading, performance optimizado
 # =====================================================
 
 # =====================================================
@@ -11,113 +11,87 @@
 # =====================================================
 
 # Load unified shell base configuration
-SHELL_BASE_FILE="${BASH_SOURCE[0]%/*}/../../../lib/shell-base.sh"
+BASHRC_PATH="$(realpath "${BASH_SOURCE[0]}")"
+BASHRC_DIR="$(dirname "$BASHRC_PATH")"
+SHELL_BASE_FILE="$BASHRC_DIR/../../../lib/shell-base.sh"
 if [[ -f "$SHELL_BASE_FILE" ]]; then
     source "$SHELL_BASE_FILE"
-    init_shell_base
 else
-    echo "⚠️  Warning: Unified shell base not found, using fallback configuration"
-    # Fallback basic configuration
+    echo "⚠️  Warning: Unified shell base not found at $SHELL_BASE_FILE"
+    # Minimal fallback configuration
     export EDITOR='nvim' VISUAL='nvim' BROWSER='firefox' TERMINAL='kitty'
-    export LANG="${ARCH_DREAM_LOCALE:-C.utf8}"
+    export LANG="${ARCH_DREAM_LOCALE:-en_US.UTF-8}"
     export LC_ALL="$LANG"
 fi
 
-# Source global definitions
+# Source global definitions if available
 [[ -f /etc/bashrc ]] && source /etc/bashrc
 
 # =====================================================
 # 🎯 BASH-SPECIFIC OPTIMIZATIONS
 # =====================================================
 
-# History configuration - Optimized
-HISTCONTROL=ignoreboth:erasedups
-HISTSIZE=5000
-HISTFILESIZE=10000
-HISTTIMEFORMAT="%Y-%m-%d %T "
-HISTIGNORE="ls:ll:la:cd:pwd:clear:history:exit"
-
-# Append to the history file, don't overwrite it
-shopt -s histappend
-
-# Check the window size after each command
-shopt -s checkwinsize
+# Shell options - Essential only (only in bash)
+if [[ -n "$BASH_VERSION" ]]; then
+    shopt -s histappend checkwinsize
+fi
 
 # Make less more friendly for non-text input files
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# Set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
+[[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # =====================================================
-# 🔧 COMPLETION SYSTEM
+# 🔧 BASH-SPECIFIC FEATURES
 # =====================================================
 
-# Enable programmable completion features
-if ! shopt -oq posix; then
-    if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-    elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
-    fi
-fi
-
-# =====================================================
-# 🚀 ENVIRONMENT INTEGRATIONS
-# =====================================================
-
-# FZF key bindings and completion
-if command -v fzf &> /dev/null; then
-    # Use system package if available
-    if [[ -f /usr/share/fzf/key-bindings.bash ]] && [[ -f /usr/share/fzf/completion.bash ]]; then
-        source /usr/share/fzf/key-bindings.bash
-        source /usr/share/fzf/completion.bash
-    fi
-    
-    # FZF configuration
-    export FZF_DEFAULT_OPTS="
-    --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
-    --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
-    --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
-    --height=60% --layout=reverse --border --margin=1 --padding=1
-    --preview-window=right:60%:wrap
-    --bind='ctrl-u:preview-page-up,ctrl-d:preview-page-down'
-    --bind='ctrl-/:toggle-preview'
-    --bind='ctrl-y:execute-silent(echo {} | xclip -selection clipboard)'
-    "
-    
-    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
-fi
-
-# =====================================================
-# 🔧 DEVELOPMENT INTEGRATIONS
-# =====================================================
-
-# Bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# Initialize fastfetch (system info display) - only if not in tmux/screen/vscode
-if [[ $- == *i* ]]; then
-    if [[ -z "$FASTFETCH_SHOWN" && -z "${TMUX:-}${STY:-}" && -z "${VSCODE_INJECTION:-}${TERM_PROGRAM:-}" ]]; then
-        if command -v fastfetch &> /dev/null; then
-            fastfetch
+# Enable programmable completion features (lazy load)
+load_bash_completion() {
+    if ! shopt -oq posix; then
+        if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+            source /usr/share/bash-completion/bash_completion
+        elif [[ -f /etc/bash_completion ]]; then
+            source /etc/bash_completion
         fi
-        export FASTFETCH_SHOWN=1
     fi
+}
+
+# FZF integration (lazy load)
+setup_fzf() {
+    if command -v fzf &> /dev/null; then
+        # Use system package if available
+        if [[ -f /usr/share/fzf/key-bindings.bash ]] && [[ -f /usr/share/fzf/completion.bash ]]; then
+            source /usr/share/fzf/key-bindings.bash
+            source /usr/share/fzf/completion.bash
+        fi
+        
+        # FZF configuration
+        export FZF_DEFAULT_OPTS="--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796 --height=60% --layout=reverse --border --margin=1 --padding=1"
+        export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+    fi
+}
+
+# Initialize features only when needed
+[[ $- == *i* ]] && setup_fzf
+
+# Bun completions (lazy)
+[[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
+
+# Fastfetch is handled by zsh only - removed from bash
+
+# Initialize starship prompt for bash
+if command -v starship &>/dev/null; then
+    eval "$(starship init bash)"
 fi
 
 # =====================================================
 # 🏁 FINAL INITIALIZATION
 # =====================================================
 
-# Load any additional custom configurations
-[ -f ~/.bashrc.local ] && source ~/.bashrc.local
+# Load local customizations
+[[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
 
-# Create local config if not exists
+# Create minimal local config if not exists
 if [[ ! -f "$HOME/.bashrc.local" ]]; then
     cat > "$HOME/.bashrc.local" << 'EOF'
 # =====================================================
@@ -129,8 +103,6 @@ if [[ ! -f "$HOME/.bashrc.local" ]]; then
 
 # Variables de entorno personalizadas
 # export ARCH_DREAM_LOCALE="en_US.UTF-8"
-# export TARGET=""
-# export PROXY=""
 
 # Aliases personalizados
 # alias custom="comando personalizado"
@@ -143,13 +115,9 @@ if [[ ! -f "$HOME/.bashrc.local" ]]; then
 EOF
 fi
 
-# =====================================================
-# 🔧 PERFORMANCE OPTIMIZATIONS
-# =====================================================
-
-# Disable welcome messages
+# Performance optimizations
 export BASH_WELCOME_SHOWN=1
-
-# Mark shell as loaded
 export BASH_CONFIG_LOADED=true
+
+# Debug message (only if requested)
 [[ -n "${ARCH_DREAM_DEBUG:-}" ]] && echo "✅ Bash configuration loaded successfully"

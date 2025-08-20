@@ -1,0 +1,158 @@
+#!/bin/bash
+# =====================================================
+# 🚀 ARCH DREAM - CLI TOOL v4.1
+# =====================================================
+
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERSION="4.1.0"
+
+# Colors
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
+
+log() { echo -e "${CYAN}[ARCH-DREAM]${NC} $*"; }
+success() { echo -e "${GREEN}[OK]${NC} $*"; }
+error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+
+show_help() {
+    echo -e "${BOLD}🚀 Arch Dream CLI v$VERSION${NC}"
+    cat << EOF
+
+${YELLOW}COMANDOS:${NC}
+  ${GREEN}status${NC}              Estado de módulos
+  ${GREEN}list${NC}                Listar módulos
+  ${GREEN}install${NC} <modules>   Instalar módulos
+  ${GREEN}update${NC}              Actualizar todo
+  ${GREEN}profile${NC} <name>      Instalar perfil (developer/gaming/minimal)
+  ${GREEN}doctor${NC}              Diagnosticar problemas
+  ${GREEN}clean${NC}               Limpiar cache
+  ${GREEN}version${NC}             Mostrar versión
+
+${YELLOW}EJEMPLOS:${NC}
+  arch-dream status
+  arch-dream install development:web
+  arch-dream profile developer
+  arch-dream doctor
+EOF
+}
+
+cmd_status() {
+    log "📊 Estado de Arch Dream v$VERSION"
+    
+    local modules=($(./install.sh --list | grep '^  - ' | sed 's/^  - //'))
+    local installed=0
+    
+    for module in "${modules[@]}"; do
+        if is_installed "$module"; then
+            echo -e "  ✅ $module"
+            ((installed++))
+        else
+            echo -e "  ❌ $module"
+        fi
+    done
+    
+    echo
+    success "$installed/${#modules[@]} módulos instalados"
+}
+
+cmd_install() {
+    local args=("$@")
+    # Convertir wildcards automáticamente
+    for i in "${!args[@]}"; do
+        if [[ "${args[$i]}" == *":all" ]]; then
+            args[$i]="${args[$i]%:all}:*"
+        fi
+    done
+    ./install.sh "${args[@]}"
+}
+
+cmd_update() {
+    log "🔄 Actualizando sistema..."
+    sudo pacman -Syu --noconfirm
+    
+    if [[ -d "$SCRIPT_DIR/.git" ]]; then
+        cd "$SCRIPT_DIR" && git pull
+    fi
+    
+    success "Sistema actualizado"
+}
+
+cmd_profile() {
+    local profile="$1"
+    shift
+    local extra_args=("$@")
+    
+    case "$profile" in
+        developer)
+            ./install.sh --force "${extra_args[@]}" core:zsh "development:*" terminal:kitty tools:fastfetch
+            ;;
+        gaming)
+            ./install.sh --force "${extra_args[@]}" core:zsh terminal:kitty tools:fastfetch
+            ;;
+        minimal)
+            ./install.sh --force "${extra_args[@]}" core:zsh tools:nano
+            ;;
+        server)
+            ./install.sh --force "${extra_args[@]}" core:bash tools:nano
+            ;;
+        *)
+            error "Perfil: developer, gaming, minimal, server"
+            return 1
+            ;;
+    esac
+}
+
+cmd_doctor() {
+    log "🔍 Diagnóstico del sistema"
+    
+    # Verificaciones básicas
+    [[ -f ./install.sh ]] && success "✓ Instalador OK" || error "✗ Instalador no encontrado"
+    [[ -d ./modules ]] && success "✓ Módulos OK" || error "✗ Módulos no encontrados"
+    
+    # Verificar shell configs
+    [[ -f ~/.zshrc ]] && zsh -n ~/.zshrc && success "✓ .zshrc OK" || error "✗ .zshrc problema"
+    [[ -f ~/.bashrc ]] && bash -n ~/.bashrc && success "✓ .bashrc OK" || error "✗ .bashrc problema"
+    
+    # Herramientas esenciales
+    for tool in git sudo pacman; do
+        command -v "$tool" &>/dev/null && success "✓ $tool" || error "✗ $tool faltante"
+    done
+}
+
+cmd_clean() {
+    log "🧹 Limpiando cache..."
+    rm -f ~/.zshrc.zwc ~/.zcompdump* 2>/dev/null || true
+    sudo pacman -Sc --noconfirm
+    success "Cache limpiado"
+}
+
+is_installed() {
+    local module="$1"
+    case "$module" in
+        "core:zsh") [[ -f ~/.zshrc && -L ~/.zshrc ]] ;;
+        "core:bash") [[ -f ~/.bashrc && -L ~/.bashrc ]] ;;
+        "development:nvim") [[ -d ~/.config/nvim ]] ;;
+        "development:web") [[ -f ~/.npmrc ]] ;;
+        "terminal:kitty") [[ -f ~/.config/kitty/kitty.conf ]] ;;
+        "tools:fastfetch") command -v fastfetch &>/dev/null ;;
+        "tools:nano") [[ -f ~/.nanorc ]] ;;
+        *) false ;;
+    esac
+}
+
+main() {
+    case "${1:-help}" in
+        status) cmd_status ;;
+        list) ./install.sh --list ;;
+        install) shift; cmd_install "$@" ;;
+        update) cmd_update ;;
+        profile) shift; cmd_profile "$@" ;;
+        doctor) cmd_doctor ;;
+        clean) cmd_clean ;;
+        version) echo "v$VERSION" ;;
+        *) show_help ;;
+    esac
+}
+
+main "$@"

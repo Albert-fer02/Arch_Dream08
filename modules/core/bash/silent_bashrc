@@ -1,9 +1,0 @@
-#!/bin/bash
-# Silent bashrc wrapper
-
-# Force locale override
-export LANG=C.utf8
-export LC_ALL=C.utf8
-
-# Source the real bashrc but suppress setlocale warnings
-source /home/dreamcoder08/Documentos/PROYECTOS/Arch_Dream08/modules/core/bash/bashrc 2> >(grep -v "setlocale" >&2)
