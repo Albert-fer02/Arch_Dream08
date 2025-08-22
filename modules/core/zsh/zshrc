@@ -1,68 +1,52 @@
 #!/bin/zsh
 # =====================================================
-# 🚀 ZSH Configuration - Arch Dream v4.1
+# 🚀 ZSH Configuration - Arch Dream v4.2 CLEAN
 # =====================================================
-# Clean and optimized Zsh configuration
-# =====================================================
-
-# =====================================================
-# ⚡ BASIC CONFIGURATION
+# Focused and essential Zsh configuration
 # =====================================================
 
-# History configuration optimizada
+# =====================================================
+# 📚 HISTORIAL OPTIMIZADO
+# =====================================================
+
 HISTFILE=~/.zsh_history
 HISTSIZE=50000
 SAVEHIST=50000
+
+# Opciones de historial esenciales
 setopt HIST_IGNORE_DUPS          # No duplicar comandos consecutivos
 setopt HIST_IGNORE_ALL_DUPS      # Eliminar duplicados en todo el historial
 setopt HIST_SAVE_NO_DUPS         # No guardar duplicados
 setopt HIST_FIND_NO_DUPS         # No mostrar duplicados en búsqueda
 setopt HIST_IGNORE_SPACE         # Ignorar comandos que empiecen con espacio
 setopt HIST_REDUCE_BLANKS        # Eliminar espacios extras
-setopt HIST_VERIFY              # Verificar antes de ejecutar !!
-setopt SHARE_HISTORY            # Compartir historial entre sesiones
-setopt APPEND_HISTORY           # Agregar al historial, no sobrescribir
-setopt INC_APPEND_HISTORY       # Escribir inmediatamente al historial
-setopt EXTENDED_HISTORY         # Incluir timestamps en historial
+setopt HIST_VERIFY               # Verificar antes de ejecutar !!
+setopt SHARE_HISTORY             # Compartir historial entre sesiones
+setopt APPEND_HISTORY            # Agregar al historial
+setopt INC_APPEND_HISTORY        # Escribir inmediatamente
+setopt EXTENDED_HISTORY          # Incluir timestamps
 
-# Directory navigation mejorada
-setopt AUTO_CD               # cd automático
-setopt AUTO_PUSHD            # push automático al directorio stack
-setopt PUSHD_IGNORE_DUPS     # No duplicar en stack
-setopt PUSHD_SILENT          # No mostrar stack después de pushd
-setopt PUSHD_TO_HOME         # pushd sin argumentos va a home
-setopt CDABLE_VARS           # Permite cd a variables
+# Navegación de directorios
+setopt AUTO_CD                   # cd automático
+setopt AUTO_PUSHD                # push automático al directorio stack
+setopt PUSHD_IGNORE_DUPS         # No duplicar en stack
 
-# Completion system avanzado
+# =====================================================
+# ⚡ COMPLETION BÁSICO
+# =====================================================
+
 autoload -Uz compinit
+compinit
 
-# Compilar completions solo una vez al día para mejor rendimiento
-if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
-    compinit
-else
-    compinit -C
-fi
-
-setopt COMPLETE_IN_WORD      # Completar en medio de palabras
-setopt ALWAYS_TO_END         # Cursor al final después de completar
-setopt AUTO_MENU             # Mostrar menu de completions
-setopt AUTO_LIST             # Listar opciones automáticamente
-setopt AUTO_PARAM_SLASH      # Agregar slash a directorios
-setopt AUTO_PARAM_KEYS       # Completar llaves automáticamente
-setopt FLOW_CONTROL          # Permitir Ctrl+S/Ctrl+Q
-setopt MENU_COMPLETE         # Completar con TAB en menu
+setopt COMPLETE_IN_WORD          # Completar en medio de palabras
+setopt ALWAYS_TO_END             # Cursor al final después de completar
+setopt AUTO_MENU                 # Mostrar menu de completions
+setopt AUTO_LIST                 # Listar opciones automáticamente
 
 # Opciones adicionales útiles
-setopt CORRECT               # Corregir comandos mal escritos
-setopt CORRECT_ALL           # Corregir todos los argumentos
-setopt EXTENDED_GLOB         # Globbing extendido
-setopt NO_BEEP              # Sin sonidos
-setopt NO_CASE_GLOB         # Globbing insensitive a mayúsculas
-setopt NUMERIC_GLOB_SORT    # Ordenar archivos numéricamente
-setopt RC_EXPAND_PARAM      # Expansión de parámetros mejorada
-setopt CHASE_LINKS          # Resolver enlaces simbólicos
-setopt MULTIOS              # Redirección múltiple
-setopt LONG_LIST_JOBS       # Formato largo para jobs
+setopt CORRECT                   # Corregir comandos mal escritos
+setopt EXTENDED_GLOB             # Globbing extendido
+setopt NO_BEEP                   # Sin sonidos
 
 # =====================================================
 # 🎨 STARSHIP PROMPT
@@ -71,12 +55,11 @@ setopt LONG_LIST_JOBS       # Formato largo para jobs
 if command -v starship &>/dev/null; then
     eval "$(starship init zsh)"
 else
-    # Fallback prompt
     PROMPT='%F{cyan}%n@%m%f:%F{blue}%~%f$ '
 fi
 
 # =====================================================
-# 🔧 ENVIRONMENT VARIABLES
+# 🔧 VARIABLES DE ENTORNO
 # =====================================================
 
 export EDITOR='nvim'
@@ -87,36 +70,35 @@ export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 
 # =====================================================
-# 📂 ALIASES
+# 📂 ALIASES ESENCIALES
 # =====================================================
 
-# Navigation
+# Navegación
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -- -='cd -'
 
-# File operations
+# Operaciones de archivos
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -I'
 alias mkdir='mkdir -pv'
 
-# List files
+# Listado de archivos
 if command -v eza &>/dev/null; then
     alias ls='eza --icons --group-directories-first'
     alias ll='eza -l --icons --group-directories-first'
     alias la='eza -la --icons --group-directories-first'
     alias tree='eza --tree --icons'
 else
-    alias ll='ls -l'
-    alias la='ls -la'
+    alias ll='ls -l --color=auto'
+    alias la='ls -la --color=auto'
 fi
 
-# Modern replacements with fallbacks
+# Herramientas modernas
 if command -v bat &>/dev/null; then
     alias cat='bat --style=auto --paging=never'
-    alias catt='bat --style=plain --paging=never'  # cat tradicional
 fi
 
 if command -v btop &>/dev/null; then
@@ -128,242 +110,97 @@ fi
 
 if command -v rg &>/dev/null; then
     alias grep='rg --smart-case --hidden'
-    alias rgg='rg --no-heading --with-filename'
 fi
 
 if command -v fd &>/dev/null; then
     alias find='fd --hidden --follow'
-    alias fdd='fd --type d'  # Solo directorios
-    alias fdf='fd --type f'  # Solo archivos
 fi
 
-if command -v dust &>/dev/null; then
-    alias du='dust'
-fi
-
-if command -v duf &>/dev/null; then
-    alias df='duf'
-fi
-
-if command -v procs &>/dev/null; then
-    alias ps='procs'
-fi
-
-# Git shortcuts extendidos
+# Git shortcuts
 alias g='git'
 alias gs='git status -sb'
-alias gss='git status'
 alias ga='git add'
-alias gaa='git add --all'
 alias gc='git commit'
-alias gcm='git commit -m'
-alias gca='git commit --amend'
 alias gp='git push'
-alias gpo='git push origin'
 alias gl='git pull'
-alias glo='git pull origin'
 alias gd='git diff'
-alias gds='git diff --staged'
-alias gdt='git difftool'
 alias gco='git checkout'
-alias gcb='git checkout -b'
 alias gb='git branch'
-alias gba='git branch -a'
-alias gbd='git branch -d'
-alias gbD='git branch -D'
-alias gm='git merge'
-alias gr='git rebase'
-alias gri='git rebase -i'
-alias grh='git reset --hard'
-alias grs='git reset --soft'
-alias gst='git stash'
-alias gstp='git stash pop'
-alias gsta='git stash apply'
-alias gstd='git stash drop'
-alias gstl='git stash list'
-alias glog='git log --oneline --graph --decorate --all'
-alias glol='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
-alias glols='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit --all'
-alias gwip='git add -A; git commit -m "WIP"'
-alias gunwip='git log -n 1 | grep -q -c "WIP" && git reset HEAD~1'
+alias glog='git log --oneline --graph --decorate'
 
-# System info extendida
+# Sistema
 alias myip='curl -s ipinfo.io/ip'
-alias localip="ip route get 1.1.1.1 | grep -oP 'src \K\S+'"
-alias publicip='curl -s ifconfig.me'
-alias ips="ip -c addr show | grep -E '^[0-9]+:' -A 2"
 alias ports='netstat -tulanp'
-alias listening='netstat -tlnp'
 alias sysinfo='fastfetch 2>/dev/null || neofetch 2>/dev/null || uname -a'
-alias diskusage='df -h | grep -vE "^Filesystem|tmpfs|cdrom"'
-alias meminfo='free -h'
-alias cpuinfo='lscpu'
-alias gpuinfo='lspci | grep -i vga'
 
-# Arch Linux específicos
+# Arch Linux
 alias pacupdate='sudo pacman -Syu'
 alias pacinstall='sudo pacman -S'
-alias pacremove='sudo pacman -Rns'
 alias pacsearch='pacman -Ss'
-alias pacinfo='pacman -Si'
-alias paclist='pacman -Q'
-alias pacorphans='pacman -Qtdq'
-alias pacclean='sudo pacman -Sc'
 alias aurinstall='yay -S'
 alias aurupdate='yay -Syu'
-alias aursearch='yay -Ss'
 
 # =====================================================
-# 🔌 PLUGINS AND TOOLS
+# 🔌 PLUGINS
 # =====================================================
 
-# FZF integration avanzada
-if command -v fzf &>/dev/null; then
-    # Source key bindings y completions
-    for fzf_file in /usr/share/fzf/{key-bindings,completion}.zsh ~/.fzf/shell/{key-bindings,completion}.zsh; do
-        [[ -f "$fzf_file" ]] && source "$fzf_file"
-    done
-    
-    # Configuración FZF avanzada
-    export FZF_DEFAULT_OPTS="
-        --height 50%
-        --layout=reverse
-        --border
-        --inline-info
-        --preview 'bat --style=numbers --color=always --line-range :500 {}'
-        --preview-window up:60%:hidden:wrap
-        --bind 'ctrl-/:toggle-preview'
-        --bind 'ctrl-u:preview-page-up'
-        --bind 'ctrl-d:preview-page-down'
-        --bind 'alt-enter:select-all+accept'
-        --color='hl:148,hl+:154,pointer:032,marker:010,bg+:237,gutter:008'
-    "
-    
-    # FZF para diferentes comandos
-    if command -v fd &>/dev/null; then
-        export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-        export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
-    elif command -v rg &>/dev/null; then
-        export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    fi
-    
-    # Funciones FZF personalizadas
-    fcd() {
-        local dir
-        dir=$(fd --type d --hidden --follow --exclude .git | fzf --preview 'eza --tree --level=2 {} 2>/dev/null || tree -L 2 {} 2>/dev/null || ls -la {}') && cd "$dir"
-    }
-    
-    fvim() {
-        local file
-        file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {}') && nvim "$file"
-    }
-    
-    fkill() {
-        local pid
-        pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}') && kill -9 "$pid"
-    }
-    
-    fglog() {
-        git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-        fzf --ansi --no-sort --reverse --tiebreak=index \
-            --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show --color=always %' \
-            --bind 'enter:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show %)'
-    }
+# Autosuggestions
+if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 fi
 
-# Zoxide (better cd)
+# Syntax highlighting
+if [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+    source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# Completions adicionales
+if [[ -d /usr/share/zsh/plugins/zsh-completions ]]; then
+    fpath=(/usr/share/zsh/plugins/zsh-completions/src $fpath)
+fi
+
+# FZF
+if command -v fzf &>/dev/null; then
+    source /usr/share/fzf/key-bindings.zsh 2>/dev/null
+    source /usr/share/fzf/completion.zsh 2>/dev/null
+    
+    export FZF_DEFAULT_OPTS="--height 50% --layout=reverse --border"
+    
+    if command -v fd &>/dev/null; then
+        export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    fi
+fi
+
+# Zoxide
 if command -v zoxide &>/dev/null; then
     eval "$(zoxide init zsh)"
     alias cd='z'
 fi
 
-# Atuin (better history)
+# Atuin
 if command -v atuin &>/dev/null; then
     eval "$(atuin init zsh)"
 fi
 
 # =====================================================
-# 🎯 KEY BINDINGS AVANZADOS
+# 🎯 KEY BINDINGS BÁSICOS
 # =====================================================
 
-# Emacs-style key bindings
-bindkey -e
+bindkey -e  # Emacs-style
 
-# History search mejorado
+# History search
 bindkey '^R' history-incremental-search-backward
-bindkey '^S' history-incremental-search-forward
 bindkey '^P' history-search-backward
 bindkey '^N' history-search-forward
-
-# Navegación por historial con substring
-bindkey '^[[A' history-substring-search-up 2>/dev/null || bindkey '^[[A' up-line-or-history
-bindkey '^[[B' history-substring-search-down 2>/dev/null || bindkey '^[[B' down-line-or-history
-
-# Word navigation extendida
-bindkey '^[[1;5D' backward-word      # Ctrl+Left
-bindkey '^[[1;5C' forward-word       # Ctrl+Right
-bindkey '^[b' backward-word          # Alt+b
-bindkey '^[f' forward-word           # Alt+f
-
-# Line navigation
-bindkey '^A' beginning-of-line       # Ctrl+a
-bindkey '^E' end-of-line            # Ctrl+e
-bindkey '^[[H' beginning-of-line     # Home
-bindkey '^[[F' end-of-line          # End
-
-# Delete operations
-bindkey '^H' backward-kill-word      # Ctrl+Backspace
-bindkey '^[[3;5~' kill-word         # Ctrl+Delete
-bindkey '^W' backward-kill-word      # Ctrl+w
-bindkey '^K' kill-line              # Ctrl+k
-bindkey '^U' backward-kill-line     # Ctrl+u
-
-# Undo/Redo
-bindkey '^Z' undo                   # Ctrl+z
-bindkey '^Y' redo                   # Ctrl+y
-
-# Edit command line
-bindkey '^X^E' edit-command-line    # Ctrl+x Ctrl+e
-
-# Accept suggestions
-bindkey '^I' complete-word          # Tab
-bindkey '^[[Z' reverse-menu-complete # Shift+Tab
-
-# Clear screen
-bindkey '^L' clear-screen           # Ctrl+l
-
-# Custom functions keys
-# Insertar sudo al principio
-sudo-command-line() {
-    [[ -z $BUFFER ]] && zle up-history
-    if [[ $BUFFER == sudo\ * ]]; then
-        LBUFFER="${LBUFFER#sudo }"
-    else
-        LBUFFER="sudo $LBUFFER"
-    fi
-}
-zle -N sudo-command-line
-bindkey "\e\e" sudo-command-line  # Alt+Alt
-
-# =====================================================
-# 🚀 PERFORMANCE OPTIMIZATIONS
-# =====================================================
-
-# NVM lazy loading (moved to optimizations section)
-
-# Lazy load conda if it exists
-if [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]]; then
-    alias conda='unalias conda; source "$HOME/anaconda3/etc/profile.d/conda.sh"; conda'
-fi
 
 # =====================================================
 # 🎨 WELCOME MESSAGE
 # =====================================================
 
-# Show system info on first terminal open (optimized)
-if [[ -z "$FASTFETCH_SHOWN" && -z "${TMUX:-}${STY:-}" && -z "${VSCODE_INJECTION:-}${TERM_PROGRAM:-}" ]]; then
+if [[ -z "$FASTFETCH_SHOWN" && -z "${TMUX:-}${STY:-}" ]]; then
     if command -v fastfetch &>/dev/null; then
         fastfetch
         export FASTFETCH_SHOWN=1
@@ -374,15 +211,15 @@ if [[ -z "$FASTFETCH_SHOWN" && -z "${TMUX:-}${STY:-}" && -z "${VSCODE_INJECTION:
 fi
 
 # =====================================================
-# 🔧 FUNCIONES ADICIONALES
+# 🔧 FUNCIONES ÚTILES
 # =====================================================
 
-# Función para crear directorio y entrar
+# Crear directorio y entrar
 mkcd() {
     mkdir -p "$1" && cd "$1"
 }
 
-# Extraer cualquier tipo de archivo
+# Extraer archivos
 extract() {
     if [[ -f $1 ]]; then
         case $1 in
@@ -397,9 +234,7 @@ extract() {
             *.zip)       unzip "$1"     ;;
             *.Z)         uncompress "$1";;
             *.7z)        7z x "$1"      ;;
-            *.xz)        unxz "$1"      ;;
-            *.lzma)      unlzma "$1"    ;;
-            *)           echo "'$1' no se puede extraer con extract()" ;;
+            *)           echo "'$1' no se puede extraer" ;;
         esac
     else
         echo "'$1' no es un archivo válido"
@@ -414,286 +249,63 @@ backup() {
     echo "Backup creado: $backup_name"
 }
 
-# Buscar archivos por contenido
-fgrep() {
-    if command -v rg &>/dev/null; then
-        rg --color=always --line-number --no-heading --smart-case "${*:-}" |
-        fzf --ansi \
-            --color "hl:-1:underline,hl+:-1:underline:reverse" \
-            --delimiter : \
-            --preview 'bat --color=always {1} --highlight-line {2}' \
-            --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'
-    else
-        grep -r "$1" .
-    fi
-}
-
-# Buscar en historial con fecha
-hgrep() {
-    fc -li 1 | grep "$1"
-}
-
-# Información rápida del sistema
-quickinfo() {
-    echo -e "\033[1;34mSistema:\033[0m $(uname -sr)"
-    echo -e "\033[1;34mHostname:\033[0m $(hostname)"
-    echo -e "\033[1;34mUptime:\033[0m $(uptime -p 2>/dev/null || uptime)"
-    echo -e "\033[1;34mUsuario:\033[0m $(whoami)"
-    echo -e "\033[1;34mShell:\033[0m $SHELL"
-    echo -e "\033[1;34mTerminal:\033[0m $TERM"
-    echo -e "\033[1;34mPATH:\033[0m ${PATH//:/\n  }"
-}
-
 # Recargar configuración
 reload() {
     source ~/.zshrc
     echo "Configuración de Zsh recargada"
 }
 
-# Mostrar fastfetch nuevamente
-showinfo() {
-    unset FASTFETCH_SHOWN
-    if command -v fastfetch &>/dev/null; then
-        fastfetch
-        export FASTFETCH_SHOWN=1
-    elif command -v neofetch &>/dev/null; then
-        neofetch
-        export FASTFETCH_SHOWN=1
-    fi
+# Información del sistema
+quickinfo() {
+    echo -e "\033[1;34mSistema:\033[0m $(uname -sr)"
+    echo -e "\033[1;34mHostname:\033[0m $(hostname)"
+    echo -e "\033[1;34mUptime:\033[0m $(uptime -p 2>/dev/null || uptime)"
+    echo -e "\033[1;34mUsuario:\033[0m $(whoami)"
+    echo -e "\033[1;34mShell:\033[0m $SHELL"
 }
 
-# =====================================================
-# 🚀 FASTFETCH AUTO-START
-# =====================================================
-
-# Auto-start fastfetch for new terminal sessions
-if [[ -z "$FASTFETCH_SHOWN" ]]; then
-    if command -v fastfetch &>/dev/null; then
-        fastfetch
-        export FASTFETCH_SHOWN=1
-    elif command -v neofetch &>/dev/null; then
-        neofetch
-        export FASTFETCH_SHOWN=1
-    fi
-fi
-
-# =====================================================
-# 📋 LOCAL CUSTOMIZATIONS
-# =====================================================
-
-# Load local customizations if they exist
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-
-# =====================================================
-# 🎯 COMPLETION ENHANCEMENTS
-# =====================================================
-
-# Case insensitive completion
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-
-# Colored completion
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-
-# Menu selection
-zstyle ':completion:*' menu select
-
-# Group results by category
-zstyle ':completion:*' group-name ''
-
-# Describe options
-zstyle ':completion:*:descriptions' format '%F{cyan}-- %d --%f'
-
-# =====================================================
-# 🔧 FINAL SETUP
-# =====================================================
-
-# =====================================================
-# ⚡ OPTIMIZACIONES FINALES
-# =====================================================
-
-# Lazy load para nvm
-if [[ -d "$HOME/.nvm" ]]; then
-    export NVM_DIR="$HOME/.nvm"
-    nvm() {
-        unset -f nvm
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-        nvm "$@"
-    }
-fi
-
-# Lazy load para conda
-if [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" || -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]]; then
-    conda() {
-        unset -f conda
-        local conda_setup
-        if [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]]; then
-            conda_setup="$HOME/anaconda3/etc/profile.d/conda.sh"
-        elif [[ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]]; then
-            conda_setup="$HOME/miniconda3/etc/profile.d/conda.sh"
-        fi
-        [[ -n "$conda_setup" ]] && source "$conda_setup"
-        conda "$@"
-    }
-fi
-
-# Lazy load para pyenv
-if command -v pyenv &>/dev/null; then
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    pyenv() {
-        unset -f pyenv
-        eval "$(command pyenv init -)"
-        eval "$(command pyenv init --path)"
-        pyenv "$@"
-    }
-fi
-
-# Compile zshrc for faster loading
-if [[ ~/.zshrc -nt ~/.zshrc.zwc ]] || [[ ! -f ~/.zshrc.zwc ]]; then
-    zcompile ~/.zshrc &!
-fi
-
-# Limpiar variables temporales
-unset fzf_file conda_setup
-
-# Performance: preload common commands
-(command -v git fd rg bat eza &>/dev/null &)
-
-# Auto-update check (una vez al día)
-if [[ ! -f ~/.zsh_last_update ]] || [[ $(find ~/.zsh_last_update -mtime +1 2>/dev/null) ]]; then
-    if command -v yay &>/dev/null && [[ "$SHELL" == *"zsh" ]]; then
-        echo "\033[33m[Arch Dream] Checking for updates...\033[0m" >&2
-        touch ~/.zsh_last_update
-    fi
-fi
-# =====================================================
-# 🎯 FUNCIONES ADICIONALES ESPECÍFICAS
-# =====================================================
-
-# Funciones específicas para Arch Linux
+# Actualizar Arch
 arch-update() {
-    echo "🔄 Actualizando sistema Arch..."
+    echo "🔄 Actualizando sistema..."
     sudo pacman -Syu && {
         echo "✅ Sistema actualizado"
         if command -v yay &>/dev/null; then
-            echo "🔄 Actualizando paquetes AUR..."
             yay -Syu --noconfirm
         fi
     }
 }
 
-arch-clean() {
-    echo "🧹 Limpiando sistema Arch..."
-    sudo pacman -Sc --noconfirm
-    sudo pacman -Rns $(pacman -Qtdq) 2>/dev/null || echo "No hay paquetes huérfanos"
-    if command -v yay &>/dev/null; then
-        yay -Sc --noconfirm
-    fi
-    echo "✅ Sistema limpiado"
-}
-
+# Buscar paquetes
 arch-search() {
-    if [[ -z "$1" ]]; then
-        echo "Uso: arch-search <paquete>"
-        return 1
-    fi
+    [[ -z "$1" ]] && { echo "Uso: arch-search <paquete>"; return 1; }
     pacman -Ss "$1"
-    if command -v yay &>/dev/null; then
-        echo "\n🔍 Resultados de AUR:"
-        yay -Ss "$1"
-    fi
+    command -v yay &>/dev/null && yay -Ss "$1"
 }
 
-# Funciones de desarrollo
-devenv() {
-    case "$1" in
-        python|py)
-            echo "🐍 Configurando entorno Python..."
-            python -m venv venv
-            source venv/bin/activate
-            pip install --upgrade pip
-            echo "✅ Entorno Python activado"
-            ;;
-        node|js)
-            echo "📦 Configurando entorno Node.js..."
-            npm init -y
-            echo "✅ Proyecto Node.js inicializado"
-            ;;
-        rust|rs)
-            echo "🦀 Configurando entorno Rust..."
-            cargo init
-            echo "✅ Proyecto Rust inicializado"
-            ;;
-        go)
-            echo "🐹 Configurando entorno Go..."
-            go mod init $(basename $(pwd))
-            echo "✅ Módulo Go inicializado"
-            ;;
-        *)
-            echo "Uso: devenv [python|node|rust|go]"
-            echo "Entornos disponibles: python, node, rust, go"
-            ;;
-    esac
-}
+# =====================================================
+# 📋 CUSTOMIZACIONES LOCALES
+# =====================================================
 
-# Sistema de configuración rápida
-config-edit() {
-    case "$1" in
-        zsh|zshrc)
-            ${EDITOR:-nvim} ~/.zshrc
-            ;;
-        zshlocal|local)
-            ${EDITOR:-nvim} ~/.zshrc.local
-            ;;
-        nvim|vim)
-            ${EDITOR:-nvim} ~/.config/nvim/init.lua 2>/dev/null || ${EDITOR:-nvim} ~/.vimrc
-            ;;
-        starship)
-            ${EDITOR:-nvim} ~/.config/starship.toml
-            ;;
-        kitty)
-            ${EDITOR:-nvim} ~/.config/kitty/kitty.conf
-            ;;
-        alacritty)
-            ${EDITOR:-nvim} ~/.config/alacritty/alacritty.yml
-            ;;
-        tmux)
-            ${EDITOR:-nvim} ~/.tmux.conf
-            ;;
-        *)
-            echo "Configuraciones disponibles:"
-            echo "  zsh, zshlocal, nvim, starship, kitty, alacritty, tmux"
-            ;;
-    esac
-}
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
-# Git workflow simplificado
-git-workflow() {
-    case "$1" in
-        start)
-            git checkout -b "feature/$2"
-            echo "✅ Rama feature/$2 creada"
-            ;;
-        finish)
-            local current_branch=$(git branch --show-current)
-            git checkout main || git checkout master
-            git pull
-            git merge "$current_branch"
-            git branch -d "$current_branch"
-            echo "✅ Feature merge completado"
-            ;;
-        sync)
-            git add .
-            git commit -m "${2:-WIP: sync changes}"
-            git push
-            echo "✅ Cambios sincronizados"
-            ;;
-        *)
-            echo "Uso: git-workflow [start|finish|sync] <nombre>"
-            echo "  start <nombre>  - Crear nueva feature branch"
-            echo "  finish          - Merger y limpiar branch actual"
-            echo "  sync [mensaje]  - Add, commit y push rápido"
-            ;;
-    esac
-}
+# =====================================================
+# 🎨 COMPLETION STYLING BÁSICO
+# =====================================================
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# =====================================================
+# ⚡ LAZY LOADING ESENCIAL
+# =====================================================
+
+# NVM lazy loading
+if [[ -d "$HOME/.nvm" ]]; then
+    export NVM_DIR="$HOME/.nvm"
+    nvm() {
+        unset -f nvm
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm "$@"
+    }
+fi
