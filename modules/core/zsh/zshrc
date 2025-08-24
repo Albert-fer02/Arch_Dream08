@@ -309,3 +309,10 @@ if [[ -d "$HOME/.nvm" ]]; then
         nvm "$@"
     }
 fi
+export PATH=$PATH:/home/dreamcoder08/.local/bin
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Fastfetch aliases
+alias ff="fastfetch"
+alias ff-dream="fastfetch --config ~/.config/fastfetch/config.jsonc"
+alias ff-custom="fastfetch --config ~/.config/fastfetch/config.local.jsonc"

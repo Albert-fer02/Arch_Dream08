@@ -121,3 +121,8 @@ export BASH_CONFIG_LOADED=true
 
 # Debug message (only if requested)
 [[ -n "${ARCH_DREAM_DEBUG:-}" ]] && echo "✅ Bash configuration loaded successfully"
+
+# Fastfetch aliases
+alias ff="fastfetch"
+alias ff-dream="fastfetch --config ~/.config/fastfetch/config.jsonc"
+alias ff-custom="fastfetch --config ~/.config/fastfetch/config.local.jsonc"
