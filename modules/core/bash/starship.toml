@@ -5,29 +5,30 @@
 # Mantiene la estética original, mejora performance 78% menos código
 # =====================================================
 
-# Configuración optimizada y unificada
+# Configuración optimizada y unificada con diseño elegante
 format = """
-╭─ $os$username$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill
-╰─ $character"""
+╭─$os$username$hostname$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill$cmd_duration $jobs
+╰─$character"""
 
-right_format = "$cmd_duration $jobs"
+# right_format vacío para un diseño más limpio y centrado
+right_format = ""
 
 add_newline = true
 command_timeout = 1000
 scan_timeout = 50
 continuation_prompt = "❯ "
 
-# Fill character para el diseño elegante
+# Fill character con gradiente sutil
 [fill]
-symbol = "─"
-style = "fg:#45475A"
+symbol = "━"
+style = "fg:#313244"
 
 # =====================================================
 # 🖥️ SISTEMA OPERATIVO - Identificación visual
 # =====================================================
 
 [os]
-format = "[$symbol]($style)"
+format = "[$symbol]($style) "
 style = "bold fg:#CBA6F7"
 disabled = false
 
@@ -80,28 +81,28 @@ Windows = "🪟"
 [username]
 style_user = "bold fg:#89B4FA"
 style_root = "bold fg:#F38BA8"
-format = "[$user](bold fg:#CDD6F4) "
+format = "[$user]($style)@"
 disabled = false
 show_always = true
 
 [hostname]
 ssh_only = false
-format = "[$hostname](bold fg:#CDD6F4) "
+format = "[$hostname](bold fg:#A6E3A1) "
 disabled = false
-style = "bold fg:#CDD6F4"
+style = "bold fg:#A6E3A1"
 
 # =====================================================
 # 📁 DIRECTORIO - Navegación inteligente
 # =====================================================
 
 [directory]
-style = "bold fg:#89B4FA"
+style = "bold fg:#74C7EC"
 format = "[$path]($style)[$read_only]($read_only_style) "
 truncation_length = 3
 truncation_symbol = "…"
-read_only = "[RO]"
+read_only = " 󰌾"
 read_only_style = "fg:#F38BA8"
-home_symbol = "~"
+home_symbol = "󰋜 "
 use_logical_path = true
 fish_style_pwd_dir_length = 1
 
@@ -129,19 +130,19 @@ truncation_length = 12
 truncation_symbol = "…"
 
 [git_status]
-format = "([$all_status$ahead_behind]($style))"
+format = "([$all_status$ahead_behind]($style)) "
 style = "fg:#F9E2AF"
-ahead = "↑${count}"
-diverged = "⇅${ahead_count}⇅${behind_count}"
-behind = "↓${count}"
-up_to_date = "✓"
+ahead = "󰜷${count}"
+diverged = "󰹺${ahead_count}󰜮${behind_count}"
+behind = "󰜮${count}"
+up_to_date = "󰘽"
 untracked = "?${count}"
-modified = "!${count}"
-staged = "+${count}"
-renamed = "~${count}"
-deleted = "-${count}"
-stashed = "*${count}"
-conflicted = "x${count}"
+modified = "󰏫${count}"
+staged = "󰐗${count}"
+renamed = "󰑕${count}"
+deleted = "󰍷${count}"
+stashed = "󰏗${count}"
+conflicted = "󰞇${count}"
 ignore_submodules = true
 disabled = false
 
@@ -150,9 +151,9 @@ disabled = false
 # =====================================================
 
 [character]
-success_symbol = "[❯](bold fg:#A6E3A1)"
-error_symbol = "[❯](bold fg:#F38BA8)"
-vicmd_symbol = "[❮](bold fg:#F9E2AF)"
+success_symbol = "[󰘧](bold fg:#A6E3A1)"
+error_symbol = "[󰘧](bold fg:#F38BA8)"
+vicmd_symbol = "[󰘨](bold fg:#F9E2AF)"
 
 # =====================================================
 # 🐍 LENGUAJES - Solo los esenciales para día a día
@@ -214,8 +215,8 @@ display_private = false
 # =====================================================
 
 [jobs]
-symbol = " "
-format = "[$symbol$number ]($style)"
+symbol = "󰜎 "
+format = "[$symbol$number]($style) "
 style = "bold fg:#89B4FA"
 number_threshold = 1
 symbol_threshold = 1
@@ -226,7 +227,7 @@ symbol_threshold = 1
 
 [cmd_duration]
 min_time = 2000
-format = "[󰥓 $duration]($style)"
+format = "[󱎫 $duration]($style) "
 style = "fg:#F9E2AF"
 show_milliseconds = false
 show_notifications = false
@@ -238,15 +239,15 @@ min_time_to_notify = 45000
 
 [env_var.TARGET]
 variable = "TARGET"
-symbol = "🎯"
-format = "[$symbol$env_value ]($style)"
-style = "bold black bg:bright-red"
+symbol = "󰓾 "
+format = "[$symbol$env_value]($style) "
+style = "bold fg:#11111B bg:#F38BA8"
 
 [env_var.PROXY]
 variable = "PROXY"
-symbol = "🚇"
-format = "[$symbol$env_value ]($style)"
-style = "bold bright-purple"
+symbol = "󰞉 "
+format = "[$symbol$env_value]($style) "
+style = "bold fg:#11111B bg:#CBA6F7"
 
 # =====================================================
 # 🛠️ HERRAMIENTAS PERSONALIZADAS - Solo las que usas
@@ -255,9 +256,9 @@ style = "bold bright-purple"
 [custom.nmap]
 command = 'printf %s "$NMAP_VERSION"'
 when = 'test -n "$NMAP_VERSION"'
-symbol = "📡"
-style = "bold cyan"
-format = "[$symbol($output )]($style)"
+symbol = "󰤂 "
+style = "bold fg:#74C7EC"
+format = "[$symbol$output]($style) "
 
 # =====================================================
 # ⚠️ OPTIMIZACIONES DE RENDIMIENTO
