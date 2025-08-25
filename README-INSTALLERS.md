@@ -74,7 +74,7 @@ Arch_Dream08/
 ./install.sh development:*
 
 # Instalar terminal y temas
-./install.sh terminal:kitty themes:dracula
+./install.sh terminal:kitty themes:catppuccin
 
 # Simular instalación completa
 ./install.sh --dry-run --all
@@ -134,7 +134,7 @@ modules/category/module/
 - **`tools:nano`** - Editor nano con configuración avanzada
 
 #### 🎨 Themes (Temas)
-- **`themes:dracula`** - Tema Dracula para múltiples aplicaciones
+- **`themes:catppuccin`** - Tema Catppuccin optimizado para cuidar los ojos (Mocha/Latte)
 
 ### 🔗 Dependencias de Módulos
 

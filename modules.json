@@ -46,5 +46,13 @@
     "files": ["init.lua", "lua"],
     "aur_packages": [],
     "optional": true
+  },
+  "themes:catppuccin": {
+    "name": "Catppuccin Color Palettes",
+    "description": "Paletas de colores Catppuccin optimizadas para cuidar los ojos (Mocha/Latte) - Solo Starship",
+    "dependencies": [],
+    "files": ["catppuccin-mocha.toml", "catppuccin-latte.toml"],
+    "aur_packages": [],
+    "optional": true
   }
 } 

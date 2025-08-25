@@ -46,7 +46,7 @@ cmd_status() {
     for module in "${modules[@]}"; do
         if is_installed "$module"; then
             echo -e "  ✅ $module"
-            ((installed++))
+            installed=$((installed + 1))
         else
             echo -e "  ❌ $module"
         fi

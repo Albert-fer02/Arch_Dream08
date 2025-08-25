@@ -1,298 +1,172 @@
-# =====================================================
-# 🚀 STARSHIP PROMPT - ARCH DREAM OPTIMIZADO
-# =====================================================
-# Configuración optimizada para día a día
-# Mantiene la estética original, mejora performance 78% menos código
-# =====================================================
+# ~/.config/starship.toml
 
-# Configuración optimizada y unificada con diseño elegante
-format = """
-╭─$os$username$hostname$directory $git_branch$git_status $python$nodejs$rust$golang$docker_context$package$fill$cmd_duration $jobs
-╰─$character"""
-
-# right_format vacío para un diseño más limpio y centrado
-right_format = ""
+# 🚀 STARSHIP PROMPT - POWERLEVEL10K CATTAPPUCCIN THEME (CORREGIDO)
+# Inspirado en p10k y con la paleta de colores Catppuccin Mocha.
+# Requiere una Nerd Font para visualizar los iconos correctamente.
 
 add_newline = true
-command_timeout = 1000
-scan_timeout = 50
-continuation_prompt = "❯ "
 
-# Fill character con gradiente sutil
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](lavender)"
+
+# Define la paleta de colores Catppuccin Mocha
+# CORRECCIÓN: La tabla se llama [colors], no [palette].
+[colors]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+
+# Formato principal del prompt
+format = """$os$username$hostname$directory$git_branch$git_status$fill$cmd_duration
+$character"""
+
 [fill]
-symbol = "━"
-style = "fg:#313244"
-
-# =====================================================
-# 🖥️ SISTEMA OPERATIVO - Identificación visual
-# =====================================================
+symbol = " "
 
 [os]
-format = "[$symbol]($style) "
-style = "bold fg:#CBA6F7"
+style = "bg:peach fg:base"
+format = "[$symbol ]($style)"
 disabled = false
 
 [os.symbols]
-Alpaquita = "🔔"
-Alpine = "🏔️"
-Amazon = "🙂"
-Android = "🤖"
-Arch = "🌋"
-Artix = "🎗️"
-CentOS = "💠"
-Debian = "🌀"
-DragonFly = "🐉"
-Emscripten = "🔗"
-EndeavourOS = "🚀"
-Fedora = "🎩"
-FreeBSD = "😈"
-Garuda = "🦅"
-Gentoo = "🗜️"
-HardenedBSD = "🛡️"
-Illumos = "🐦"
-Linux = "🐧"
-Macos = "🍎"
-Manjaro = "🥭"
-Mariner = "🌊"
-MidnightBSD = "🌘"
-Mint = "🌿"
-NetBSD = "🚩"
-NixOS = "❄️"
-OpenBSD = "🐡"
-OpenCloudOS = "☁️"
-openEuler = "🦉"
-openSUSE = "🦎"
-OracleLinux = "🦴"
-Pop = "🍭"
-Raspbian = "🍓"
-Redhat = "🎩"
-RedHatEnterprise = "🎩"
-Redox = "🧪"
-Solus = "⛵"
-SUSE = "🦎"
-Ubuntu = "🎯"
-Unknown = "❓"
-Windows = "🪟"
-
-# =====================================================
-# 👤 USUARIO Y HOST - Tema Red Team Profesional
-# =====================================================
+Windows = ""
+Ubuntu = ""
+SUSE = ""
+Raspbian = ""
+Mint = ""
+Macos = ""
+Manjaro = ""
+Linux = ""
+Gentoo = ""
+Fedora = ""
+EndeavourOS = ""
+Debian = ""
+CentOS = ""
+Arch = ""
+Alpine = ""
+Amazon = ""
+Android = ""
 
 [username]
-style_user = "bold fg:#89B4FA"
-style_root = "bold fg:#F38BA8"
-format = "[$user]($style)@"
-disabled = false
 show_always = true
+style_user = "bg:blue fg:base"
+style_root = "bg:red fg:base"
+format = "[$user]($style)"
 
 [hostname]
 ssh_only = false
-format = "[$hostname](bold fg:#A6E3A1) "
+style = "bg:teal fg:base"
+format = "[@$hostname]($style) "
+trim_at = "."
 disabled = false
-style = "bold fg:#A6E3A1"
-
-# =====================================================
-# 📁 DIRECTORIO - Navegación inteligente
-# =====================================================
 
 [directory]
-style = "bold fg:#74C7EC"
-format = "[$path]($style)[$read_only]($read_only_style) "
+style = "bg:mauve fg:base"
+format = "[in]($style) [$path]($style) "
 truncation_length = 3
-truncation_symbol = "…"
-read_only = " 󰌾"
-read_only_style = "fg:#F38BA8"
-home_symbol = "󰋜 "
-use_logical_path = true
-fish_style_pwd_dir_length = 1
-
-[directory.substitutions]
-"Documents" = "docs"
-"Downloads" = "dl"
-"Projects" = "proj"
-"Scripts" = "scripts"
-"Tools" = "tools"
-"src" = "src"
-"lib" = "lib"
-"bin" = "bin"
-"config" = "config"
-"modules" = "modules"
-
-# =====================================================
-# 🔥 GIT - Control de versiones optimizado
-# =====================================================
+truncation_symbol = "…/"
+read_only_style = "bg:maroon fg:base"
+read_only = "[$read_only_symbol]($read_only_style)"
 
 [git_branch]
-symbol = " "
-format = "[$symbol$branch(:$remote_branch)]($style) "
-style = "bold fg:#A6E3A1"
-truncation_length = 12
-truncation_symbol = "…"
+symbol = ""
+style = "bg:sapphire fg:base"
+format = "[$symbol $branch]($style)"
 
 [git_status]
-format = "([$all_status$ahead_behind]($style)) "
-style = "fg:#F9E2AF"
-ahead = "󰜷${count}"
-diverged = "󰹺${ahead_count}󰜮${behind_count}"
-behind = "󰜮${count}"
-up_to_date = "󰘽"
-untracked = "?${count}"
-modified = "󰏫${count}"
-staged = "󰐗${count}"
-renamed = "󰑕${count}"
-deleted = "󰍷${count}"
-stashed = "󰏗${count}"
-conflicted = "󰞇${count}"
-ignore_submodules = true
-disabled = false
-
-# =====================================================
-# ⚡ PROMPT CHARACTER - Diseño profesional
-# =====================================================
-
-[character]
-success_symbol = "[󰘧](bold fg:#A6E3A1)"
-error_symbol = "[󰘧](bold fg:#F38BA8)"
-vicmd_symbol = "[󰘨](bold fg:#F9E2AF)"
-
-# =====================================================
-# 🐍 LENGUAJES - Solo los esenciales para día a día
-# =====================================================
-
-[python]
-symbol = "󰪔 "
-format = "[$symbol$version]($style) "
-style = "bold fg:#FAB387"
-pyenv_version_name = true
-python_binary = ["./venv/bin/python", "python", "python3"]
-detect_extensions = ["py"]
-detect_files = ["requirements.txt", ".python-version", "pyproject.toml", "Pipfile", "tox.ini", "setup.py", "__init__.py"]
-detect_folders = [".venv", "venv", ".env"]
-
-[nodejs]
-symbol = "󰩏 "
-format = "[$symbol$version]($style) "
-style = "bold fg:#A6E3A1"
-detect_files = ["package.json", ".nvmrc"]
-detect_folders = ["node_modules"]
-detect_extensions = ["js", "mjs", "cjs", "ts"]
-
-[rust]
-symbol = "󰪌 "
-format = "[$symbol$version]($style) "
-style = "bold fg:#F38BA8"
-detect_extensions = ["rs"]
-detect_files = ["Cargo.toml"]
-
-[golang]
-symbol = "󰩟 "
-format = "[$symbol$version]($style) "
-style = "bold fg:#89B4FA"
-detect_extensions = ["go"]
-detect_files = ["go.mod", "go.sum", "glide.yaml", "Gopkg.yml", "Gopkg.lock", ".go-version"]
-
-# Docker context solo si está activo
-[docker_context]
-symbol = "🐳 "
-format = "[$symbol$context]($style) "
-style = "bold fg:#89B4FA"
-only_with_files = true
-detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
-detect_folders = []
-
-# =====================================================
-# 📦 GESTORES DE PAQUETES - Solo Arch
-# =====================================================
-
-[package]
-symbol = "󰖪 "
-format = "[$symbol$version]($style) "
-style = "bold fg:#89B4FA"
-display_private = false
-
-# =====================================================
-# 📊 INFORMACIÓN DEL SISTEMA - Solo esencial
-# =====================================================
-
-[jobs]
-symbol = "󰜎 "
-format = "[$symbol$number]($style) "
-style = "bold fg:#89B4FA"
-number_threshold = 1
-symbol_threshold = 1
-
-# =====================================================
-# ⏱️ TIEMPO Y RENDIMIENTO
-# =====================================================
+style = "bg:sapphire fg:base"
+format = '([$all_status$ahead_behind]($style))'
+conflicted = ""
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇡${ahead_count}⇣${behind_count}"
+untracked = ""
+stashed = ""
+modified = ""
+staged = '[](fg:green)'
+renamed = ""
+deleted = ""
 
 [cmd_duration]
-min_time = 2000
-format = "[󱎫 $duration]($style) "
-style = "fg:#F9E2AF"
-show_milliseconds = false
-show_notifications = false
-min_time_to_notify = 45000
+min_time = 500
+style = "fg:yellow"
+format = "took [$duration]($style) "
 
-# =====================================================
-# 🎯 VARIABLES RED TEAM - Solo esenciales
-# =====================================================
+# --- Iconos para lenguajes de programación ---
 
-[env_var.TARGET]
-variable = "TARGET"
-symbol = "󰓾 "
-format = "[$symbol$env_value]($style) "
-style = "bold fg:#11111B bg:#F38BA8"
+[python]
+symbol = ""
+style = "bg:surface0 fg:yellow"
+format = '[${symbol} ${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 
-[env_var.PROXY]
-variable = "PROXY"
-symbol = "󰞉 "
-format = "[$symbol$env_value]($style) "
-style = "bold fg:#11111B bg:#CBA6F7"
+[nodejs]
+symbol = ""
+style = "bg:surface0 fg:green"
+format = '[$symbol ($version)]($style)'
 
-# =====================================================
-# 🛠️ HERRAMIENTAS PERSONALIZADAS - Solo las que usas
-# =====================================================
+[rust]
+symbol = ""
+style = "bg:surface0 fg:peach"
+format = '[$symbol ($version)]($style)'
 
-[custom.nmap]
-command = 'printf %s "$NMAP_VERSION"'
-when = 'test -n "$NMAP_VERSION"'
-symbol = "󰤂 "
-style = "bold fg:#74C7EC"
-format = "[$symbol$output]($style) "
+[golang]
+symbol = ""
+style = "bg:surface0 fg:sky"
+format = '[$symbol ($version)]($style)'
 
-# =====================================================
-# ⚠️ OPTIMIZACIONES DE RENDIMIENTO
-# =====================================================
-# Todos los módulos innecesarios están deshabilitados por omisión
-# Solo se incluyen los módulos que aparecen en el formato principal
+[java]
+symbol = ""
+style = "bg:surface0 fg:peach"
+format = '[$symbol ($version)]($style)'
 
-# Deshabilitar módulos específicos que pueden ralentizar
-[git_commit]
-disabled = true
+[php]
+symbol = ""
+style = "bg:surface0 fg:mauve"
+format = '[$symbol ($version)]($style)'
 
-[git_state]
-disabled = true
+[docker_context]
+symbol = ""
+style = "bg:surface0 fg:blue"
+format = '[$symbol $context]($style)'
 
-[git_metrics]
-disabled = true
+[c]
+symbol = ""
+style = "bg:surface0 fg:blue"
+format = '[$symbol ($version)]($style)'
 
-[memory_usage]
-disabled = true
+[lua]
+symbol = ""
+style = "bg:surface0 fg:blue"
+format = '[$symbol ($version)]($style)'
 
-[battery]
-disabled = true
-
-[time]
-disabled = true
-
-[shell]
-disabled = true
-
-[status]
-disabled = true
-
-[sudo]
-disabled = true
-
-# Todos los demás lenguajes están deshabilitados por omisión
-# para máximo rendimiento
+[package]
+symbol = ""
+style = "bg:surface0 fg:text"
+format = '[$symbol$version]($style)'

@@ -162,11 +162,11 @@ install_productivity_tools() {
     for tool in "${essential_tools[@]}"; do
         if command -v "$tool" &>/dev/null; then
             success "✓ $tool ya está instalado"
-            ((installed_count++))
+            installed_count=$((installed_count + 1))
         else
             warn "⚠️  $tool no está instalado - funcionalidad limitada"
         fi
-    done || true  # Evitar que el loop falle
+    done
     
     log "Herramientas esenciales: $installed_count/${#essential_tools[@]} disponibles"
     success "✅ Verificación de herramientas completada"
@@ -340,7 +340,7 @@ verify_module_installation() {
     # Verificar Zsh instalado
     if command -v zsh &>/dev/null; then
         success "✓ Zsh instalado $(zsh --version)"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ Zsh no está instalado"
     fi
@@ -348,7 +348,7 @@ verify_module_installation() {
     # Verificar Starship instalado
     if command -v starship &>/dev/null; then
         success "✓ Starship instalado $(starship --version | head -1)"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ Starship no está instalado"
     fi
@@ -356,7 +356,7 @@ verify_module_installation() {
     # Verificar Zinit instalado
     if [[ -d "$ZINIT_HOME/zinit.git" ]]; then
         success "✓ Zinit instalado"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ Zinit no está instalado"
     fi
@@ -364,7 +364,7 @@ verify_module_installation() {
     # Verificar .zshrc
     if [[ -L "$HOME/.zshrc" ]] && [[ -e "$HOME/.zshrc" ]]; then
         success "✓ .zshrc configurado"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ .zshrc no está configurado"
     fi
@@ -372,7 +372,7 @@ verify_module_installation() {
     # Verificar configuración de Starship
     if [[ -f "$STARSHIP_CONFIG_DIR/starship.toml" ]]; then
         success "✓ Starship configurado"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ Starship no está configurado"
     fi
@@ -380,7 +380,7 @@ verify_module_installation() {
     # Verificar directorios de Zsh
     if [[ -d "$ZSH_CACHE_DIR" ]] && [[ -d "$ZSH_COMPDUMP_DIR" ]]; then
         success "✓ Directorios de Zsh configurados"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ Directorios de Zsh no están configurados"
     fi
@@ -391,13 +391,13 @@ verify_module_installation() {
     
     for tool in "${essential_tools[@]}"; do
         if command -v "$tool" &>/dev/null; then
-            ((tools_installed++))
+            tools_installed=$((tools_installed + 1))
         fi
     done
     
     if [[ $tools_installed -ge 3 ]]; then
         success "✓ Herramientas de productividad ($tools_installed/${#essential_tools[@]} esenciales)"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         warn "⚠️  Pocas herramientas de productividad instaladas ($tools_installed/${#essential_tools[@]})"
     fi
@@ -405,10 +405,10 @@ verify_module_installation() {
     # Verificar FZF configurado
     if command -v fzf &>/dev/null && [[ -f "/usr/share/fzf/key-bindings.zsh" ]]; then
         success "✓ FZF completamente configurado"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     elif command -v fzf &>/dev/null; then
         success "✓ FZF instalado (configuración básica)"
-        ((++checks_passed))
+        checks_passed=$((checks_passed + 1))
     else
         error "✗ FZF no está instalado"
     fi

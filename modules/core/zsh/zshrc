@@ -52,6 +52,11 @@ setopt NO_BEEP                   # Sin sonidos
 # 🎨 STARSHIP PROMPT
 # =====================================================
 
+# Inicialización directa de Starship con fallback seguro
+export STARSHIP_CONFIG="${STARSHIP_CONFIG:-$HOME/.config/starship.toml}"
+# Evitar errores "parameter not set" cuando Starship consulta variables internas
+export STARSHIP_CMD_STATUS="${STARSHIP_CMD_STATUS-0}"
+export STARSHIP_DURATION="${STARSHIP_DURATION-0}"
 if command -v starship &>/dev/null; then
     eval "$(starship init zsh)"
 else
@@ -68,6 +73,8 @@ export BROWSER='firefox'
 export TERMINAL='kitty'
 export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
+# Asegurar que LS_COLORS exista antes de usarlo en estilos de completion
+export LS_COLORS="${LS_COLORS-}"
 
 # =====================================================
 # 📂 ALIASES ESENCIALES
@@ -265,7 +272,7 @@ quickinfo() {
 }
 
 # Actualizar Arch
-arch-update() {
+function arch-update() {
     echo "🔄 Actualizando sistema..."
     sudo pacman -Syu && {
         echo "✅ Sistema actualizado"
@@ -316,3 +323,188 @@ export PATH=$PATH:/home/dreamcoder08/.local/bin
 alias ff="fastfetch"
 alias ff-dream="fastfetch --config ~/.config/fastfetch/config.jsonc"
 alias ff-custom="fastfetch --config ~/.config/fastfetch/config.local.jsonc"
+
+# Nano aliases
+alias nano="nano --rcfile ~/.config/nano/nanorc"
+alias nano-code="nano --rcfile ~/.config/nano/code.nanorc"
+alias nano-config="nano --rcfile ~/.config/nano/config.nanorc"
+alias nano-log="nano --rcfile ~/.config/nano/log.nanorc"
+alias nano-edit="nano --rcfile ~/.config/nano/nanorc.local"
+
+# =====================================================
+# ⚡ OPTIMIZACIONES AVANZADAS DE PERFORMANCE
+# =====================================================
+
+# Profiling opcional (descomenta para debugging)
+# zmodload zsh/zprof
+
+# Cache de completiones
+[[ ! -d ~/.zsh/cache ]] && mkdir -p ~/.zsh/cache
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+# Completión más inteligente
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*' use-cache on
+
+# Completión para herramientas de pentesting
+compdef _gnu_generic nmap 2>/dev/null
+compdef _gnu_generic metasploit 2>/dev/null
+compdef _gnu_generic burp 2>/dev/null
+
+# =====================================================
+# 🎯 FUNCIONES AVANZADAS PARA RED TEAM
+# =====================================================
+
+# Función para cambiar contexto de pentesting
+pentest-context() {
+    local target="$1"
+    local proxy="$2"
+    
+    if [[ -n "$target" ]]; then
+        export TARGET="$target"
+        echo "🎯 Target configurado: $TARGET"
+    fi
+    
+    if [[ -n "$proxy" ]]; then
+        export PROXY="$proxy"
+        echo "🔒 Proxy configurado: $PROXY"
+    fi
+    
+    # Actualizar prompt si Starship está disponible
+    if command -v starship &>/dev/null; then
+        starship_precmd
+    fi
+}
+
+# Función para limpiar contexto
+clear-context() {
+    unset TARGET PROXY VPN_STATUS CURRENT_TOOL
+    echo "🧹 Contexto limpiado"
+    if command -v starship &>/dev/null; then
+        starship_precmd
+    fi
+}
+
+# Función para mostrar información del sistema
+system_status() {
+    local cpu_usage=$(top -bn1 2>/dev/null | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1 || echo "N/A")
+    local mem_usage=$(free 2>/dev/null | grep Mem | awk '{printf("%.1f", $3/$2 * 100.0)}' || echo "N/A")
+    local disk_usage=$(df / 2>/dev/null | tail -1 | awk '{print $5}' | sed 's/%//' || echo "N/A")
+    
+    echo -e "💻 CPU: ${cpu_usage}% | 🧠 RAM: ${mem_usage}% | 💾 DISK: ${disk_usage}%"
+}
+
+# Función para limpiar historial sensible
+clean_history() {
+    local sensitive_patterns=("password" "token" "key" "secret" "passwd" "api_key")
+    for pattern in "${sensitive_patterns[@]}"; do
+        sed -i "/$pattern/d" ~/.zsh_history 2>/dev/null
+    done
+    echo "🧹 Historial sensible limpiado"
+}
+
+# =====================================================
+# ⌨️ KEY BINDINGS AVANZADOS
+# =====================================================
+
+# Navegación mejorada
+bindkey '^[[1;5C' forward-word      # Ctrl+Right
+bindkey '^[[1;5D' backward-word     # Ctrl+Left
+bindkey '^H' backward-kill-word     # Ctrl+Backspace
+bindkey '^[[3;5~' kill-word         # Ctrl+Delete
+
+# Búsqueda en historial con FZF (si está disponible)
+if command -v fzf &>/dev/null; then
+    bindkey '^R' fzf-history-widget
+fi
+
+# =====================================================
+# 🚀 LAZY LOADING MEJORADO
+# =====================================================
+
+# Función para lazy loading
+lazy_load() {
+    local cmd="$1"
+    local init_cmd="$2"
+    
+    eval "$cmd() { unset -f $cmd; $init_cmd; $cmd \"\$@\"; }"
+}
+
+# Lazy loading para herramientas pesadas (ejemplos)
+# lazy_load "docker" "source /usr/share/zsh/plugins/zsh-docker/docker.plugin.zsh"
+# lazy_load "kubectl" "source /usr/share/zsh/plugins/zsh-kubectl/kubectl.plugin.zsh"
+
+# =====================================================
+# 🎨 PROMPT PERSONALIZADO AVANZADO
+# =====================================================
+
+# Prompt personalizado para cuando Starship no esté disponible
+custom_prompt() {
+    local exit_code=$?
+    local user_color="%F{cyan}"
+    local host_color="%F{green}"
+    local dir_color="%F{blue}"
+    local git_color="%F{yellow}"
+    
+    # Usuario y host
+    local prompt_user="$user_color%n@%m%f"
+    
+    # Directorio actual
+    local prompt_dir="$dir_color%~%f"
+    
+    # Estado de Git
+    local git_status=""
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        local branch=$(git branch --show-current 2>/dev/null)
+        local status=$(git status --porcelain 2>/dev/null | wc -l)
+        if [[ $status -gt 0 ]]; then
+            git_status="$git_color[$branch*]%f"
+        else
+            git_status="$git_color[$branch]%f"
+        fi
+    fi
+    
+    # Indicador de exit code
+    local exit_indicator=""
+    if [[ $exit_code -ne 0 ]]; then
+        exit_indicator="%F{red}❯%f"
+    else
+        exit_indicator="%F{green}❯%f"
+    fi
+    
+    # Variables de contexto Red Team
+    local context_info=""
+    [[ -n "$TARGET" ]] && context_info="$context_info %F{red}🎯$TARGET%f"
+    [[ -n "$PROXY" ]] && context_info="$context_info %F{cyan}🔒$PROXY%f"
+    
+    PROMPT="$prompt_user:$prompt_dir$git_status$context_info $exit_indicator "
+}
+
+# Usar prompt personalizado si Starship no está disponible
+if ! command -v starship &>/dev/null; then
+    setopt PROMPT_SUBST
+    precmd_functions+=(custom_prompt)
+fi
+
+# =====================================================
+# 🔒 SEGURIDAD Y PRIVACIDAD
+# =====================================================
+
+# Variables sensibles (no se guardan en historial)
+export API_KEY="" 2>/dev/null
+export SECRET_TOKEN="" 2>/dev/null
+export DATABASE_PASSWORD="" 2>/dev/null
+
+# =====================================================
+# 📊 ALIASES AVANZADOS
+# =====================================================
+
+# Información del sistema
+alias status="system_status"
+alias context="echo -e \"🎯 Target: ${TARGET:-'No configurado'}\n🔒 Proxy: ${PROXY:-'No configurado'}\""
+alias clean="clear-context"
+
+# Herramientas de pentesting (si están disponibles)
+command -v nmap &>/dev/null && alias nmap-priv="sudo nmap"
+command -v msfconsole &>/dev/null && alias msf="msfconsole"
+command -v burpsuite &>/dev/null && alias burp="burpsuite"

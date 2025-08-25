@@ -1,0 +1,260 @@
+# =====================================================
+# 🚀 STARSHIP PROMPT - CATPPUCCIN MOCHA VS CODE SIMPLE
+# =====================================================
+# Versión simplificada para VS Code Terminal
+# Mantiene la estética del tema original pero con colores básicos
+# =====================================================
+
+# Formato simple y funcional
+format = """
+$os$username$directory$git_branch$git_status$python$nodejs$rust$golang$docker_context$package$fill$cmd_duration$jobs
+$character"""
+
+right_format = ""
+
+add_newline = true
+command_timeout = 1000
+scan_timeout = 30
+continuation_prompt = "❯ "
+
+# Fill character simple
+[fill]
+symbol = "─"
+style = "fg:240"
+
+# =====================================================
+# 🖥️ SISTEMA OPERATIVO
+# =====================================================
+
+[os]
+format = "[$symbol]($style) "
+style = "bold fg:183"
+disabled = false
+
+[os.symbols]
+Arch = "🌋"
+Linux = "🐧"
+Ubuntu = "🎯"
+Debian = "🌀"
+Fedora = "🎩"
+CentOS = "💠"
+Unknown = "❓"
+
+# =====================================================
+# 👤 USUARIO Y HOST
+# =====================================================
+
+[username]
+style_user = "bold fg:147"
+style_root = "bold fg:203"
+format = "[$user]($style)"
+
+[hostname]
+ssh_only = true
+format = "[@$hostname]($style) "
+disabled = false
+style = "bold fg:166"
+trim_at = ".local"
+
+# =====================================================
+# 📁 DIRECTORIO
+# =====================================================
+
+[directory]
+style = "bold fg:147"
+format = "[$path]($style) "
+truncation_length = 3
+truncation_symbol = "..."
+home_symbol = "~"
+use_logical_path = true
+
+[directory.substitutions]
+"Documents" = "docs"
+"Downloads" = "dl"
+"Projects" = "proj"
+"Scripts" = "scripts"
+"Tools" = "tools"
+"src" = "src"
+"lib" = "lib"
+"config" = "config"
+"modules" = "modules"
+
+# =====================================================
+# 🔥 GIT
+# =====================================================
+
+[git_branch]
+symbol = " "
+format = "[$symbol$branch]($style) "
+style = "bold fg:166"
+truncation_length = 12
+truncation_symbol = "..."
+
+[git_status]
+format = "([$all_status$ahead_behind]($style)) "
+style = "fg:223"
+ahead = "⇡${count}"
+diverged = "⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+up_to_date = ""
+untracked = "?${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✘${count}"
+stashed = "*${count}"
+conflicted = "=${count}"
+ignore_submodules = true
+disabled = false
+
+# =====================================================
+# ⚡ PROMPT CHARACTER
+# =====================================================
+
+[character]
+success_symbol = "[❯](bold fg:166)"
+error_symbol = "[❯](bold fg:203)"
+vicmd_symbol = "[❮](bold fg:223)"
+
+# =====================================================
+# 🐍 LENGUAJES
+# =====================================================
+
+[python]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:215"
+pyenv_version_name = false
+python_binary = ["python3", "python"]
+detect_extensions = ["py"]
+detect_files = ["requirements.txt", "pyproject.toml", "Pipfile"]
+detect_folders = [".venv", "venv"]
+
+[nodejs]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:166"
+detect_files = ["package.json"]
+detect_folders = ["node_modules"]
+detect_extensions = ["js", "ts"]
+
+[rust]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:203"
+detect_extensions = ["rs"]
+detect_files = ["Cargo.toml"]
+
+[golang]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:147"
+detect_extensions = ["go"]
+detect_files = ["go.mod"]
+
+# =====================================================
+# 🐳 DOCKER
+# =====================================================
+
+[docker_context]
+symbol = " "
+format = "[$symbol$context]($style) "
+style = "bold fg:147"
+only_with_files = true
+detect_files = ["Dockerfile", "docker-compose.yml"]
+detect_folders = []
+
+# =====================================================
+# 📦 PAQUETES
+# =====================================================
+
+[package]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:147"
+display_private = false
+
+# =====================================================
+# 📊 SISTEMA
+# =====================================================
+
+[jobs]
+symbol = " "
+format = "[$symbol$number]($style) "
+style = "fg:147"
+number_threshold = 1
+symbol_threshold = 1
+
+# =====================================================
+# ⏱️ TIEMPO
+# =====================================================
+
+[cmd_duration]
+min_time = 2000
+format = "[ $duration]($style) "
+style = "fg:223"
+show_milliseconds = false
+show_notifications = false
+min_time_to_notify = 30000
+
+# =====================================================
+# 🎯 VARIABLES RED TEAM
+# =====================================================
+
+[env_var.TARGET]
+variable = "TARGET"
+symbol = "🎯"
+format = "[$symbol$env_value]($style) "
+style = "bold fg:111 bg:203"
+
+[env_var.PROXY]
+variable = "PROXY"
+symbol = "🔒"
+format = "[$symbol$env_value]($style) "
+style = "bold fg:111 bg:183"
+
+# =====================================================
+# 🎨 MÓDULOS ADICIONALES
+# =====================================================
+
+[bun]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "fg:215"
+disabled = false
+
+[crystal]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:189"
+disabled = false
+
+[dart]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:147"
+disabled = false
+
+[dotnet]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:183"
+disabled = false
+
+[kotlin]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:183"
+disabled = false
+
+[lua]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:147"
+disabled = false
+
+[swift]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:215"
+disabled = false

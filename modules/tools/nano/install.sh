@@ -78,11 +78,11 @@ install_nano() {
 setup_nano_directories() {
     log "Configurando directorios de Nano..."
     
-    # Crear directorios necesarios
-    mkdir -p "$NANO_CONFIG_DIR" "$NANO_SYNTAX_DIR" "$NANO_THEMES_DIR"
+    # Usar la función mejorada para crear directorios de configuración
+    create_config_directory "$NANO_CONFIG_DIR" "directorio principal de Nano"
     
     # Establecer permisos correctos
-    chmod 755 "$NANO_CONFIG_DIR" "$NANO_SYNTAX_DIR" "$NANO_THEMES_DIR"
+    chmod 755 "$NANO_CONFIG_DIR"
     
     success "✅ Directorios de Nano configurados"
 }

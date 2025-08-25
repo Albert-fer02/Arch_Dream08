@@ -103,21 +103,10 @@ install_additional_fonts() {
 setup_kitty_directories() {
     log "Configurando directorios de Kitty..."
     
-    # Normalizar si existe un symlink roto o archivo en la ruta de config
-    if [[ -L "$KITTY_CONFIG_DIR" ]]; then
-        local target
-        target=$(readlink -f "$KITTY_CONFIG_DIR" || true)
-        if [[ -z "$target" || ! -d "$target" ]]; then
-            warn "Enlace roto detectado en $KITTY_CONFIG_DIR, corrigiendo..."
-            rm -f "$KITTY_CONFIG_DIR"
-        fi
-    elif [[ -e "$KITTY_CONFIG_DIR" && ! -d "$KITTY_CONFIG_DIR" ]]; then
-        warn "$KITTY_CONFIG_DIR es un archivo, moviendo a backup..."
-        mv "$KITTY_CONFIG_DIR" "$KITTY_CONFIG_DIR.backup_$(date +%Y%m%d_%H%M%S)"
-    fi
-
-    # Crear directorios necesarios
-    mkdir -p "$KITTY_CONFIG_DIR" "$KITTY_THEMES_DIR" "$KITTY_SESSIONS_DIR"
+    # Usar la función mejorada para crear directorios de configuración
+    create_config_directory "$KITTY_CONFIG_DIR" "directorio principal de Kitty"
+    create_config_directory "$KITTY_THEMES_DIR" "directorio de temas de Kitty"
+    create_config_directory "$KITTY_SESSIONS_DIR" "directorio de sesiones de Kitty"
     
     # Establecer permisos correctos
     chmod 755 "$KITTY_CONFIG_DIR" "$KITTY_THEMES_DIR" "$KITTY_SESSIONS_DIR"

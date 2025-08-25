@@ -1,26 +1,26 @@
 # =====================================================
-# 🚀 STARSHIP PROMPT - ARCH DREAM UNIFIED OPTIMIZED
+# 🚀 STARSHIP PROMPT - CATPPUCCIN MOCHA VS CODE OPTIMIZED
 # =====================================================
-# Configuración optimizada para Arch Linux
-# Compatible con Kitty Terminal y Warp AI
-# Diseño moderno, eficiente y altamente funcional
+# Versión optimizada para VS Code Terminal
+# Mantiene la estética del tema original pero con compatibilidad mejorada
 # =====================================================
 
-# Diseño optimizado para mejor rendimiento
+# Diseño inspirado en Powerlevel10k - Productivo y Minimalista
 format = """
-$os$username$directory$git_branch$git_status$fill$cmd_duration$character"""
+$os$username$directory$git_branch$git_status$python$nodejs$rust$golang$docker_context$package$fill$cmd_duration$jobs
+$character"""
 
-right_format = "$time$battery"
+right_format = "$battery"
 
 add_newline = true
-command_timeout = 500  # Reducido para mejor performance
-scan_timeout = 20      # Reducido para mejor performance
-continuation_prompt = "> "
+command_timeout = 1000
+scan_timeout = 30
+continuation_prompt = "❯ "
 
 # Fill character para el diseño elegante
 [fill]
 symbol = "─"
-style = "fg:#45475A"
+style = "fg:240"
 
 # =====================================================
 # 🖥️ SISTEMA OPERATIVO - Identificación visual
@@ -28,7 +28,7 @@ style = "fg:#45475A"
 
 [os]
 format = "[$symbol]($style) "
-style = "bold fg:#CBA6F7"
+style = "bold fg:183"
 disabled = false
 
 [os.symbols]
@@ -78,8 +78,8 @@ Windows = "🪟"
 # =====================================================
 
 [username]
-style_user = "bold fg:#89B4FA"
-style_root = "bold fg:#F38BA8"
+style_user = "bold fg:147"
+style_root = "bold fg:203"
 format = "[$user]($style) "
 disabled = false
 show_always = true
@@ -88,25 +88,25 @@ show_always = true
 ssh_only = true
 format = "[@$hostname]($style) "
 disabled = false
-style = "bold fg:#A6E3A1"
+style = "bold fg:166"
 trim_at = ".local"
 
 # =====================================================
-# 📁 DIRECTORIO - Navegación inteligente optimizada
+# 📁 DIRECTORIO - Navegación inteligente
 # =====================================================
 
 [directory]
-style = "bold fg:#89B4FA"
-format = "[$path]($style) "
-truncation_length = 2  # Reducido para mejor performance
+style = "bold fg:147"
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 3
 truncation_symbol = ""
 read_only = ""
-read_only_style = "bold fg:#F38BA8"
+read_only_style = "bold fg:203"
 home_symbol = "~"
 use_logical_path = true
 fish_style_pwd_dir_length = 1
-before_repo_root_style = "bold fg:#6C7086"
-repo_root_style = "bold fg:#89B4FA"
+before_repo_root_style = "bold fg:102"
+repo_root_style = "bold fg:147"
 
 [directory.substitutions]
 "Documents" = "docs"
@@ -134,19 +134,46 @@ repo_root_style = "bold fg:#89B4FA"
 "/root" = "root"
 
 # =====================================================
-# 🔥 GIT - Control de versiones optimizado
+# 🔥 GIT - Control de versiones avanzado
 # =====================================================
 
 [git_branch]
 symbol = " "
 format = "[$symbol$branch]($style) "
-style = "bold fg:#A6E3A1"
-truncation_length = 8  # Reducido para mejor performance
+style = "bold fg:166"
+truncation_length = 10
 truncation_symbol = ""
+
+[git_commit]
+commit_hash_length = 7
+format = "[$hash$tag]($style) "
+style = "bold fg:189"
+only_detached = true
+tag_symbol = " "
+tag_disabled = false
+disabled = true
+
+[git_state]
+format = "\\([$state( $progress_current/$progress_total)]($style)\\) "
+style = "bold fg:223"
+cherry_pick = "PICK"
+bisect = "BISECT"
+am = "AM"
+am_or_rebase = "AM/RB"
+rebase = "REBASE"
+merge = "MERGE"
+disabled = true
+
+[git_metrics]
+added_style = "bold fg:166"
+deleted_style = "bold fg:203"
+only_nonzero_diffs = true
+format = "([+$added]($added_style) )([-$deleted]($deleted_style) )"
+disabled = true
 
 [git_status]
 format = "[$all_status$ahead_behind]($style) "
-style = "bold fg:#F9E2AF"
+style = "bold fg:223"
 ahead = "⇡${count}"
 diverged = "⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
@@ -162,88 +189,89 @@ ignore_submodules = true
 disabled = false
 
 # =====================================================
-# ⚡ PROMPT CHARACTER - Diseño profesional optimizado
+# ⚡ PROMPT CHARACTER - Diseño profesional
 # =====================================================
 
 [character]
-success_symbol = "[❯](bold fg:#A6E3A1)"
-error_symbol = "[❯](bold fg:#F38BA8)"
-vicmd_symbol = "[❮](bold fg:#F9E2AF)"
+success_symbol = "[❯](bold fg:166)"
+error_symbol = "[❯](bold fg:203)"
+vicmd_symbol = "[❮](bold fg:223)"
 
 # =====================================================
-# 🐍 LENGUAJES - Solo los más usados para performance
+# 🐍 LENGUAJES - Stack completo optimizado
 # =====================================================
 
 [python]
 symbol = " "
 format = "[$symbol$version]($style) "
-style = "bold fg:#FAB387"
+style = "bold fg:215"
 pyenv_version_name = false
 python_binary = ["python3", "python"]
 detect_extensions = ["py"]
 detect_files = ["requirements.txt", "pyproject.toml", "Pipfile"]
 detect_folders = [".venv", "venv"]
-disabled = false
 
 [nodejs]
 symbol = " "
 format = "[$symbol$version]($style) "
-style = "bold fg:#A6E3A1"
+style = "bold fg:166"
 detect_files = ["package.json"]
 detect_folders = ["node_modules"]
 detect_extensions = ["js", "ts"]
-disabled = false
 
 [rust]
 symbol = " "
 format = "[$symbol$version]($style) "
-style = "bold fg:#F38BA8"
+style = "bold fg:203"
 detect_extensions = ["rs"]
 detect_files = ["Cargo.toml"]
-disabled = false
 
 [golang]
 symbol = " "
 format = "[$symbol$version]($style) "
-style = "bold fg:#89B4FA"
+style = "bold fg:147"
 detect_extensions = ["go"]
 detect_files = ["go.mod"]
-disabled = false
 
 # =====================================================
-# 🐳 CONTENEDORES - Solo Docker para performance
+# 🐳 CONTENEDORES Y ORQUESTACIÓN
 # =====================================================
 
 [docker_context]
 symbol = " "
 format = "[$symbol$context]($style) "
-style = "bold fg:#89B4FA"
+style = "bold fg:147"
 only_with_files = true
 detect_files = ["Dockerfile", "docker-compose.yml"]
 detect_folders = []
-disabled = false
 
 # =====================================================
-# 📦 GESTORES DE PAQUETES - Solo los esenciales
+# 📦 GESTORES DE PAQUETES
 # =====================================================
 
 [package]
 symbol = " "
 format = "[$symbol$version]($style) "
-style = "bold fg:#89B4FA"
+style = "bold fg:147"
 display_private = false
+
+# =====================================================
+# 📊 INFORMACIÓN DEL SISTEMA - Monitoreo avanzado
+# =====================================================
+
+[memory_usage]
+symbol = " "
+format = "[$symbol$ram]($style) "
+threshold = 80
+style = "fg:203"
 disabled = false
 
-# =====================================================
-# 📊 INFORMACIÓN DEL SISTEMA - Solo lo esencial
-# =====================================================
-
 [battery]
-full_symbol = "󰁹 "
-charging_symbol = "󰂄 "
-discharging_symbol = "󰁾 "
-unknown_symbol = "󰁽 "
-empty_symbol = "󰂎 "
+full_symbol = " "
+charging_symbol = " "
+discharging_symbol = " "
+unknown_symbol = " "
+empty_symbol = " "
 disabled = false
 format = "[$symbol$percentage]($style) "
 
@@ -263,131 +291,120 @@ style = "yellow"
 threshold = 80
 style = "green"
 
+[jobs]
+symbol = " "
+format = "[$symbol$number]($style) "
+style = "fg:147"
+number_threshold = 1
+symbol_threshold = 1
+
 # =====================================================
-# ⏱️ TIEMPO Y RENDIMIENTO - Optimizado
+# ⏱️ TIEMPO Y RENDIMIENTO
 # =====================================================
 
 [time]
 disabled = false
 format = "[$time]($style) "
-style = "fg:#6C7086"
+style = "fg:102"
 time_format = "%H:%M"
 utc_time_offset = "local"
 
 [cmd_duration]
-min_time = 2000  # Solo mostrar comandos que tomen más de 2 segundos
+min_time = 2000
 format = "[ $duration]($style) "
-style = "fg:#F9E2AF"
+style = "fg:223"
 show_milliseconds = false
 show_notifications = false
 min_time_to_notify = 30000
-disabled = false
 
 # =====================================================
-# 🔐 VARIABLES PERSONALIZADAS RED TEAM PRO - Optimizadas
+# 🎯 VARIABLES PERSONALIZADAS RED TEAM PRO
 # =====================================================
 
-# Target objetivo
 [env_var.TARGET]
 variable = "TARGET"
 symbol = "🎯"
-format = "[$symbol$env_value ]($style)"
-style = "bold bright-white bg:red"
-disabled = false
+format = "[$symbol$env_value]($style) "
+style = "bold fg:111 bg:203"
 
-# Proxy/Tunnel activo
 [env_var.PROXY]
 variable = "PROXY"
 symbol = "🔒"
-format = "[$symbol$env_value ]($style)"
-style = "bold bright-cyan"
+format = "[$symbol$env_value]($style) "
+style = "bold fg:111 bg:183"
+
+# =====================================================
+# 🎨 SHELLS Y EDITORES
+# =====================================================
+
+[status]
+format = "[$symbol$status ]($style)"
+style = "bold fg:203"
+symbol = " "
+success_symbol = ""
+not_executable_symbol = " "
+not_found_symbol = " "
+sigint_symbol = " "
+signal_symbol = " "
+disabled = false
+
+[sudo]
+format = "[as $symbol]($style)"
+symbol = " "
+style = "bold fg:203"
+allow_windows = false
 disabled = false
 
 # =====================================================
-# ⚠️ MÓDULOS DESHABILITADOS PARA MEJOR PERFORMANCE
+# 💻 MÓDULOS ADICIONALES OPTIMIZADOS
 # =====================================================
 
-# Módulos que pueden ralentizar el prompt
-[load]
+# Shell indicator (disabled for minimalism)
+[shell]
 disabled = true
 
-[memory_usage]
-disabled = true
-
-[jobs]
-disabled = true
-
-[kubernetes]
-disabled = true
-
-[helm]
-disabled = true
-
-[terraform]
-disabled = true
-
-[aws]
-disabled = true
-
-[gcloud]
-disabled = true
-
-[azure]
-disabled = true
-
-# Lenguajes menos comunes deshabilitados
-[java]
-disabled = true
-
-[php]
-disabled = true
-
-[ruby]
-disabled = true
-
-[c]
-disabled = true
-
-[cpp]
-disabled = true
-
-[conda]
-disabled = true
-
-[meson]
-disabled = true
-
-[nim]
-disabled = true
-
+# Módulos adicionales optimizados
 [bun]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "fg:215"
+disabled = false
 
 [crystal]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:189"
+disabled = false
 
 [dart]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:147"
+disabled = false
 
 [dotnet]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:183"
+disabled = false
 
 [kotlin]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:183"
+disabled = false
 
 [lua]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:147"
+disabled = false
 
 [swift]
-disabled = true
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bold fg:215"
+disabled = false
 
-# =====================================================
-# 🎯 CONFIGURACIÓN FINAL OPTIMIZADA
-# =====================================================
-
-# Comentarios finales
-# Esta configuración está optimizada para:
-# - Mejor rendimiento del prompt
-# - Menor tiempo de carga
-# - Funcionalidad esencial mantenida
-# - Compatibilidad con Red Team
+# Deshabilitar módulos innecesarios para VS Code
+# Nota: Estos módulos ya están deshabilitados arriba en sus respectivas secciones

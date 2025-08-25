@@ -47,25 +47,20 @@ install_module_dependencies() {
   success "✅ Todas las dependencias están instaladas"
 }
 
+# Configurar directorios de Neovim
 setup_nvim_directories() {
-  log "Configurando directorios de Neovim..."
-
-  # Normalizar si existe un symlink roto o archivo
-  if [[ -L "$NVIM_CONFIG_DIR" ]]; then
-    local target
-    target=$(readlink -f "$NVIM_CONFIG_DIR" || true)
-    if [[ -z "$target" || ! -d "$target" ]]; then
-      warn "Enlace roto detectado en $NVIM_CONFIG_DIR, corrigiendo..."
-      rm -f "$NVIM_CONFIG_DIR"
-    fi
-  elif [[ -e "$NVIM_CONFIG_DIR" && ! -d "$NVIM_CONFIG_DIR" ]]; then
-    warn "$NVIM_CONFIG_DIR es un archivo, moviendo a backup..."
-    mv "$NVIM_CONFIG_DIR" "$NVIM_CONFIG_DIR.backup_$(date +%Y%m%d_%H%M%S)"
-  fi
-
-  mkdir -p "$NVIM_CONFIG_DIR"
-  chmod 755 "$NVIM_CONFIG_DIR"
-  success "✅ Directorio de Neovim configurado"
+    log "Configurando directorios de Neovim..."
+    
+    # Usar la función mejorada para crear directorios de configuración
+    create_config_directory "$NVIM_CONFIG_DIR" "directorio principal de Neovim"
+    
+    # Crear directorios adicionales si es necesario
+    mkdir -p "$NVIM_CONFIG_DIR/lua" "$NVIM_CONFIG_DIR/spell"
+    
+    # Establecer permisos correctos
+    chmod 755 "$NVIM_CONFIG_DIR" "$NVIM_CONFIG_DIR/lua" "$NVIM_CONFIG_DIR/spell"
+    
+    success "✅ Directorios de Neovim configurados"
 }
 
 configure_module_files() {

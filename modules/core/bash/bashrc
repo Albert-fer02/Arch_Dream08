@@ -126,3 +126,10 @@ export BASH_CONFIG_LOADED=true
 alias ff="fastfetch"
 alias ff-dream="fastfetch --config ~/.config/fastfetch/config.jsonc"
 alias ff-custom="fastfetch --config ~/.config/fastfetch/config.local.jsonc"
+
+# Nano aliases
+alias nano="nano --rcfile ~/.config/nano/nanorc"
+alias nano-code="nano --rcfile ~/.config/nano/code.nanorc"
+alias nano-config="nano --rcfile ~/.config/nano/config.nanorc"
+alias nano-log="nano --rcfile ~/.config/nano/log.nanorc"
+alias nano-edit="nano --rcfile ~/.config/nano/nanorc.local"

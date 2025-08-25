@@ -15,8 +15,8 @@ IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_VERSION="5.0.0"
-LOCKFILE="/tmp/arch-dream-install.lock"
-LOG_FILE="/tmp/arch-dream-install.log"
+LOCKFILE="$HOME/.cache/arch-dream-install.lock"
+LOG_FILE="$HOME/.cache/arch-dream-install.log"
 
 # Variables de control
 INSTALL_ALL=false
@@ -183,9 +183,11 @@ backup_existing_configs() {
     local backed_up=0
     
     for config in "${configs[@]}"; do
-        [[ -e "$HOME/$config" ]] && {
-            cp -r "$HOME/$config" "$backup_dir/" 2>/dev/null && ((backed_up++))
-        }
+        if [[ -e "$HOME/$config" ]]; then
+            if cp -r "$HOME/$config" "$backup_dir/" 2>/dev/null; then
+                backed_up=$((backed_up + 1))
+            fi
+        fi
     done
     
     if [[ $backed_up -gt 0 ]]; then
@@ -243,15 +245,15 @@ install_modules_parallel() {
     log "🚀 Instalación paralela de ${#modules[@]} módulos..."
     
     for module in "${modules[@]}"; do
-        [[ $job_count -ge $max_jobs ]] && {
+        if [[ $job_count -ge $max_jobs ]]; then
             wait "${pids[0]}"
             pids=("${pids[@]:1}")
-            ((job_count--))
-        }
+            job_count=$((job_count - 1))
+        fi
         
         install_module "$module" &
         pids+=($!)
-        ((job_count++))
+        job_count=$((job_count + 1))
     done
     
     for pid in "${pids[@]}"; do
@@ -334,7 +336,7 @@ ${BOLD}MÓDULOS:${NC}
     development:*       Herramientas de desarrollo (nvim, web)
     terminal:*          Configuraciones de terminal (kitty)
     tools:*             Utilidades (fastfetch, nano)
-    themes:*            Temas visuales (dracula)
+    themes:*            Temas visuales (catppuccin)
 
 ${BOLD}EJEMPLOS:${NC}
     $0 --all                        # Instalar todo
@@ -408,6 +410,9 @@ interactive_selection() {
 # =====================================================
 
 main() {
+    # Crear directorio de cache si no existe
+    mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCKFILE")"
+    
     # Inicializar logging
     > "$LOG_FILE"
     log "Iniciando Arch Dream Installer v$PROJECT_VERSION"
@@ -541,6 +546,8 @@ main() {
     local installed=0
     local failed=0
     
+    # Variables ya inicializadas anteriormente
+    
     if [[ "$PARALLEL_INSTALL" == "true" && ${#resolved_modules[@]} -gt 1 ]]; then
         install_modules_parallel "${resolved_modules[@]}"
         
@@ -549,18 +556,28 @@ main() {
             failed=0
         else
             for module in "${resolved_modules[@]}"; do
-                [[ -f "$HOME/.config/arch-dream/installed/$module" ]] && ((installed++)) || ((failed++))
+                if [[ -f "$HOME/.config/arch-dream/installed/$module" ]]; then
+                    installed=$((installed + 1))
+                else
+                    failed=$((failed + 1))
+                fi
             done
         fi
     else
         for module in "${resolved_modules[@]}"; do
             if install_module "$module"; then
-                ((installed++))
+                installed=$((installed + 1))
             else
-                ((failed++))
+                failed=$((failed + 1))
                 [[ "$FORCE_INSTALL" != "true" ]] && break
             fi
         done
+        
+        # En modo dry run, todos los módulos se consideran instalados exitosamente
+        if [[ "$DRY_RUN" == "true" ]]; then
+            installed=${#resolved_modules[@]}
+            failed=0
+        fi
     fi
     
     local total_time=$(($(date +%s) - start_time))

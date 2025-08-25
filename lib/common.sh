@@ -385,6 +385,32 @@ create_backup() {
     fi
 }
 
+# Crear directorio de configuración de manera segura
+create_config_directory() {
+    local config_dir="$1"
+    local description="${2:-directorio de configuración}"
+    
+    # Si el directorio es un symlink al sistema anterior, reemplazarlo
+    if [[ -L "$config_dir" ]]; then
+        local target=$(readlink -f "$config_dir" 2>/dev/null || true)
+        if [[ -n "$target" && "$target" == *"/.mydotfiles/"* ]]; then
+            log "Reemplazando symlink al sistema anterior: $config_dir -> $target"
+            create_backup "$config_dir"
+            rm -f "$config_dir"
+        fi
+    fi
+    
+    # Crear directorio si no existe
+    if [[ ! -d "$config_dir" ]]; then
+        mkdir -p "$config_dir"
+        success "✅ $description creado: $config_dir"
+    else
+        success "✓ $description ya existe: $config_dir"
+    fi
+    
+    return 0
+}
+
 # Crear symlink seguro
 create_symlink() {
     local source="$1"
@@ -575,6 +601,16 @@ show_summary() {
 # Inicializar biblioteca
 init_library() {
     debug "Inicializando biblioteca común..."
+    
+    # Definir variables de color si no están definidas
+    [[ -z "${NC:-}" ]] && NC='\033[0m'
+    [[ -z "${BOLD:-}" ]] && BOLD='\033[1m'
+    [[ -z "${RED:-}" ]] && RED='\033[0;31m'
+    [[ -z "${GREEN:-}" ]] && GREEN='\033[0;32m'
+    [[ -z "${YELLOW:-}" ]] && YELLOW='\033[1;33m'
+    [[ -z "${BLUE:-}" ]] && BLUE='\033[0;34m'
+    [[ -z "${CYAN:-}" ]] && CYAN='\033[0;36m'
+    [[ -z "${PURPLE:-}" ]] && PURPLE='\033[0;35m'
     
     # Verificar sistema
     if ! is_arch_linux; then

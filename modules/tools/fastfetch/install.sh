@@ -83,21 +83,8 @@ install_fastfetch() {
 setup_fastfetch_directories() {
     log "Configurando directorios de Fastfetch..."
     
-    # Normalizar si existe un symlink roto o archivo en la ruta de config
-    if [[ -L "$FASTFETCH_CONFIG_DIR" ]]; then
-        local target
-        target=$(readlink -f "$FASTFETCH_CONFIG_DIR" || true)
-        if [[ -z "$target" || ! -d "$target" ]]; then
-            warn "Enlace roto detectado en $FASTFETCH_CONFIG_DIR, corrigiendo..."
-            rm -f "$FASTFETCH_CONFIG_DIR"
-        fi
-    elif [[ -e "$FASTFETCH_CONFIG_DIR" && ! -d "$FASTFETCH_CONFIG_DIR" ]]; then
-        warn "$FASTFETCH_CONFIG_DIR es un archivo, moviendo a backup..."
-        mv "$FASTFETCH_CONFIG_DIR" "$FASTFETCH_CONFIG_DIR.backup_$(date +%Y%m%d_%H%M%S)"
-    fi
-
-    # Crear directorio principal
-    mkdir -p "$FASTFETCH_CONFIG_DIR"
+    # Usar la función mejorada para crear directorios de configuración
+    create_config_directory "$FASTFETCH_CONFIG_DIR" "directorio principal de Fastfetch"
     
     # Establecer permisos correctos
     chmod 755 "$FASTFETCH_CONFIG_DIR"
@@ -114,15 +101,27 @@ configure_module_files() {
     
     # Copiar imágenes personalizadas
     local images=("Dreamcoder01.jpg" "Dreamcoder02.jpg" "Dreamcoder03.jpg" "Dreamcoder04.jpg" "Dreamcoder05.jpg" "Dreamcoder06.jpg" "Dreamcoder07.jpg" "Dreamcoder08.jpg" "Dreamcoder09.jpg")
+    local images_copied=0
+    
     for image in "${images[@]}"; do
         if [[ -f "$SCRIPT_DIR/$image" ]]; then
-            cp "$SCRIPT_DIR/$image" "$FASTFETCH_CONFIG_DIR/"
-            success "✓ Imagen copiada: $image"
+            if cp "$SCRIPT_DIR/$image" "$FASTFETCH_CONFIG_DIR/"; then
+                success "✓ Imagen copiada: $image"
+                images_copied=$((images_copied + 1))
+            else
+                warn "⚠️  No se pudo copiar la imagen: $image"
+            fi
+        else
+            warn "⚠️  Imagen no encontrada: $image"
         fi
     done
-
-    # Crear enlaces simbólicos en ~/.config/fastfetch para que
-    # Las imágenes ya están en el directorio principal, no se necesitan enlaces
+    
+    if [[ $images_copied -eq 0 ]]; then
+        error "❌ No se pudo copiar ninguna imagen personalizada"
+        return 1
+    fi
+    
+    success "✅ $images_copied imágenes copiadas correctamente"
     
     # Crear archivo de configuración local si no existe
     if [[ ! -f "$FASTFETCH_CONFIG_DIR/config.local.jsonc" ]]; then
@@ -145,8 +144,6 @@ configure_module_files() {
 EOF
         success "✅ Archivo de configuración local creado: $FASTFETCH_CONFIG_DIR/config.local.jsonc"
     fi
-    
-    # Tema personalizado no es necesario para la funcionalidad básica
     
     success "✅ Archivos del módulo configurados"
 }
@@ -316,7 +313,12 @@ verify_module_installation() {
     fi
     
     # Verificar imágenes
-    local image_count=$(find "$FASTFETCH_CONFIG_DIR" -name "*.jpg" | wc -l)
+    local image_count=0
+    # Usar ls para contar archivos .jpg (más confiable que find)
+    if ls "$FASTFETCH_CONFIG_DIR"/*.jpg &>/dev/null; then
+        image_count=$(ls "$FASTFETCH_CONFIG_DIR"/*.jpg 2>/dev/null | wc -l)
+    fi
+    
     if [[ $image_count -gt 0 ]]; then
         success "✓ Imágenes personalizadas configuradas ($image_count imágenes)"
         ((++checks_passed))
