@@ -1,8 +1,9 @@
 # =====================================================
-# 🚀 STARSHIP PROMPT - ARCH DREAM PREMIUM DELUXE
+# 🚀 STARSHIP PROMPT - ARCH DREAM MAXIMALIST MASTERPIECE
 # =====================================================
-# Diseño ultra premium inspirado en Powerlevel10k con detalles visuales avanzados
-# Tema Catppuccin Mocha con estética ultra elegante, funcional y visualmente impactante
+# Diseño maximalista inspirado en expertos de UX y diseño premium
+# Tema Catppuccin Mocha con estética de revista de diseño internacional
+# Separadores elegantes, iconos sofisticados y experiencia visual inmersiva
 # =====================================================
 
 # Configuración general optimizada
@@ -10,10 +11,10 @@ add_newline = true
 command_timeout = 1000
 continuation_prompt = "  "
 
-# Formato principal del prompt - diseño Powerlevel10k ultra premium con separadores elegantes
+# Formato principal del prompt - diseño maximalista con separadores elegantes
 format = "$username$hostname$directory$git_branch$git_status$fill$character"
 
-# Lado derecho - información ultra premium con diseño atractivo
+# Lado derecho - información premium con diseño atractivo
 right_format = "$time$cmd_duration"
 
 # Fill character para el diseño elegante
@@ -22,7 +23,7 @@ symbol = " "
 style = "fg:#313244"
 
 # =====================================================
-# 👤 USUARIO Y HOST - Diseño Powerlevel10k ultra premium con separadores
+# 👤 USUARIO Y HOST - Diseño maximalista con separadores elegantes
 # =====================================================
 
 [username]
@@ -30,6 +31,7 @@ show_always = true
 style_user = "bold bg:#89b4fa fg:#1e1e2e"
 style_root = "bold bg:#f38ba8 fg:#1e1e2e"
 format = "  $user "
+disabled = false
 
 [hostname]
 ssh_only = false
@@ -39,7 +41,7 @@ trim_at = "."
 disabled = false
 
 # =====================================================
-# 📁 DIRECTORIO - Navegación con estilo Powerlevel10k ultra premium
+# 📁 DIRECTORIO - Navegación maximalista con iconos sofisticados
 # =====================================================
 
 [directory]
@@ -64,7 +66,6 @@ fish_style_pwd_dir_length = 1
 "Scripts" = "📜"
 "Tools" = "🔧"
 "src" = "📦"
-"config" = "⚙️"
 "modules" = "🧩"
 "Arch_Dream08" = "🌋"
 "core" = "⚡"
@@ -79,9 +80,40 @@ fish_style_pwd_dir_length = 1
 "assets" = "🎭"
 "images" = "🖼️"
 "dreamcoder" = "🌟"
+"nvim" = "🔮"
+"kitty" = "🐱"
+"fastfetch" = "📊"
+"nano" = "✏️"
+"common" = "🔗"
+"install" = "🔧"
+"update" = "🔄"
+"cleanup" = "🧹"
+"verify" = "✅"
+"test" = "🧪"
+"benchmark" = "📈"
+"fix" = "🔧"
+"one-liner" = "⚡"
+"README" = "📋"
+"LICENSE" = "⚖️"
+"lua" = "🌙"
+"plugins" = "🔌"
+"keybindings" = "⌨️"
+"functions" = "⚡"
+"aliases" = "🏷️"
+"advanced" = "🚀"
+"ui" = "🎨"
+"welcome" = "👋"
+"prompt" = "💬"
+"completion" = "🔍"
+"environment" = "🌍"
+"history" = "📚"
+"logging" = "📝"
+"cache" = "💾"
+"profiles" = "👤"
+"error-handling" = "⚠️"
 
 # =====================================================
-# 🔥 GIT - Control de versiones estilo Powerlevel10k ultra premium
+# 🔥 GIT - Control de versiones maximalista con feedback visual inmersivo
 # =====================================================
 
 [git_branch]
@@ -107,7 +139,7 @@ stashed = "≡"
 conflicted = "!"
 
 # =====================================================
-# ⚡ PROMPT CHARACTER - Diseño Powerlevel10k ultra premium
+# ⚡ PROMPT CHARACTER - Diseño maximalista con feedback contextual
 # =====================================================
 
 [character]
@@ -116,7 +148,7 @@ error_symbol = "[❯](bold fg:#f38ba8)"
 vicmd_symbol = "[❮](bold fg:#b4befe)"
 
 # =====================================================
-# 🐍 LENGUAJES - Solo los esenciales con estilo ultra premium
+# 🐍 LENGUAJES - Solo los esenciales con estilo maximalista
 # =====================================================
 
 [python]
@@ -148,7 +180,7 @@ detect_files = ["Cargo.toml"]
 disabled = false
 
 # =====================================================
-# 🐳 DOCKER - Solo cuando es necesario con estilo ultra premium
+# 🐳 DOCKER - Solo cuando es necesario con estilo maximalista
 # =====================================================
 
 [docker_context]
@@ -160,7 +192,7 @@ detect_files = ["Dockerfile", "docker-compose.yml"]
 disabled = false
 
 # =====================================================
-# 📦 PAQUETES - Solo información esencial con estilo ultra premium
+# 📦 PAQUETES - Solo información esencial con estilo maximalista
 # =====================================================
 
 [package]
@@ -171,7 +203,7 @@ display_private = false
 disabled = false
 
 # =====================================================
-# ⏱️ TIEMPO Y DURACIÓN - Información ultra premium
+# ⏱️ TIEMPO Y DURACIÓN - Información maximalista con diseño premium
 # =====================================================
 
 [time]
@@ -188,7 +220,7 @@ show_milliseconds = false
 disabled = false
 
 # =====================================================
-# 🎯 VARIABLES PERSONALIZADAS - Solo las esenciales ultra premium
+# 🎯 VARIABLES PERSONALIZADAS - Solo las esenciales maximalistas
 # =====================================================
 
 [env_var.TARGET]
@@ -206,7 +238,7 @@ style = "bold bg:cyan fg:black"
 disabled = false
 
 # =====================================================
-# 🔧 MÓDULOS ADICIONALES PREMIUM - Solo los más útiles
+# 🔧 MÓDULOS ADICIONALES MAXIMALISTAS - Solo los más útiles
 # =====================================================
 
 # Estado del sistema - solo cuando es relevante
@@ -276,15 +308,18 @@ disabled = true
 disabled = true
 
 # =====================================================
-# 🎯 CONFIGURACIÓN FINAL ULTRA PREMIUM
+# 🎯 CONFIGURACIÓN FINAL MAXIMALIST MASTERPIECE
 # =====================================================
 
 # Esta configuración está optimizada para:
-# - Diseño ultra premium inspirado en Powerlevel10k
-# - Estética elegante con detalles visuales avanzados
+# - Diseño maximalista inspirado en expertos de UX
+# - Estética de revista de diseño internacional
+# - Separadores elegantes y iconos sofisticados
 # - Paleta de colores Catppuccin rica y armoniosa
 # - Rendimiento óptimo del prompt
 # - Solo funcionalidades esenciales y útiles
 # - Sin sobre-ingeniería
-# - Experiencia visual premium y funcional
-# - Separadores elegantes y iconos visuales atractivos
+# - Experiencia visual inmersiva y premium
+# - Iconos sofisticados y estética visual impactante
+# - Formato .toml respetado para máxima compatibilidad
+# - Diseño maximalista que transforma la terminal en arte
