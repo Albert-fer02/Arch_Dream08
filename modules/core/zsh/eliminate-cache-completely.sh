@@ -176,7 +176,7 @@ main() {
     echo "1. Ejecuta: exec zsh"
     echo "2. Tu terminal se abrirá instantáneamente"
     echo "3. Sin procesos de cache ni demoras"
-    echo "4. Solo tu prompt de Starship perfecto"
+    echo "4. Solo tu prompt de Powerlevel10k perfecto"
     echo ""
     echo -e "${BLUE}🎯 RESULTADO ESPERADO:${NC}"
     echo "• Terminal ultra-rápida y silenciosa"

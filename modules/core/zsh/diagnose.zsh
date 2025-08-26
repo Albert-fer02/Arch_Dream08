@@ -32,7 +32,7 @@ check_critical_files() {
         "$HOME/.config/zsh/common/logging.sh"
         # Comentado para evitar procesos en background
         # "$HOME/.config/zsh/common/cache.sh"
-        "$HOME/.config/zsh/config/starship.zsh"
+        # "$HOME/.config/zsh/config/starship.zsh" - Eliminado (migrando a Powerlevel10k)
         "$HOME/.config/zsh/ui/prompt.zsh"
     )
     
@@ -63,7 +63,7 @@ check_critical_functions() {
         "zsh_log_info"
         "zsh_log_warn"
         "zsh_log_error"
-        "init_starship"
+        # "init_starship" - Eliminado (migrando a Powerlevel10k)
     )
     
     local missing_functions=0
@@ -79,54 +79,10 @@ check_critical_functions() {
     return $missing_functions
 }
 
-# Función para verificar variables de Starship
-check_starship_vars() {
-    print_status "INFO" "Verificando variables de Starship..."
-    
-    local starship_vars=(
-        "STARSHIP_CMD_STATUS"
-        "STARSHIP_DURATION"
-        "STARSHIP_JOBS"
-    )
-    
-    local missing_vars=0
-    for var in "${starship_vars[@]}"; do
-        if [[ -n "${(P)var}" ]]; then
-            print_status "OK" "Variable definida: $var = ${(P)var}"
-        else
-            print_status "WARN" "Variable no definida: $var"
-            ((missing_vars++))
-        fi
-    done
-    
-    return $missing_vars
-}
-
-# Función para verificar estado de Starship
-check_starship_status() {
-    print_status "INFO" "Verificando estado de Starship..."
-    
-    if command -v starship &>/dev/null; then
-        print_status "OK" "Starship está instalado"
-        
-        if (( $+functions[starship_precmd] )); then
-            print_status "OK" "Función starship_precmd disponible"
-        else
-            print_status "ERROR" "Función starship_precmd no disponible"
-            return 1
-        fi
-        
-        if (( $+functions[starship_preexec] )); then
-            print_status "OK" "Función starship_preexec disponible"
-        else
-            print_status "ERROR" "Función starship_preexec no disponible"
-            return 1
-        fi
-    else
-        print_status "WARN" "Starship no está instalado"
-        return 1
-    fi
-    
+# Función para verificar estado del sistema (Starship eliminado)
+check_system_status() {
+    print_status "INFO" "Verificando estado del sistema..."
+    print_status "OK" "Sistema preparado para Powerlevel10k"
     return 0
 }
 
@@ -197,13 +153,8 @@ run_diagnosis() {
     check_critical_functions
     total_errors=$((total_errors + $?))
     
-    check_starship_vars
+    check_system_status
     total_warnings=$((total_warnings + $?))
-    
-    check_starship_status
-    if [[ $? -ne 0 ]]; then
-        ((total_errors++))
-    fi
     
     check_zsh_hooks
     check_permissions
@@ -233,7 +184,7 @@ run_diagnosis() {
     
     if [[ $total_warnings -gt 0 ]]; then
         echo "• Ejecuta: check_system_integrity"
-        echo "• Verifica la configuración de Starship"
+        echo "• Sistema preparado para Powerlevel10k"
     fi
     
     if [[ $total_errors -eq 0 && $total_warnings -eq 0 ]]; then

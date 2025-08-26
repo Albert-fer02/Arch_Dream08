@@ -60,7 +60,7 @@ verify_files() {
         "config/shell-base.bash"
         "config/history.bash"
         "config/completion.bash"
-        "config/starship.bash"
+        # "config/starship.bash" - Eliminado (migrando a Powerlevel10k)
         "config/environment.bash"
         "aliases/basic.bash"
         "aliases/git.bash"

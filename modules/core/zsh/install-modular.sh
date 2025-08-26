@@ -60,7 +60,7 @@ verify_files() {
     local files=(
         "config/history.zsh"
         "config/completion.zsh"
-        "config/starship.zsh"
+        # "config/starship.zsh" - Eliminado (migrando a Powerlevel10k)
         "config/environment.zsh"
         "aliases/basic.zsh"
         "aliases/git.zsh"

@@ -20,15 +20,6 @@ zstyle ':completion:*' quiet true
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
 
-# Configuración de Starship (consolidada desde bash)
-export STARSHIP_LOG="error"
-export STARSHIP_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/starship"
-export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
-
-# Crear directorio de caché si no existe
-[[ ! -d "$STARSHIP_CACHE" ]] && mkdir -p "$STARSHIP_CACHE"
-
-# Inicializar Starship para zsh
-if command -v starship &>/dev/null; then
-    eval "$(starship init zsh)"
+# Configuración preparada para Powerlevel10k
+# (Starship eliminado - migrando a Powerlevel10k)
 fi

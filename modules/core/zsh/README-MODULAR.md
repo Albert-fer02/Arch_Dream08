@@ -13,7 +13,7 @@ modules/core/zsh/
 ├── config/                    # Configuración base
 │   ├── history.zsh          # Configuración del historial
 │   ├── completion.zsh       # Configuración de completions
-│   ├── starship.zsh         # Configuración de Starship prompt
+│   ├── # starship.zsh - Eliminado (migrando a Powerlevel10k)
 │   └── environment.zsh      # Variables de entorno
 ├── aliases/                  # Aliases organizados por categoría
 │   ├── basic.zsh            # Aliases básicos de navegación
@@ -242,7 +242,7 @@ zmodload zsh/zprof
 ## 📚 Referencias
 
 - [ZSH Documentation](https://zsh.sourceforge.io/Doc/)
-- [Starship Documentation](https://starship.rs/)
+- [Powerlevel10k Documentation](https://github.com/romkatv/powerlevel10k)
 - [Arch Linux Wiki](https://wiki.archlinux.org/)
 
 ## 🤝 Contribución
