@@ -1,0 +1,187 @@
+#!/bin/zsh
+# =====================================================
+# 🚀 ZSH Configuration - Arch Dream v4.3 MODULAR
+# =====================================================
+# Configuración modular y optimizada de Zsh
+# =====================================================
+
+# =====================================================
+# 🛡️ INICIALIZACIÓN SEGURA
+# =====================================================
+
+# Cargar base shell ZSH primero
+source "$HOME/.config/zsh/config/shell-base.zsh" || {
+    print "❌ Error crítico: No se pudo cargar shell-base.zsh" >&2
+    return 1 2>/dev/null || exit 1
+}
+
+# Cargar sistemas comunes (compatibles bash/zsh)
+source "$HOME/.config/zsh/common/error-handling.sh" 2>/dev/null || true
+
+# Cargar sistema de logging
+source "$HOME/.config/zsh/common/logging.sh" 2>/dev/null || true
+
+# Cargar sistema de cache
+source "$HOME/.config/zsh/common/cache.sh" 2>/dev/null || true
+
+# Cargar sistema de configuración
+source "$HOME/.config/zsh/common/config.sh" 2>/dev/null || true
+
+# Cargar sistema de perfiles
+source "$HOME/.config/zsh/common/profiles.sh" 2>/dev/null || true
+
+# Inicializar sistemas
+if (( $+functions[init_logging] )); then
+    init_logging
+fi
+
+if (( $+functions[init_cache] )); then
+    init_cache
+fi
+
+if (( $+functions[init_config] )); then
+    init_config
+fi
+
+# Iniciar profiling de performance
+if (( $+functions[log_perf_start] )); then
+    log_perf_start "zsh_config_load"
+fi
+
+# =====================================================
+# Crear archivo de configuración local si no existe
+if [[ ! -f "$HOME/.zshrc.local" ]]; then
+    (( $+functions[log_info] )) && log_info "Creating local ZSH configuration file"
+    
+    cat > "$HOME/.zshrc.local" << 'EOF'
+# =====================================================
+# 🧩 CONFIGURACIÓN LOCAL DE ZSH - ARCH DREAM v4.3
+# =====================================================
+# Personalizaciones específicas del usuario
+# Este archivo NO se sobrescribe con actualizaciones
+# =====================================================
+
+# Variables de entorno personalizadas
+# export ARCH_DREAM_LOCALE="en_US.UTF-8"
+# export ARCH_DREAM_THEME="catppuccin"
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
+
+# Configuración de perfil preferido
+# export ARCH_DREAM_ACTIVE_PROFILE="developer"
+
+EOF
+fi
+
+# 📁 CONFIGURACIÓN BASE
+# =====
+
+# Configuración del historial
+safe_source "$HOME/.config/zsh/config/history.zsh"
+
+# Configuración de completions
+safe_source "$HOME/.config/zsh/config/completion.zsh"
+
+# Variables de entorno
+safe_source "$HOME/.config/zsh/config/environment.zsh"
+
+# =====================================================
+# 🎨 INTERFAZ DE USUARIO
+# =====================================================
+
+# Prompt de Starship
+safe_source "$HOME/.config/zsh/config/starship.zsh" false
+
+# Prompt personalizado
+safe_source "$HOME/.config/zsh/ui/prompt.zsh" false
+
+# Mensaje de bienvenida
+safe_source "$HOME/.config/zsh/ui/welcome.zsh" false
+
+# =====================================================
+# 🔌 PLUGINS Y HERRAMIENTAS
+# =====================================================
+
+# Gestor de plugins
+safe_source "$HOME/.config/zsh/plugins/plugin-manager.zsh"
+
+# =====================================================
+# ⌨️  INTERACCIÓN
+# =====================================================
+
+# Key bindings
+safe_source "$HOME/.config/zsh/keybindings/keybindings.zsh" false
+
+# =====================================================
+# 🔧 FUNCIONES
+# =====================================================
+
+# Funciones básicas
+safe_source "$HOME/.config/zsh/functions/basic.zsh"
+
+# Funciones de Arch Linux
+safe_source "$HOME/.config/zsh/functions/arch.zsh" false
+
+# Funciones de Red Team
+safe_source "$HOME/.config/zsh/functions/redteam.zsh" false
+
+# =====================================================
+# 📂 ALIASES
+# =====================================================
+
+# Aliases básicos
+safe_source "$HOME/.config/zsh/aliases/basic.zsh"
+
+# Aliases de Git
+safe_source "$HOME/.config/zsh/aliases/git.zsh" false
+
+# Aliases del sistema
+safe_source "$HOME/.config/zsh/aliases/system.zsh" false
+
+# Aliases de Red Team
+safe_source "$HOME/.config/zsh/aliases/redteam.zsh" false
+
+# =====================================================
+# ⚡ FUNCIONALIDADES AVANZADAS
+# =====================================================
+
+# Lazy loading
+safe_source "$HOME/.config/zsh/advanced/lazy-loading.zsh" false
+
+# Seguridad
+safe_source "$HOME/.config/zsh/advanced/security.zsh" false
+
+# =====================================================
+# 📋 CUSTOMIZACIONES LOCALES
+# =====================================================
+
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# =====================================================
+# 🚀 OPTIMIZACIONES FINALES
+# =====================================================
+
+# Profiling opcional (descomenta para debugging)
+# zmodload zsh/zprof
+
+# =====================================================
+# ✅ INICIALIZACIÓN COMPLETADA
+# =====================================================
+
+# Finalizar profiling si está activo
+if (( $+functions[log_perf_end] )); then
+    log_perf_end "zsh_config_load"
+fi
+
+# Mensaje de confirmación
+if (( $+functions[zsh_log_info] )); then
+    zsh_log_info "ZSH modular optimizado cargado exitosamente!"
+else
+    print -P "%F{green}🚀 ZSH modular optimizado cargado exitosamente!%f"
+fi
