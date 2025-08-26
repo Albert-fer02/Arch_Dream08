@@ -1,8 +1,8 @@
 # =====================================================
 # 🚀 STARSHIP PROMPT - ARCH DREAM OPTIMIZADO
 # =====================================================
-# Configuración limpia y funcional para máxima productividad
-# Tema Catppuccin Mocha moderno y legible
+# Configuración con paleta Catppuccin rica y diseño atractivo
+# Tema Catppuccin Mocha moderno, elegante y productivo
 # =====================================================
 
 # Configuración general optimizada
@@ -10,10 +10,10 @@ add_newline = true
 command_timeout = 1000
 continuation_prompt = "  "
 
-# Formato principal del prompt - limpio y funcional
+# Formato principal del prompt - diseño elegante con separadores
 format = "$username$hostname$directory$git_branch$git_status$fill$character"
 
-# Lado derecho - información útil pero no intrusiva
+# Lado derecho - información útil con diseño atractivo
 right_format = "$time$cmd_duration"
 
 # Fill character para el diseño elegante
@@ -22,34 +22,34 @@ symbol = " "
 style = "fg:#313244"
 
 # =====================================================
-# 👤 USUARIO Y HOST - Identificación clara
+# 👤 USUARIO Y HOST - Diseño elegante con fondos
 # =====================================================
 
 [username]
 show_always = true
-style_user = "bold fg:#89b4fa"
-style_root = "bold fg:#f38ba8"
-format = "$user "
+style_user = "bold bg:#89b4fa fg:#1e1e2e"
+style_root = "bold bg:#f38ba8 fg:#1e1e2e"
+format = "[ $user ]($style) "
 
 [hostname]
 ssh_only = false
-style = "fg:#94e2d5"
-format = "@$hostname "
+style = "bold bg:#94e2d5 fg:#1e1e2e"
+format = "[ $hostname ]($style) "
 trim_at = "."
 disabled = false
 
 # =====================================================
-# 📁 DIRECTORIO - Navegación inteligente
+# 📁 DIRECTORIO - Navegación inteligente con diseño atractivo
 # =====================================================
 
 [directory]
-style = "bold fg:#89b4fa"
-format = "$path "
+style = "bold bg:#cba6f7 fg:#1e1e2e"
+format = "[ $path ]($style) "
 truncation_length = 2
 truncation_symbol = "…/"
-read_only_style = "fg:#f38ba8 bold"
+read_only_style = "bold bg:#f38ba8 fg:#1e1e2e"
 read_only = " "
-home_symbol = "~"
+home_symbol = "🏠"
 use_logical_path = true
 fish_style_pwd_dir_length = 1
 
@@ -66,21 +66,22 @@ fish_style_pwd_dir_length = 1
 "src" = "📦"
 "config" = "⚙️"
 "modules" = "🧩"
+"Arch_Dream08" = "🌋"
 
 # =====================================================
-# 🔥 GIT - Control de versiones esencial
+# 🔥 GIT - Control de versiones con diseño elegante
 # =====================================================
 
 [git_branch]
 symbol = "🌿"
-style = "bold fg:#a6e3a1"
-format = "$symbol$branch "
+style = "bold bg:#a6e3a1 fg:#1e1e2e"
+format = "[ $symbol$branch ]($style) "
 truncation_length = 10
 truncation_symbol = "…"
 
 [git_status]
 format = "[$all_status$ahead_behind]($style)"
-style = "bold fg:#f9e2af"
+style = "bold bg:#f9e2af fg:#1e1e2e"
 ahead = "⇡${count}"
 diverged = "⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
@@ -94,7 +95,7 @@ stashed = "≡"
 conflicted = "!"
 
 # =====================================================
-# ⚡ PROMPT CHARACTER - Diseño moderno
+# ⚡ PROMPT CHARACTER - Diseño moderno y atractivo
 # =====================================================
 
 [character]
@@ -103,13 +104,13 @@ error_symbol = "[❯](bold fg:#f38ba8)"
 vicmd_symbol = "[❮](bold fg:#b4befe)"
 
 # =====================================================
-# 🐍 LENGUAJES - Solo los esenciales
+# 🐍 LENGUAJES - Solo los esenciales con diseño atractivo
 # =====================================================
 
 [python]
 symbol = "🐍"
-format = "[$symbol$version]($style)"
-style = "fg:#94e2d5"
+format = "[ $symbol$version ]($style)"
+style = "bold bg:#94e2d5 fg:#1e1e2e"
 pyenv_version_name = false
 python_binary = ["python3", "python"]
 detect_extensions = ["py"]
@@ -119,8 +120,8 @@ disabled = false
 
 [nodejs]
 symbol = "⬢"
-format = "[$symbol$version]($style)"
-style = "fg:#94e2d5"
+format = "[ $symbol$version ]($style)"
+style = "bold bg:#94e2d5 fg:#1e1e2e"
 detect_files = ["package.json"]
 detect_folders = ["node_modules"]
 detect_extensions = ["js", "ts"]
@@ -128,68 +129,68 @@ disabled = false
 
 [rust]
 symbol = "🦀"
-format = "[$symbol$version]($style)"
-style = "fg:#f38ba8"
+format = "[ $symbol$version ]($style)"
+style = "bold bg:#f38ba8 fg:#1e1e2e"
 detect_extensions = ["rs"]
 detect_files = ["Cargo.toml"]
 disabled = false
 
 # =====================================================
-# 🐳 DOCKER - Solo cuando es necesario
+# 🐳 DOCKER - Solo cuando es necesario con diseño atractivo
 # =====================================================
 
 [docker_context]
 symbol = "🐳"
-format = "[$symbol$context]($style)"
-style = "fg:#94e2d5"
+format = "[ $symbol$context ]($style)"
+style = "bold bg:#94e2d5 fg:#1e1e2e"
 only_with_files = true
 detect_files = ["Dockerfile", "docker-compose.yml"]
 disabled = false
 
 # =====================================================
-# 📦 PAQUETES - Solo información esencial
+# 📦 PAQUETES - Solo información esencial con diseño atractivo
 # =====================================================
 
 [package]
 symbol = "📦"
-format = "[$symbol$version]($style)"
-style = "fg:#89b4fa"
+format = "[ $symbol$version ]($style)"
+style = "bold bg:#89b4fa fg:#1e1e2e"
 display_private = false
 disabled = false
 
 # =====================================================
-# ⏱️ TIEMPO Y DURACIÓN - Información útil
+# ⏱️ TIEMPO Y DURACIÓN - Información útil con diseño elegante
 # =====================================================
 
 [time]
 disabled = false
-format = "[$time]($style)"
-style = "fg:#6c7086"
+format = "[ $time ]($style)"
+style = "bold bg:#6c7086 fg:#1e1e2e"
 time_format = "%H:%M"
 
 [cmd_duration]
 min_time = 1000
-format = "[$duration]($style)"
-style = "fg:#f9e2af"
+format = "[ $duration ]($style)"
+style = "bold bg:#f9e2af fg:#1e1e2e"
 show_milliseconds = false
 disabled = false
 
 # =====================================================
-# 🎯 VARIABLES PERSONALIZADAS - Solo las esenciales
+# 🎯 VARIABLES PERSONALIZADAS - Solo las esenciales con diseño atractivo
 # =====================================================
 
 [env_var.TARGET]
 variable = "TARGET"
 symbol = "🎯"
-format = "[$symbol$env_value]($style)"
-style = "bold fg:red"
+format = "[ $symbol$env_value ]($style)"
+style = "bold bg:red fg:white"
 disabled = false
 
 [env_var.PROXY]
 variable = "PROXY"
 symbol = "🔒"
-format = "[$symbol$env_value]($style)"
-style = "bold fg:cyan"
+format = "[ $symbol$env_value ]($style)"
+style = "bold bg:cyan fg:black"
 disabled = false
 
 # =====================================================
@@ -250,6 +251,7 @@ disabled = true
 # Esta configuración está optimizada para:
 # - Máxima productividad y legibilidad
 # - Rendimiento óptimo del prompt
-# - Diseño moderno y limpio
+# - Diseño moderno, elegante y atractivo
+# - Paleta de colores Catppuccin rica y armoniosa
 # - Solo funcionalidades esenciales
 # - Sin sobre-ingeniería
