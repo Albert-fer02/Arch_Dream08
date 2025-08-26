@@ -14,13 +14,13 @@ modules/core/zsh/
 ├── 📁 ui/                         # Interfaz de usuario
 ├── 📁 advanced/                   # Configuraciones avanzadas
 ├── powerlevel10k-maximalist.zsh   # Configuración maximalista de Powerlevel10k
-├── zshrc.modular.oh-my-zsh        # **CONFIGURACIÓN PRINCIPAL**
+├── .zshrc                         # **CONFIGURACIÓN PRINCIPAL (ARCHIVO REAL)**
 └── README-OH-MY-ZSH.md            # Este archivo
 ```
 
 ## 🎯 **CONFIGURACIÓN PRINCIPAL**
 
-El archivo **`zshrc.modular.oh-my-zsh`** es la configuración principal que:
+El archivo **`.zshrc`** está ahora **directamente en la carpeta `zsh/`** del proyecto y:
 
 1. **Integra Oh-my-zsh** con la configuración modular de Arch Dream
 2. **Carga Powerlevel10k** con el tema maximalista personalizado
@@ -32,13 +32,13 @@ El archivo **`zshrc.modular.oh-my-zsh`** es la configuración principal que:
 ### **Enlace Simbólico (Recomendado):**
 ```bash
 # Crear enlace simbólico desde el home del usuario
-ln -s /ruta/al/proyecto/modules/core/zsh/zshrc.modular.oh-my-zsh ~/.zshrc
+ln -s /ruta/al/proyecto/modules/core/zsh/.zshrc ~/.zshrc
 ```
 
 ### **Carga Manual:**
 ```bash
 # Cargar la configuración manualmente
-source /ruta/al/proyecto/modules/core/zsh/zshrc.modular.oh-my-zsh
+source /ruta/al/proyecto/modules/core/zsh/.zshrc
 ```
 
 ## 🌟 **CARACTERÍSTICAS DEL SISTEMA**
@@ -81,8 +81,8 @@ Editar: `aliases/basic.zsh`, `aliases/git.zsh`, `aliases/system.zsh`
 ### **Agregar Funciones:**
 Editar: `functions/basic.zsh`, `functions/arch.zsh`, `functions/redteam.zsh`
 
-### **Modificar Plugins:**
-Editar: `zshrc.modular.oh-my-zsh` (sección plugins)
+### **Modificar Configuración Principal:**
+Editar: `.zshrc` (archivo principal en la carpeta zsh/)
 
 ## 🔍 **SOLUCIÓN DE PROBLEMAS**
 
@@ -101,7 +101,7 @@ Editar: `zshrc.modular.oh-my-zsh` (sección plugins)
 
 ## 📚 **ARCHIVOS IMPORTANTES**
 
-- **`zshrc.modular.oh-my-zsh`** - Configuración principal del sistema
+- **`.zshrc`** - **CONFIGURACIÓN PRINCIPAL** del sistema (en la carpeta zsh/)
 - **`powerlevel10k-maximalist.zsh`** - Tema maximalista personalizado
 - **`welcome.zsh`** - Mensaje de bienvenida personalizado
 - **`plugin-manager.zsh`** - Gestión de plugins personalizada
@@ -113,8 +113,11 @@ Un sistema completamente organizado que combina:
 - ✅ **Powerlevel10k** con diseño maximalista premium
 - ✅ **Arch Dream modular** para funcionalidades avanzadas
 - ✅ **Estructura ordenada** y fácil de mantener
+- ✅ **Archivo .zshrc** directamente en la carpeta zsh/ del proyecto
 - ✅ **Sin sobre-ingeniería** - solo funcionalidad y belleza
 
 ---
 
 **🎨 Tu terminal ahora es una obra de arte digital maximalista y completamente organizada!**
+
+**📁 El archivo .zshrc está ahora correctamente ubicado en la carpeta zsh/ del proyecto**
