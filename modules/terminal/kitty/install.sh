@@ -196,7 +196,7 @@ EOF
     fi
     
     # Configurar como terminal por defecto si es posible
-    if [[ -n "$TERMINAL" ]] && [[ "$TERMINAL" != "kitty" ]]; then
+    if [[ -n "${TERMINAL:-}" ]] && [[ "$TERMINAL" != "kitty" ]]; then
         if confirm "¿Configurar Kitty como terminal por defecto?" true; then
             echo 'export TERMINAL="kitty"' >> "$HOME/.bashrc"
             echo 'export TERMINAL="kitty"' >> "$HOME/.zshrc"

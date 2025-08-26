@@ -1,0 +1,85 @@
+#!/bin/zsh
+# =====================================================
+# 🚀 ZSH Configuration - Arch Dream v4.3 MODULAR
+# =====================================================
+
+# =====================================================
+# 📁 CONFIGURACIÓN BASE
+# =====================================================
+
+# Cargar configuración temprana
+source "$HOME/.config/zsh/config/00-early-init.zsh"
+
+# Cargar base shell ZSH PRIMERO (para tener safe_source disponible)
+source "$HOME/.config/zsh/config/shell-base.zsh"
+
+# Configuración del historial
+safe_source "$HOME/.config/zsh/config/history.zsh"
+
+# Configuración de completions
+safe_source "$HOME/.config/zsh/config/completion.zsh"
+
+# Variables de entorno
+safe_source "$HOME/.config/zsh/config/environment.zsh"
+
+# =====================================================
+# 🎨 INTERFAZ DE USUARIO
+# =====================================================
+
+# Mensaje de bienvenida
+safe_source "$HOME/.config/zsh/ui/welcome.zsh"
+
+# =====================================================
+# 📂 ALIASES
+# =====================================================
+
+# Aliases básicos
+safe_source "$HOME/.config/zsh/aliases/basic.zsh"
+
+# Aliases de Git
+safe_source "$HOME/.config/zsh/aliases/git.zsh"
+
+# Aliases del sistema
+safe_source "$HOME/.config/zsh/aliases/system.zsh"
+
+# Aliases de Red Team
+safe_source "$HOME/.config/zsh/aliases/redteam.zsh"
+
+# =====================================================
+# ⚡ FUNCIONES
+# =====================================================
+
+# Funciones básicas
+safe_source "$HOME/.config/zsh/functions/basic.zsh"
+
+# Funciones de desarrollo
+safe_source "$HOME/.config/zsh/functions/development.zsh"
+
+# Funciones de Arch
+safe_source "$HOME/.config/zsh/functions/arch.zsh"
+
+# Funciones de Red Team
+safe_source "$HOME/.config/zsh/functions/redteam.zsh"
+
+# =====================================================
+# 🔌 PLUGINS
+# =====================================================
+
+# Plugin manager
+safe_source "$HOME/.config/zsh/plugins/plugin-manager.zsh"
+
+# =====================================================
+# ⚡ FUNCIONALIDADES AVANZADAS
+# =====================================================
+
+# Lazy loading
+safe_source "$HOME/.config/zsh/advanced/lazy-loading.zsh"
+
+# Limpieza del sistema
+safe_source "$HOME/.config/zsh/advanced/cleanup.zsh"
+
+# =====================================================
+# 🏁 FINALIZACIÓN
+# =====================================================
+
+echo "🚀 ZSH modular cargado exitosamente"

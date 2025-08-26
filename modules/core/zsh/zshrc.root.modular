@@ -1,0 +1,211 @@
+#!/bin/zsh
+# =====================================================
+# 🔴 ROOT ZSH Configuration - Arch Dream MODULAR
+# =====================================================
+# Configuración modular para root basada en zshrc.modular
+# Features: Shared modular base + root-specific customizations
+# =====================================================
+
+# =====================================================
+# 🔴 ROOT MODE INITIALIZATION
+# =====================================================
+
+# Marcar como modo root
+export ROOT_MODE=1
+export ROOT_USER=1
+
+# Configurar paths específicos para root
+export HISTFILE="/root/.zsh_history"
+export ZSH_CACHE_DIR="/root/.zsh"
+export ZINIT_HOME="${XDG_DATA_HOME:-/root/.local/share}/zinit/zinit.git"
+
+# Crear directorios necesarios para root
+[[ ! -d "$ZSH_CACHE_DIR" ]] && mkdir -p "$ZSH_CACHE_DIR"
+[[ ! -d "$(dirname $ZINIT_HOME)" ]] && mkdir -p "$(dirname $ZINIT_HOME)"
+
+# =====================================================
+# 📁 CARGA DE CONFIGURACIÓN BASE MODULAR
+# =====================================================
+
+# Cargar configuración modular base
+if [[ -f "${0:A:h}/zshrc.modular" ]]; then
+    source "${0:A:h}/zshrc.modular"
+else
+    echo "⚠️  Error: zshrc.modular no encontrado"
+    return 1
+fi
+
+# =====================================================
+# 🔴 ROOT-SPECIFIC OVERRIDES
+# =====================================================
+
+# Override de configuración del historial para root
+HISTFILE="/root/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+
+# Override de cache de completions para root
+zstyle ':completion::complete:*' cache-path "/root/.zsh/cache"
+
+# =====================================================
+# 🔧 ZINIT PLUGIN MANAGER (ROOT)
+# =====================================================
+
+# Descargar Zinit si no está disponible
+if [[ ! -d "$ZINIT_HOME" ]]; then
+    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME" 2>/dev/null
+fi
+
+# Cargar Zinit si está disponible
+if [[ -f "${ZINIT_HOME}/zinit.zsh" ]]; then
+    source "${ZINIT_HOME}/zinit.zsh"
+    
+    # Plugins específicos para root
+    zinit light zsh-users/zsh-completions
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zdharma-continuum/fast-syntax-highlighting
+    zinit light rupa/z
+    zinit light zdharma-continuum/history-search-multi-word
+    zinit light agkozak/zsh-z
+    zinit light MichaelAquilina/zsh-you-should-use
+    zinit light wfxr/forgit
+    zinit light changyuheng/zsh-interactive-cd
+    zinit light zsh-users/zsh-history-substring-search
+fi
+
+# =====================================================
+# 🔴 ROOT-SPECIFIC ALIASES
+# =====================================================
+
+# Aliases específicos para root
+alias services='systemctl list-units --type=service'
+alias logs='journalctl -f'
+alias syslogs='journalctl -p 3 -xb'
+alias reload-systemd='systemctl daemon-reload'
+alias netstat='ss -tuln'
+
+# Aliases de seguridad para root
+alias chmod-secure='chmod 600'
+alias chmod-exec='chmod 755'
+alias chown-root='chown root:root'
+alias backup-config='tar czf /root/backup-$(date +%Y%m%d-%H%M%S).tar.gz'
+
+# =====================================================
+# 🔴 ROOT-SPECIFIC FUNCTIONS
+# =====================================================
+
+# Función de actualización del sistema para root
+sysupdate() {
+    echo "🔄 Actualizando sistema como root..."
+    pacman -Syu
+    echo "✅ Sistema actualizado"
+}
+
+# Función de limpieza del sistema para root
+cleanup() {
+    echo "🧹 Limpiando sistema como root..."
+    pacman -Rns $(pacman -Qtdq) 2>/dev/null || echo "No hay paquetes huérfanos"
+    pacman -Sc
+    journalctl --vacuum-time=2weeks
+    echo "✅ Sistema limpiado"
+}
+
+# Función de información del sistema para root
+rootinfo() {
+    echo "🔴 Información del Sistema Root:"
+    echo "  Servicios Activos: $(systemctl list-units --type=service --state=active | wc -l)"
+    echo "  Servicios Fallidos: $(systemctl list-units --type=service --state=failed | wc -l)"
+    echo "  Procesos: $(ps aux | wc -l)"
+    echo "  Carga: $(uptime | awk -F'load average:' '{print $2}')"
+    echo "  Memoria: $(free -h | awk 'NR==2{printf "%.1fG/%.1fG (%.0f%%)", $3/1024, $2/1024, $3*100/$2}')"
+    echo "  Disco: $(df -h / | awk 'NR==2{printf "%s/%s (%s)", $3, $2, $5}')"
+    echo "  Último Login: $(last -1 | head -1 | awk '{print $3, $4, $5, $6}')"
+}
+
+# Función de edición rápida de configuraciones para root
+rootconfig() {
+    case "$1" in
+        zsh|zshrc)      $EDITOR /root/.zshrc ;;
+        zshlocal)       $EDITOR /root/.zshrc.local ;;
+        hosts)          $EDITOR /etc/hosts ;;
+        fstab)          $EDITOR /etc/fstab ;;
+        ssh)            $EDITOR /etc/ssh/sshd_config ;;
+        pacman)         $EDITOR /etc/pacman.conf ;;
+        *)              echo "Disponibles: zsh, zshlocal, hosts, fstab, ssh, pacman" ;;
+    esac
+}
+
+# Función de gestión de servicios para root
+sctl() {
+    case "$1" in
+        start)   systemctl start "$2" ;;
+        stop)    systemctl stop "$2" ;;
+        restart) systemctl restart "$2" ;;
+        status)  systemctl status "$2" ;;
+        enable)  systemctl enable "$2" ;;
+        disable) systemctl disable "$2" ;;
+        reload)  systemctl reload "$2" ;;
+        *)       echo "Uso: sctl {start|stop|restart|status|enable|disable|reload} servicio" ;;
+    esac
+}
+
+# =====================================================
+# 🔴 ROOT SECURITY OPTIMIZATIONS
+# =====================================================
+
+# Deshabilitar auto-launch de herramientas en modo root
+if command -v fastfetch >/dev/null 2>&1; then
+    fastfetch() {
+        if [[ "$1" == "--auto" || "$1" == "-a" ]]; then
+            echo "🔴 Fastfetch auto-launch deshabilitado en modo root"
+            return 0
+        fi
+        command fastfetch "$@"
+    }
+fi
+
+# Deshabilitar mensajes de gitstatus
+export GITSTATUS_DAEMON_LOG_LEVEL=ERROR
+export GITSTATUS_DAEMON_LOG_LEVEL_STDERR=ERROR
+
+# =====================================================
+# 📋 CONFIGURACIÓN LOCAL ROOT
+# =====================================================
+
+# Cargar configuración local específica de root
+[[ -f /root/.zshrc.local ]] && source /root/.zshrc.local
+
+# Crear archivo de configuración local si no existe
+if [[ ! -f "/root/.zshrc.local" ]]; then
+    cat > "/root/.zshrc.local" << 'EOF'
+# =====================================================
+# 🔴 CONFIGURACIÓN LOCAL ROOT - ZSH
+# =====================================================
+# Personalizaciones específicas del usuario root
+# Este archivo NO se sobrescribe con actualizaciones
+# =====================================================
+
+# Variables de entorno personalizadas
+# export TARGET=""
+# export PROXY=""
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
+
+EOF
+fi
+
+# =====================================================
+# ✅ INICIALIZACIÓN ROOT COMPLETADA
+# =====================================================
+
+# Marcar shell como cargado
+export ZSH_ROOT_CONFIG_LOADED=true
+
+# Mensaje de confirmación
+echo "🔴 ZSH Root modular optimizado cargado exitosamente!"

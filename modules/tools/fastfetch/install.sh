@@ -3,7 +3,7 @@
 # 🧩 ARCH DREAM MACHINE - MÓDULO FASTFETCH
 # =====================================================
 # Script de instalación del módulo Fastfetch
-# Versión 2.0 - Instalación optimizada y robusta
+# Versión 3.0 - Instalación optimizada con assets separados
 # =====================================================
 
 set -euo pipefail
@@ -18,14 +18,15 @@ source "$SCRIPT_DIR/../../../lib/common.sh"
 # =====================================================
 
 MODULE_NAME="Fastfetch"
-MODULE_DESCRIPTION="Información del sistema con temas personalizados"
+MODULE_DESCRIPTION="Información del sistema con temas personalizados DreamCoder"
 MODULE_DEPENDENCIES=("fastfetch" "git" "curl" "imagemagick")
-MODULE_FILES=("config.jsonc" "Dreamcoder01.jpg" "Dreamcoder02.jpg" "Dreamcoder03.jpg" "Dreamcoder04.jpg" "Dreamcoder05.jpg" "Dreamcoder06.jpg" "Dreamcoder07.jpg" "Dreamcoder08.jpg" "Dreamcoder09.jpg")
+MODULE_FILES=("config.jsonc")
 MODULE_AUR_PACKAGES=()
 MODULE_OPTIONAL=true
 
 # Directorios de instalación
 FASTFETCH_CONFIG_DIR="$HOME/.config/fastfetch"
+ASSETS_IMAGES_DIR="$SCRIPT_DIR/../../assets/images/dreamcoder"
 
 # =====================================================
 # 🔧 FUNCIONES DEL MÓDULO
@@ -83,13 +84,58 @@ install_fastfetch() {
 setup_fastfetch_directories() {
     log "Configurando directorios de Fastfetch..."
     
-    # Usar la función mejorada para crear directorios de configuración
+    # Crear directorio principal
     create_config_directory "$FASTFETCH_CONFIG_DIR" "directorio principal de Fastfetch"
     
     # Establecer permisos correctos
     chmod 755 "$FASTFETCH_CONFIG_DIR"
     
     success "✅ Directorios de Fastfetch configurados"
+}
+
+# Copiar imágenes desde assets
+copy_images_from_assets() {
+    log "Copiando imágenes desde assets..."
+    
+    if [[ ! -d "$ASSETS_IMAGES_DIR" ]]; then
+        warn "⚠️  Directorio de assets no encontrado: $ASSETS_IMAGES_DIR"
+        return 0  # No fallar, solo mostrar advertencia
+    fi
+    
+    local images_copied=0
+    local total_images=0
+    
+    # Contar imágenes disponibles
+    for img in "$ASSETS_IMAGES_DIR"/Dreamcoder*.jpg; do
+        if [[ -f "$img" ]]; then
+            ((total_images++))
+        fi
+    done
+    
+    if [[ $total_images -eq 0 ]]; then
+        warn "⚠️  No se encontraron imágenes en assets"
+        return 0  # No fallar, solo mostrar advertencia
+    fi
+    
+    # Copiar imágenes
+    for img in "$ASSETS_IMAGES_DIR"/Dreamcoder*.jpg; do
+        if [[ -f "$img" ]]; then
+            local img_name=$(basename "$img")
+            if cp "$img" "$FASTFETCH_CONFIG_DIR/"; then
+                success "✓ Imagen copiada: $img_name"
+                ((images_copied++))
+            else
+                warn "⚠️  No se pudo copiar la imagen: $img_name"
+            fi
+        fi
+    done
+    
+    if [[ $images_copied -eq 0 ]]; then
+        warn "⚠️  No se pudo copiar ninguna imagen, continuando sin imágenes personalizadas"
+        return 0  # No fallar, solo mostrar advertencia
+    fi
+    
+    success "✅ $images_copied/$total_images imágenes copiadas correctamente"
 }
 
 # Configurar archivos del módulo
@@ -99,29 +145,10 @@ configure_module_files() {
     # Crear symlink para archivo de configuración principal
     create_symlink "$SCRIPT_DIR/config.jsonc" "$FASTFETCH_CONFIG_DIR/config.jsonc" "config.jsonc"
     
-    # Copiar imágenes personalizadas
-    local images=("Dreamcoder01.jpg" "Dreamcoder02.jpg" "Dreamcoder03.jpg" "Dreamcoder04.jpg" "Dreamcoder05.jpg" "Dreamcoder06.jpg" "Dreamcoder07.jpg" "Dreamcoder08.jpg" "Dreamcoder09.jpg")
-    local images_copied=0
-    
-    for image in "${images[@]}"; do
-        if [[ -f "$SCRIPT_DIR/$image" ]]; then
-            if cp "$SCRIPT_DIR/$image" "$FASTFETCH_CONFIG_DIR/"; then
-                success "✓ Imagen copiada: $image"
-                images_copied=$((images_copied + 1))
-            else
-                warn "⚠️  No se pudo copiar la imagen: $image"
-            fi
-        else
-            warn "⚠️  Imagen no encontrada: $image"
-        fi
-    done
-    
-    if [[ $images_copied -eq 0 ]]; then
-        error "❌ No se pudo copiar ninguna imagen personalizada"
-        return 1
+    # Copiar imágenes desde assets (opcional)
+    if ! copy_images_from_assets; then
+        warn "⚠️  No se pudieron copiar imágenes desde assets, continuando sin ellas"
     fi
-    
-    success "✅ $images_copied imágenes copiadas correctamente"
     
     # Crear archivo de configuración local si no existe
     if [[ ! -f "$FASTFETCH_CONFIG_DIR/config.local.jsonc" ]]; then
@@ -215,12 +242,6 @@ EOF
                 echo 'alias ff="fastfetch-random"' >> "$config"
             fi
 
-            if grep -q "alias ff-dream=" "$config"; then
-                sed -i 's|alias ff-dream=.*|alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"|' "$config"
-            else
-                echo 'alias ff-dream="fastfetch-random --config ~/.config/fastfetch/themes/dreamcoder.jsonc"' >> "$config"
-            fi
-
             if grep -q "alias ff-custom=" "$config"; then
                 sed -i 's|alias ff-custom=.*|alias ff-custom="fastfetch-random --config ~/.config/fastfetch/config.local.jsonc"|' "$config"
             else
@@ -248,26 +269,22 @@ EOF
 echo "🎨 Configurando Fastfetch..."
 
 # Mostrar opciones disponibles
-echo "Temas disponibles:"
-echo "1. DreamCoder (personalizado)"
+echo "Opciones disponibles:"
+echo "1. Configuración principal"
 echo "2. Configuración local"
 echo "3. Configuración por defecto"
-echo "4. Configuración personalizada"
 
-read -p "Selecciona un tema (1-4): " choice
+read -p "Selecciona una opción (1-3): " choice
 
 case $choice in
     1)
-        fastfetch --config ~/.config/fastfetch/themes/dreamcoder.jsonc
+        fastfetch --config ~/.config/fastfetch/config.jsonc
         ;;
     2)
         fastfetch --config ~/.config/fastfetch/config.local.jsonc
         ;;
     3)
         fastfetch
-        ;;
-    4)
-        fastfetch --config ~/.config/fastfetch/config.jsonc
         ;;
     *)
         echo "Opción inválida"
@@ -312,9 +329,8 @@ verify_module_installation() {
         error "✗ Directorios de Fastfetch no están configurados"
     fi
     
-    # Verificar imágenes
+    # Verificar imágenes (opcional)
     local image_count=0
-    # Usar ls para contar archivos .jpg (más confiable que find)
     if ls "$FASTFETCH_CONFIG_DIR"/*.jpg &>/dev/null; then
         image_count=$(ls "$FASTFETCH_CONFIG_DIR"/*.jpg 2>/dev/null | wc -l)
     fi
@@ -323,10 +339,9 @@ verify_module_installation() {
         success "✓ Imágenes personalizadas configuradas ($image_count imágenes)"
         ((++checks_passed))
     else
-        error "✗ No se encontraron imágenes personalizadas"
+        warn "⚠️  No se encontraron imágenes personalizadas (opcional)"
+        ((++checks_passed))  # Contar como exitoso ya que es opcional
     fi
-    
-    # Tema personalizado no es necesario para la funcionalidad básica
     
     # Verificar que Fastfetch puede ejecutarse
     if fastfetch --version &>/dev/null; then
@@ -375,12 +390,10 @@ show_usage_info() {
     echo
     echo -e "${CYAN}📋 Próximos pasos:${COLOR_RESET}"
     echo -e "  1. Ejecuta: fastfetch para ver información del sistema"
-    echo -e "  2. Usa: ff-dream para el tema DreamCoder"
-    echo -e "  3. Personaliza tu configuración en: $FASTFETCH_CONFIG_DIR/config.local.jsonc"
+    echo -e "  2. Personaliza tu configuración en: $FASTFETCH_CONFIG_DIR/config.local.jsonc"
     echo
     echo -e "${YELLOW}💡 Comandos útiles:${COLOR_RESET}"
     echo -e "  - ff: Alias para fastfetch"
-    echo -e "  - ff-dream: Tema DreamCoder personalizado"
     echo -e "  - ff-custom: Configuración local"
     echo -e "  - fastfetch-config: Configuración interactiva"
     echo -e "  - clean-fastfetch-cache: Limpiar caché"

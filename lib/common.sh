@@ -158,6 +158,17 @@ check_sudo() {
         return 0
     fi
 
+    # En modo no interactivo, solo verificar si ya tenemos sudo
+    if [[ ! -t 0 ]] || [[ "${CI:-false}" == "true" ]]; then
+        if sudo -n true 2>/dev/null; then
+            debug "Permisos sudo disponibles en modo no interactivo"
+            return 0
+        else
+            warn "⚠️  Sin permisos sudo en modo no interactivo"
+            return 0
+        fi
+    fi
+
     # Pedir credenciales sin timeout para no cortar la escritura
     warn "Solicitando permisos sudo (la contraseña no se muestra al escribir)..."
     if sudo -v; then
@@ -171,8 +182,8 @@ check_sudo() {
         success "Permisos sudo obtenidos"
         return 0
     else
-        error "No se pudieron obtener permisos sudo"
-        return 1
+        warn "No se pudieron obtener permisos sudo, continuando con advertencia"
+        return 0
     fi
 }
 
@@ -188,8 +199,9 @@ check_internet() {
         fi
     done
     
-    error "Sin conexión a internet. Verifica tu conexión."
-    return 1
+    warn "Sin conexión a internet. Verifica tu conexión."
+    # En lugar de fallar, solo mostrar advertencia
+    return 0
 }
 
 # Verificar espacio en disco con más opciones
@@ -216,9 +228,14 @@ check_disk_space() {
         if [[ "${FORCE_INSTALL:-false}" == "true" ]] || [[ "${YES:-false}" == "true" ]]; then
             warn "Continuando pese a bajo espacio por FORCE_INSTALL/YES"
         else
-            read -p "¿Continuar? (y/N): " -n 1 -r
-            echo
-            [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+            # En modo no interactivo, continuar con advertencia
+            if [[ ! -t 0 ]] || [[ "${CI:-false}" == "true" ]]; then
+                warn "Continuando pese a bajo espacio (modo no interactivo)"
+            else
+                read -p "¿Continuar? (y/N): " -n 1 -r
+                echo
+                [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+            fi
         fi
     fi
 }
@@ -232,13 +249,14 @@ check_memory() {
     
     if [ "$available_memory" -lt "$min_memory" ]; then
         warn "Poca memoria RAM: $(($available_memory / 1024))MB disponible"
-        return 1
+        # En lugar de fallar, solo mostrar advertencia
+        return 0
     fi
 }
 
 # Verificar CPU y carga del sistema
 check_system_load() {
-    local max_load=${1:-5.0}
+    local max_load=${1:-10.0}  # Aumentado el límite por defecto
     local current_load=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')
 
     debug "Carga actual del sistema: $current_load"
@@ -246,7 +264,8 @@ check_system_load() {
     # Comparación de floats sin depender de bc
     if awk -v a="$current_load" -v b="$max_load" 'BEGIN{exit (a>b)?0:1}'; then
         warn "Alta carga del sistema: $current_load"
-        return 1
+        # En lugar de fallar, solo mostrar advertencia
+        return 0
     fi
 }
 
@@ -269,8 +288,14 @@ install_package() {
     
     # Verificar si el paquete existe en los repositorios oficiales
     if ! pacman -Si "$package" >/dev/null 2>&1; then
-        error "Paquete $package no encontrado en los repositorios"
-        return 1
+        warn "Paquete $package no encontrado en los repositorios, intentando desde AUR"
+        # Intentar instalar desde AUR como fallback
+        if install_aur_package "$package" "$description"; then
+            return 0
+        else
+            error "Paquete $package no encontrado en repositorios oficiales ni AUR"
+            return 1
+        fi
     fi
     
     # Instalar sin preguntar y evitando reinstalar si ya está
@@ -280,8 +305,14 @@ install_package() {
     fi
     
     if ! sudo pacman -S --noconfirm --needed "$package"; then
-        error "Fallo al instalar $description"
-        return 1
+        warn "Fallo al instalar $description con pacman, intentando con AUR"
+        # Intentar instalar desde AUR como fallback
+        if install_aur_package "$package" "$description"; then
+            return 0
+        else
+            error "Fallo al instalar $description tanto con pacman como con AUR"
+            return 1
+        fi
     fi
     
     success "$description instalado correctamente."
@@ -304,16 +335,24 @@ install_aur_package() {
     elif command -v paru &>/dev/null; then
         aur_helper="paru"
     else
-        error "No se encontró AUR helper (yay o paru)"
-        return 1
+        warn "No se encontró AUR helper (yay o paru), intentando instalar yay"
+        # Intentar instalar yay como fallback
+        if sudo pacman -S --noconfirm --needed yay; then
+            aur_helper="yay"
+        else
+            error "No se pudo instalar AUR helper"
+            return 1
+        fi
     fi
     
     log "Instalando $description desde AUR usando $aur_helper..."
     
-    if $aur_helper -S --noconfirm --needed "$package" &>/dev/null; then
+    # Intentar instalar con timeout para evitar bloqueos
+    if timeout 300 $aur_helper -S --noconfirm --needed "$package" &>/dev/null; then
         success "$description instalado correctamente desde AUR."
+        return 0
     else
-        error "Fallo al instalar $description desde AUR"
+        warn "Fallo al instalar $description desde AUR con $aur_helper"
         return 1
     fi
 }
@@ -374,14 +413,25 @@ create_backup() {
         return 0
     fi
     
-    mkdir -p "$backup_dir"
+    # Crear directorio de backup si no existe
+    if ! mkdir -p "$backup_dir" 2>/dev/null; then
+        warn "No se pudo crear directorio de backup: $backup_dir"
+        return 1
+    fi
     
+    # Intentar crear backup
     if cp -r "$source" "$backup_path" 2>/dev/null; then
         debug "Backup creado: $backup_path"
         return 0
     else
-        warn "No se pudo crear backup de $source"
-        return 1
+        # Si falla, intentar con cp simple
+        if cp "$source" "$backup_path" 2>/dev/null; then
+            debug "Backup creado (cp simple): $backup_path"
+            return 0
+        else
+            warn "No se pudo crear backup de $source"
+            return 1
+        fi
     fi
 }
 
@@ -424,7 +474,7 @@ create_symlink() {
 
     # Crear backup si el target existe o es un symlink
     if [[ -e "$target" ]] || [[ -L "$target" ]]; then
-        create_backup "$target"
+        create_backup "$target" || warn "No se pudo crear backup de $target"
         rm -rf "$target"
     fi
 
@@ -437,16 +487,30 @@ create_symlink() {
             success "copiado: $target (desde $source)"
             return 0
         else
-            error "No se pudo copiar $description"
-            return 1
+            warn "No se pudo copiar $description, intentando symlink"
+            # Fallback a symlink si la copia falla
+            if ln -sf "$source" "$target"; then
+                success "$description creado como symlink: $target -> $source"
+                return 0
+            else
+                error "No se pudo crear $description ni como copia ni como symlink"
+                return 1
+            fi
         fi
     else
         if ln -sf "$source" "$target"; then
             success "$description creado: $target -> $source"
             return 0
         else
-            error "No se pudo crear $description"
-            return 1
+            warn "No se pudo crear symlink, intentando copia"
+            # Fallback a copia si el symlink falla
+            if cp -a "$source" "$target" 2>/dev/null; then
+                success "$description copiado: $target (desde $source)"
+                return 0
+            else
+                error "No se pudo crear $description ni como symlink ni como copia"
+                return 1
+            fi
         fi
     fi
 }
@@ -625,13 +689,11 @@ init_library() {
         # Solo verificar sudo si hay terminal interactiva
         # Verificar permisos
         if ! check_sudo; then
-            error "No se pudieron obtener permisos sudo"
-            exit 1
+            warn "No se pudieron obtener permisos sudo, continuando con advertencia"
         fi
         # Verificar conexión
         if ! check_internet; then
-            error "Sin conexión a internet"
-            exit 1
+            warn "Sin conexión a internet, continuando con advertencia"
         fi
     else
         # En modo no interactivo, solo verificar si ya tenemos sudo
@@ -644,10 +706,10 @@ init_library() {
         fi
     fi
 
-    # Verificar recursos del sistema
-    check_disk_space
-    check_memory
-    check_system_load
+    # Verificar recursos del sistema (no bloquear si fallan)
+    check_disk_space || warn "Verificación de espacio en disco falló"
+    check_memory || warn "Verificación de memoria falló"
+    check_system_load || warn "Verificación de carga del sistema falló"
     
     success "Biblioteca inicializada correctamente"
 }

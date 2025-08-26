@@ -1,0 +1,180 @@
+#!/bin/bash
+# =====================================================
+# 🔴 ROOT BASH Configuration - Arch Dream MODULAR
+# =====================================================
+# Configuración modular para root basada en bashrc.modular
+# Features: Shared modular base + root-specific customizations
+# =====================================================
+
+# =====================================================
+# 🔴 ROOT MODE INITIALIZATION
+# =====================================================
+
+# Marcar como modo root
+export ROOT_MODE=1
+export ROOT_USER=1
+
+# Configurar paths específicos para root
+export HISTFILE="/root/.bash_history"
+export BASH_CACHE_DIR="/root/.bash"
+
+# Crear directorios necesarios para root
+[[ ! -d "$BASH_CACHE_DIR" ]] && mkdir -p "$BASH_CACHE_DIR"
+
+# =====================================================
+# 📁 CARGA DE CONFIGURACIÓN BASE MODULAR
+# =====================================================
+
+# Cargar configuración modular base
+if [[ -f "${BASH_SOURCE[0]%/*}/bashrc.modular" ]]; then
+    source "${BASH_SOURCE[0]%/*}/bashrc.modular"
+else
+    echo "⚠️  Error: bashrc.modular no encontrado"
+    return 1
+fi
+
+# =====================================================
+# 🔴 ROOT-SPECIFIC OVERRIDES
+# =====================================================
+
+# Override de configuración del historial para root
+HISTFILE="/root/.bash_history"
+HISTSIZE=10000
+HISTFILESIZE=20000
+
+# =====================================================
+# 🔴 ROOT-SPECIFIC ALIASES
+# =====================================================
+
+# Aliases específicos para root
+alias services='systemctl list-units --type=service'
+alias logs='journalctl -f'
+alias syslogs='journalctl -p 3 -xb'
+alias reload-systemd='systemctl daemon-reload'
+alias netstat='ss -tuln'
+
+# Aliases de seguridad para root
+alias chmod-secure='chmod 600'
+alias chmod-exec='chmod 755'
+alias chown-root='chown root:root'
+alias backup-config='tar czf /root/backup-$(date +%Y%m%d-%H%M%S).tar.gz'
+
+# =====================================================
+# 🔴 ROOT-SPECIFIC FUNCTIONS
+# =====================================================
+
+# Función de actualización del sistema para root
+sysupdate() {
+    echo "🔄 Actualizando sistema como root..."
+    pacman -Syu
+    echo "✅ Sistema actualizado"
+}
+
+# Función de limpieza del sistema para root
+cleanup() {
+    echo "🧹 Limpiando sistema como root..."
+    pacman -Rns $(pacman -Qtdq) 2>/dev/null || echo "No hay paquetes huérfanos"
+    pacman -Sc
+    journalctl --vacuum-time=2weeks
+    echo "✅ Sistema limpiado"
+}
+
+# Función de información del sistema para root
+rootinfo() {
+    echo "🔴 Información del Sistema Root:"
+    echo "  Servicios Activos: $(systemctl list-units --type=service --state=active | wc -l)"
+    echo "  Servicios Fallidos: $(systemctl list-units --type=service --state=failed | wc -l)"
+    echo "  Procesos: $(ps aux | wc -l)"
+    echo "  Carga: $(uptime | awk -F'load average:' '{print $2}')"
+    echo "  Memoria: $(free -h | awk 'NR==2{printf "%.1fG/%.1fG (%.0f%%)", $3/1024, $2/1024, $3*100/$2}')"
+    echo "  Disco: $(df -h / | awk 'NR==2{printf "%s/%s (%s)", $3, $2, $5}')"
+    echo "  Último Login: $(last -1 | head -1 | awk '{print $3, $4, $5, $6}')"
+}
+
+# Función de edición rápida de configuraciones para root
+rootconfig() {
+    case "$1" in
+        bash|bashrc)    $EDITOR /root/.bashrc ;;
+        bashlocal)      $EDITOR /root/.bashrc.local ;;
+        hosts)          $EDITOR /etc/hosts ;;
+        fstab)          $EDITOR /etc/fstab ;;
+        ssh)            $EDITOR /etc/ssh/sshd_config ;;
+        pacman)         $EDITOR /etc/pacman.conf ;;
+        *)              echo "Disponibles: bash, bashlocal, hosts, fstab, ssh, pacman" ;;
+    esac
+}
+
+# Función de gestión de servicios para root
+sctl() {
+    case "$1" in
+        start)   systemctl start "$2" ;;
+        stop)    systemctl stop "$2" ;;
+        restart) systemctl restart "$2" ;;
+        status)  systemctl status "$2" ;;
+        enable)  systemctl enable "$2" ;;
+        disable) systemctl disable "$2" ;;
+        reload)  systemctl reload "$2" ;;
+        *)       echo "Uso: sctl {start|stop|restart|status|enable|disable|reload} servicio" ;;
+    esac
+}
+
+# =====================================================
+# 🔴 ROOT SECURITY OPTIMIZATIONS
+# =====================================================
+
+# Deshabilitar auto-launch de herramientas en modo root
+if command -v fastfetch >/dev/null 2>&1; then
+    fastfetch() {
+        if [[ "$1" == "--auto" || "$1" == "-a" ]]; then
+            echo "🔴 Fastfetch auto-launch deshabilitado en modo root"
+            return 0
+        fi
+        command fastfetch "$@"
+    }
+fi
+
+# Deshabilitar mensajes de bienvenida
+export BASH_WELCOME_SHOWN=1
+
+# =====================================================
+# 📋 CONFIGURACIÓN LOCAL ROOT
+# =====================================================
+
+# Cargar configuración local específica de root
+[[ -f /root/.bashrc.local ]] && source /root/.bashrc.local
+
+# Crear archivo de configuración local si no existe
+if [[ ! -f "/root/.bashrc.local" ]]; then
+    cat > "/root/.bashrc.local" << 'EOF'
+# =====================================================
+# 🔴 CONFIGURACIÓN LOCAL ROOT - BASH
+# =====================================================
+# Personalizaciones específicas del usuario root
+# Este archivo NO se sobrescribe con actualizaciones
+# =====================================================
+
+# Variables de entorno personalizadas
+# export ARCH_DREAM_LOCALE="en_US.UTF-8"
+# export TARGET=""
+# export PROXY=""
+
+# Aliases personalizados
+# alias custom="comando personalizado"
+
+# Funciones personalizadas
+# custom_function() {
+#     echo "Mi función personalizada"
+# }
+
+EOF
+fi
+
+# =====================================================
+# ✅ INICIALIZACIÓN ROOT COMPLETADA
+# =====================================================
+
+# Marcar shell como cargado
+export BASH_ROOT_CONFIG_LOADED=true
+
+# Mensaje de confirmación
+echo "🔴 Bash Root modular optimizado cargado exitosamente!"
