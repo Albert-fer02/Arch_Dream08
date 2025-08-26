@@ -45,7 +45,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # Tema de Powerlevel10k
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# Plugins recomendados para productividad
+# Plugins recomendados para productividad (solo los instalados)
 plugins=(
     git
     zsh-autosuggestions
@@ -53,7 +53,6 @@ plugins=(
     zsh-completions
     fzf
     zoxide
-    atuin
 )
 
 # Cargar Oh-my-zsh
@@ -132,7 +131,4 @@ export PAGER="less"
 # Configuración de colores para ls
 export LS_COLORS="di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
-# Mensaje de confirmación
-echo "🚀 Arch Dream + Oh-my-zsh + Powerlevel10k Maximalist activado!"
-echo "🌟 Sistema completamente organizado y modular"
-echo "📁 Configuración ubicada en: $ARCH_DREAM_ZSH_DIR"
+

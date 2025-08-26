@@ -230,6 +230,5 @@ POWERLEVEL9K_DISABLE_RPROMPT_AFTER_COMMAND_EDIT=true
 # Cargar Powerlevel10k
 source ~/.oh-my-zsh/custom/themes/powerlevel10k/powerlevel10k.zsh-theme
 
-# Mensaje de confirmación
-echo "🎨 Powerlevel10k Maximalist Masterpiece activado!"
-echo "🌟 Tu terminal ahora es una obra de arte digital"
+
+
