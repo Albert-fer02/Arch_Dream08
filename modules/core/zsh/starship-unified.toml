@@ -1,145 +1,81 @@
 # =====================================================
-# 🚀 STARSHIP PROMPT - ARCH DREAM UNIFIED v4.3
+# 🚀 STARSHIP PROMPT - ARCH DREAM OPTIMIZADO
 # =====================================================
-# Configuración unificada para ZSH y Bash
-# Tema Catppuccin Mocha optimizado para Red Team
-# Compatible con Kitty Terminal y Warp AI
+# Configuración limpia y funcional para máxima productividad
+# Tema Catppuccin Mocha moderno y legible
 # =====================================================
 
 # Configuración general optimizada
 add_newline = true
-command_timeout = 200
+command_timeout = 1000
 continuation_prompt = "  "
 
-# Formato principal del prompt estilo Powerline
-format = "$directory$git_branch$git_status$fill$character"
+# Formato principal del prompt - limpio y funcional
+format = "$username$hostname$directory$git_branch$git_status$fill$character"
 
-right_format = ""
+# Lado derecho - información útil pero no intrusiva
+right_format = "$time$cmd_duration"
 
 # Fill character para el diseño elegante
 [fill]
 symbol = " "
-style = "bold fg:#313244"
+style = "fg:#313244"
 
 # =====================================================
-# 🖥️ SISTEMA OPERATIVO - Identificación visual
-# =====================================================
-
-[os]
-style = "bg:#fab387 fg:#1e1e2e"
-format = "[$symbol ]($style)"
-disabled = false
-
-[os.symbols]
-Alpaquita = "🔔"
-Alpine = "🏔️"
-Amazon = "🙂"
-Android = "🤖"
-Arch = "🌋"
-Artix = "🎗️"
-CentOS = "💠"
-Debian = "🌀"
-DragonFly = "🐉"
-Emscripten = "🔗"
-EndeavourOS = "🚀"
-Fedora = "🎩"
-FreeBSD = "😈"
-Garuda = "🦅"
-Gentoo = "🗜️"
-HardenedBSD = "🛡️"
-Illumos = "🐦"
-Linux = "🐧"
-Macos = "🍎"
-Manjaro = "🥭"
-Mariner = "🌊"
-MidnightBSD = "🌘"
-Mint = "🌿"
-NetBSD = "🚩"
-NixOS = "❄️"
-OpenBSD = "🐡"
-OpenCloudOS = "☁️"
-openEuler = "🦉"
-openSUSE = "🦎"
-OracleLinux = "🦴"
-Pop = "🍭"
-Raspbian = "🍓"
-Redhat = "🎩"
-RedHatEnterprise = "🎩"
-Redox = "🧪"
-Solus = "⛵"
-SUSE = "🦎"
-Ubuntu = "🎯"
-Unknown = "❓"
-Windows = "🪟"
-
-# =====================================================
-# 👤 USUARIO Y HOST - Tema Red Team Profesional
+# 👤 USUARIO Y HOST - Identificación clara
 # =====================================================
 
 [username]
 show_always = true
-style_user = "bg:#89b4fa fg:#1e1e2e"
-style_root = "bg:#f38ba8 fg:#1e1e2e"
-format = "[$user]($style)"
+style_user = "bold fg:#89b4fa"
+style_root = "bold fg:#f38ba8"
+format = "$user "
 
 [hostname]
 ssh_only = false
-style = "bg:#94e2d5 fg:#1e1e2e"
-format = "[@$hostname]($style) "
+style = "fg:#94e2d5"
+format = "@$hostname "
 trim_at = "."
 disabled = false
 
 # =====================================================
-# 📁 DIRECTORIO - Navegación inteligente optimizada
+# 📁 DIRECTORIO - Navegación inteligente
 # =====================================================
 
 [directory]
 style = "bold fg:#89b4fa"
 format = "$path "
-truncation_length = 3
+truncation_length = 2
 truncation_symbol = "…/"
-read_only_style = "bg:#f38ba8 fg:#1e1e2e bold"
-read_only = "  "
+read_only_style = "fg:#f38ba8 bold"
+read_only = " "
 home_symbol = "~"
 use_logical_path = true
 fish_style_pwd_dir_length = 1
-before_repo_root_style = "fg:#6c7086"
-repo_root_style = "bg:#cba6f7 fg:#1e1e2e"
 
 [directory.substitutions]
-"Documents" = "docs"
-"Downloads" = "dl"
-"Music" = "music"
-"Pictures" = "pics"
-"Videos" = "videos"
-"Desktop" = "desktop"
-"Developer" = "dev"
-"Projects" = "proj"
-"Scripts" = "scripts"
-"Tools" = "tools"
-"src" = "src"
-"lib" = "lib"
-"bin" = "bin"
-"config" = "config"
-"modules" = "modules"
-"docs" = "docs"
-"/opt" = "opt"
-"/etc" = "etc"
-"/var" = "var"
-"/tmp" = "tmp"
-"/usr" = "usr"
-"/home" = "home"
-"/root" = "root"
+"Documents" = "📄"
+"Downloads" = "⬇️"
+"Music" = "🎵"
+"Pictures" = "🖼️"
+"Videos" = "🎬"
+"Desktop" = "🖥️"
+"Projects" = "🚀"
+"Scripts" = "📜"
+"Tools" = "🔧"
+"src" = "📦"
+"config" = "⚙️"
+"modules" = "🧩"
 
 # =====================================================
-# 🔥 GIT - Control de versiones optimizado
+# 🔥 GIT - Control de versiones esencial
 # =====================================================
 
 [git_branch]
-symbol = ""
-style = "bold fg:#cba6f7"
-format = "[$branch]($style) "
-truncation_length = 8
+symbol = "🌿"
+style = "bold fg:#a6e3a1"
+format = "$symbol$branch "
+truncation_length = 10
 truncation_symbol = "…"
 
 [git_status]
@@ -156,11 +92,9 @@ renamed = "»"
 deleted = "×"
 stashed = "≡"
 conflicted = "!"
-ignore_submodules = true
-disabled = false
 
 # =====================================================
-# ⚡ PROMPT CHARACTER - Diseño profesional optimizado
+# ⚡ PROMPT CHARACTER - Diseño moderno
 # =====================================================
 
 [character]
@@ -169,144 +103,105 @@ error_symbol = "[❯](bold fg:#f38ba8)"
 vicmd_symbol = "[❮](bold fg:#b4befe)"
 
 # =====================================================
-# 🐍 LENGUAJES - Solo los más usados para performance
+# 🐍 LENGUAJES - Solo los esenciales
 # =====================================================
 
 [python]
-symbol = " "
-format = "[ $symbol ($version) ]($style)"
-style = "bg:#94e2d5 fg:#1e1e2e bold"
+symbol = "🐍"
+format = "[$symbol$version]($style)"
+style = "fg:#94e2d5"
 pyenv_version_name = false
 python_binary = ["python3", "python"]
 detect_extensions = ["py"]
-detect_files = ["requirements.txt", "pyproject.toml", "Pipfile"]
+detect_files = ["requirements.txt", "pyproject.toml"]
 detect_folders = [".venv", "venv"]
 disabled = false
 
 [nodejs]
-symbol = ""
-format = "[ $symbol ($version) ]($style)"
-style = "bg:#94e2d5 fg:#1e1e2e bold"
+symbol = "⬢"
+format = "[$symbol$version]($style)"
+style = "fg:#94e2d5"
 detect_files = ["package.json"]
 detect_folders = ["node_modules"]
 detect_extensions = ["js", "ts"]
 disabled = false
 
 [rust]
-symbol = ""
-format = "[$symbol]($style) "
-style = "bold fg:#f38ba8"
+symbol = "🦀"
+format = "[$symbol$version]($style)"
+style = "fg:#f38ba8"
 detect_extensions = ["rs"]
 detect_files = ["Cargo.toml"]
 disabled = false
 
-[golang]
-symbol = ""
-format = "[$symbol]($style) "
-style = "bold fg:#89b4fa"
-detect_extensions = ["go"]
-detect_files = ["go.mod"]
-disabled = false
-
 # =====================================================
-# 🐳 CONTENEDORES - Solo Docker para performance
+# 🐳 DOCKER - Solo cuando es necesario
 # =====================================================
 
 [docker_context]
-symbol = "󰡨"
-format = "[ $symbol $context ]($style)"
-style = "bg:#94e2d5 fg:#1e1e2e bold"
+symbol = "🐳"
+format = "[$symbol$context]($style)"
+style = "fg:#94e2d5"
 only_with_files = true
 detect_files = ["Dockerfile", "docker-compose.yml"]
-detect_folders = []
 disabled = false
 
 # =====================================================
-# 📦 GESTORES DE PAQUETES - Solo los esenciales
+# 📦 PAQUETES - Solo información esencial
 # =====================================================
 
 [package]
-symbol = " "
-format = "[$symbol$version]($style) "
-style = "bg:#89b4fa fg:#1e1e2e"
+symbol = "📦"
+format = "[$symbol$version]($style)"
+style = "fg:#89b4fa"
 display_private = false
 disabled = false
 
 # =====================================================
-# 📊 INFORMACIÓN DEL SISTEMA - Solo lo esencial
-# =====================================================
-
-[battery]
-full_symbol = "󰁹 "
-charging_symbol = "󰂄 "
-discharging_symbol = "󰁾 "
-unknown_symbol = "󰁽 "
-empty_symbol = "󰂎 "
-disabled = false
-format = "[$symbol$percentage]($style) "
-
-[[battery.display]]
-threshold = 15
-style = "bold bright-red"
-
-[[battery.display]]
-threshold = 30
-style = "bold yellow"
-
-[[battery.display]]
-threshold = 50
-style = "yellow"
-
-[[battery.display]]
-threshold = 80
-style = "green"
-
-# =====================================================
-# ⏱️ TIEMPO Y RENDIMIENTO - Optimizado
+# ⏱️ TIEMPO Y DURACIÓN - Información útil
 # =====================================================
 
 [time]
 disabled = false
-format = " $time "
+format = "[$time]($style)"
 style = "fg:#6c7086"
 time_format = "%H:%M"
-utc_time_offset = "local"
 
 [cmd_duration]
-min_time = 2000
-format = "[ $duration]($style)"
-style = "bold fg:#f9e2af"
+min_time = 1000
+format = "[$duration]($style)"
+style = "fg:#f9e2af"
 show_milliseconds = false
-show_notifications = false
-min_time_to_notify = 30000
 disabled = false
 
 # =====================================================
-# 🔐 VARIABLES PERSONALIZADAS RED TEAM PRO - Optimizadas
+# 🎯 VARIABLES PERSONALIZADAS - Solo las esenciales
 # =====================================================
 
-# Target objetivo
 [env_var.TARGET]
 variable = "TARGET"
 symbol = "🎯"
-format = "[$symbol$env_value ]($style)"
-style = "bold bright-white bg:red"
+format = "[$symbol$env_value]($style)"
+style = "bold fg:red"
 disabled = false
 
-# Proxy/Tunnel activo
 [env_var.PROXY]
 variable = "PROXY"
 symbol = "🔒"
-format = "[$symbol$env_value ]($style)"
-style = "bold bright-cyan"
+format = "[$symbol$env_value]($style)"
+style = "bold fg:cyan"
 disabled = false
 
 # =====================================================
-# ⚠️ MÓDULOS DESHABILITADOS PARA MEJOR PERFORMANCE
+# ⚠️ MÓDULOS DESHABILITADOS PARA PERFORMANCE
 # =====================================================
 
 # Módulos que pueden ralentizar el prompt
-# [load] - Sección eliminada (no es estándar en Starship)
+[os]
+disabled = true
+
+[battery]
+disabled = true
 
 [memory_usage]
 disabled = true
@@ -315,12 +210,6 @@ disabled = true
 disabled = true
 
 [kubernetes]
-disabled = true
-
-[helm]
-disabled = true
-
-[terraform]
 disabled = true
 
 [aws]
@@ -351,31 +240,7 @@ disabled = true
 [conda]
 disabled = true
 
-[meson]
-disabled = true
-
-[nim]
-disabled = true
-
-[bun]
-disabled = true
-
-[crystal]
-disabled = true
-
-[dart]
-disabled = true
-
-[dotnet]
-disabled = true
-
-[kotlin]
-disabled = true
-
-[lua]
-disabled = true
-
-[swift]
+[golang]
 disabled = true
 
 # =====================================================
@@ -383,8 +248,8 @@ disabled = true
 # =====================================================
 
 # Esta configuración está optimizada para:
-# - Mejor rendimiento del prompt
-# - Menor tiempo de carga
-# - Funcionalidad esencial mantenida
-# - Compatibilidad con Red Team
-# - Tema Catppuccin Mocha unificado
+# - Máxima productividad y legibilidad
+# - Rendimiento óptimo del prompt
+# - Diseño moderno y limpio
+# - Solo funcionalidades esenciales
+# - Sin sobre-ingeniería
