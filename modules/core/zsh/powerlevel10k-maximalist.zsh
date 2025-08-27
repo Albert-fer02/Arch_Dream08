@@ -23,6 +23,7 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
     # Información esencial optimizada
     status
     background_jobs
+    custom_ok
 )
 
 # =====================================================
@@ -164,13 +165,11 @@ POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND='#e0af68'  # Tokyo Night yellow
 POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND='#24283b'
 POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR='#bb9af7'  # Tokyo Night purple
 
-# Tiempo adaptativo con icono contextual
-POWERLEVEL9K_TIME_FOREGROUND='#565f89'             # Tokyo Night muted
-POWERLEVEL9K_TIME_BACKGROUND='#1a1b26'             # Tokyo Night base
-POWERLEVEL9K_TIME_FORMAT='%D{%H:%M}'
-POWERLEVEL9K_TIME_ICON='🕐'                   # Clock
-POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false          # Menos actualizaciones para mejor rendimiento
-POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_COLOR='#7aa2f7'
+# Segmento personalizado para reemplazar la hora
+# Mostrará: " ✔ " cuando se renderice junto a los separadores de la RPROMPT
+POWERLEVEL9K_CUSTOM_OK='echo "✔ "'
+POWERLEVEL9K_CUSTOM_OK_FOREGROUND='#c0caf5'
+POWERLEVEL9K_CUSTOM_OK_BACKGROUND='#1a1b26'
 
 # =====================================================
 # 📊 INFORMACIÓN DEL SISTEMA - Contextual e inteligente
