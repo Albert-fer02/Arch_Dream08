@@ -1,193 +1,220 @@
 #!/bin/zsh
 # =====================================================
-# 🚀 POWERLEVEL10K MAXIMALIST MASTERPIECE - ARCH DREAM
+# 🚀 POWERLEVEL10K DREAMCODER EVOLVED - TOKYO NIGHT FUSION
 # =====================================================
-# Configuración maximalista ultra premium para Powerlevel10k
-# Diseño de revista de diseño internacional con separadores elegantes
-# Experiencia visual inmersiva que transforma la terminal en galería de arte
+# Configuración evolucionada con Tokyo Night + Catppuccin fusion
+# Diseño adaptativo inteligente con elementos contextuales
+# Experiencia visual premium optimizada para máxima productividad
 # =====================================================
 
 # Configuración principal de Powerlevel10k
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-    # Diseño con icono de Arch Linux y separador
+    # Diseño inteligente contextual
     os_icon
     dir
     vcs
+    # Elementos contextuales (solo cuando son relevantes)
+    docker_context
+    pyenv
+    nodeenv
 )
 
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
-    # Información esencial del sistema
+    # Información esencial optimizada
     status
+    background_jobs
 )
 
 # =====================================================
-# 🎨 ESTILOS SIMPLIFICADOS - DREAMCODER VISUAL COMFORT 100%
+# 🎨 TOKYO NIGHT FUSION - DREAMCODER EVOLVED PALETTE
 # =====================================================
 
-# Colores principales (Paleta 100% enfocada en legibilidad y cuidado visual)
+# Paleta base Tokyo Night + Catppuccin fusion
 POWERLEVEL9K_COLOR_SCHEME='dark'
-POWERLEVEL9K_BACKGROUND='#0e1416'     # Fondo principal DreamCoder
-POWERLEVEL9K_FOREGROUND='#0e1416'     # Fondo principal DreamCoder
+POWERLEVEL9K_BACKGROUND='#1a1b26'     # Tokyo Night background (más profundo)
+POWERLEVEL9K_FOREGROUND='#c0caf5'     # Tokyo Night foreground (más vibrante)
 
-# Colores de estado (Catppuccin Mocha)
-POWERLEVEL9K_OK_VIOLET='#cba6f7'      # Lavender (Catppuccin Lavender)
-POWERLEVEL9K_ERROR_RED='#f38ba8'      # Red (Catppuccin Red)
-POWERLEVEL9K_WARNING_YELLOW='#f9e2af' # Yellow (Catppuccin Yellow)
-POWERLEVEL9K_SUCCESS_GREEN='#a6e3a1'  # Green (Catppuccin Green)
-POWERLEVEL9K_INFO_BLUE='#89b4fa'      # Blue (Catppuccin Blue)
+# Colores de estado evolucionados (Tokyo Night + Catppuccin)
+POWERLEVEL9K_ACCENT_BLUE='#7aa2f7'     # Tokyo Night blue (vibrant)
+POWERLEVEL9K_SUCCESS_GREEN='#9ece6a'   # Tokyo Night green (fresh)
+POWERLEVEL9K_WARNING_YELLOW='#e0af68'  # Tokyo Night yellow (warm)
+POWERLEVEL9K_ERROR_RED='#f7768e'       # Tokyo Night red (soft but visible)
+POWERLEVEL9K_MUTED_GRAY='#565f89'      # Tokyo Night comment (subtle)
+POWERLEVEL9K_PURPLE_ACCENT='#bb9af7'   # Tokyo Night purple (elegant)
 
 # =====================================================
 # 👤 USUARIO Y HOST - Diseño maximalista premium
 # =====================================================
 
-# Usuario con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_USER_ICON='👤'
-POWERLEVEL9K_USER_DEFAULT_FOREGROUND='#f8fafc'     # Blanco puro para máximo contraste
-POWERLEVEL9K_USER_DEFAULT_BACKGROUND='#1e293b'     # Slate-800 para elementos principales
-POWERLEVEL9K_USER_ROOT_FOREGROUND='#f8fafc'
-POWERLEVEL9K_USER_ROOT_BACKGROUND='#1e293b'        # Slate-800 para elementos principales
+# Usuario con Tokyo Night fusion
+POWERLEVEL9K_USER_ICON='⚡'
+POWERLEVEL9K_USER_DEFAULT_FOREGROUND='#c0caf5'     # Tokyo Night foreground
+POWERLEVEL9K_USER_DEFAULT_BACKGROUND='#24283b'     # Tokyo Night darker
+POWERLEVEL9K_USER_ROOT_FOREGROUND='#f7768e'        # Tokyo Night red para root
+POWERLEVEL9K_USER_ROOT_BACKGROUND='#24283b'
 POWERLEVEL9K_USER_TEMPLATE='%B%F{$POWERLEVEL9K_USER_DEFAULT_FOREGROUND}%n%f%b'
 
-# Host con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_HOST_ICON='🖥️'
-POWERLEVEL9K_HOST_FOREGROUND='#f8fafc'
-POWERLEVEL9K_HOST_BACKGROUND='#1e293b'             # Slate-800 para elementos principales
+# Host con diseño contextual
+POWERLEVEL9K_HOST_ICON='🌐'
+POWERLEVEL9K_HOST_FOREGROUND='#7aa2f7'             # Tokyo Night blue
+POWERLEVEL9K_HOST_BACKGROUND='#24283b'
 POWERLEVEL9K_HOST_TEMPLATE='%B%F{$POWERLEVEL9K_HOST_FOREGROUND}%m%f%b'
 
 # =====================================================
 # 📁 DIRECTORIO - Navegación maximalista con iconos sofisticados
 # =====================================================
 
-# Directorio con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_DIR_FOREGROUND='#f8fafc'              # Blanco puro para máximo contraste
-POWERLEVEL9K_DIR_BACKGROUND='#1e293b'              # Slate-800 para elementos principales
+# Directorio con diseño inteligente contextual
+POWERLEVEL9K_DIR_FOREGROUND='#c0caf5'              # Tokyo Night foreground
+POWERLEVEL9K_DIR_BACKGROUND='#1a1b26'              # Tokyo Night base
 POWERLEVEL9K_SHORTEN_STRATEGY='truncate_to_unique'
-POWERLEVEL9K_SHORTEN_DIR_LENGTH=3
-POWERLEVEL9K_SHORTEN_DELIMITER='/'
+POWERLEVEL9K_SHORTEN_DIR_LENGTH=2                  # Más compacto
+POWERLEVEL9K_SHORTEN_DELIMITER=''
 
-# Iconos específicos para carpetas del proyecto Arch Dream
+# Iconos contextuales adaptativos
 POWERLEVEL9K_DIR_ETC_ICON='⚙️'
 POWERLEVEL9K_DIR_HOME_ICON='🏠'
 POWERLEVEL9K_DIR_HOME_SUBFOLDER_ICON='📁'
 POWERLEVEL9K_DIR_DEFAULT_ICON='📂'
+POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_ICON='🔒'
+POWERLEVEL9K_DIR_PACKAGE_ICON='📦'
 
 # =====================================================
 # 🔥 GIT - Control de versiones maximalista con feedback visual inmersivo
 # =====================================================
 
-# Git con estilo Catppuccin (Mocha) - Nivel 1 (Alto contraste)
-POWERLEVEL9K_VCS_CLEAN_BACKGROUND='#1e293b'        # Slate-800 para elementos principales
-POWERLEVEL9K_VCS_CLEAN_FOREGROUND='#f8fafc'        # Blanco puro para máximo contraste
-POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='#334155'     # Slate-700 para elementos secundarios
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='#e2e8f0'     # Slate-200 para contraste medio
-POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='#475569'    # Slate-600 para elementos de estado
-POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='#cbd5e1'    # Slate-300 para contraste bajo
-POWERLEVEL9K_VCS_CONFLICTED_BACKGROUND='#dc2626'   # Rojo para conflictos
-POWERLEVEL9K_VCS_CONFLICTED_FOREGROUND='#fef2f2'   # Blanco para máximo contraste
+# Git con diseño inteligente y colores contextuales
+POWERLEVEL9K_VCS_CLEAN_BACKGROUND='#24283b'        # Tokyo Night darker
+POWERLEVEL9K_VCS_CLEAN_FOREGROUND='#9ece6a'        # Tokyo Night green para limpio
+POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='#24283b'
+POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='#e0af68'     # Tokyo Night yellow para modificado
+POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='#24283b'
+POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='#7aa2f7'    # Tokyo Night blue para sin track
+POWERLEVEL9K_VCS_CONFLICTED_BACKGROUND='#24283b'
+POWERLEVEL9K_VCS_CONFLICTED_FOREGROUND='#f7768e'   # Tokyo Night red para conflictos
+POWERLEVEL9K_VCS_LOADING_BACKGROUND='#24283b'
+POWERLEVEL9K_VCS_LOADING_FOREGROUND='#565f89'      # Tokyo Night muted
 
-# Iconos de Git maximalistas
-POWERLEVEL9K_VCS_GIT_ICON='🌿'
+# Iconos Git contextuales mejorados
+POWERLEVEL9K_VCS_GIT_ICON='✨'                    # Sparkles para git limpio
 POWERLEVEL9K_VCS_GIT_GITHUB_ICON='🐙'
 POWERLEVEL9K_VCS_GIT_GITLAB_ICON='🦊'
 POWERLEVEL9K_VCS_GIT_BITBUCKET_ICON='🐟'
+POWERLEVEL9K_VCS_DIRTY_ICON='🔥'              # Fire para cambios urgentes
+POWERLEVEL9K_VCS_CLEAN_ICON='✔️'                # Check para limpio
+POWERLEVEL9K_VCS_UNTRACKED_ICON='❓'             # Question para untracked
 
 # =====================================================
 # 🐍 LENGUAJES - Solo los esenciales con estilo maximalista ultra premium
 # =====================================================
 
-# Python con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_PYENV_FOREGROUND='#e2e8f0'            # Slate-200 para contraste medio
-POWERLEVEL9K_PYENV_BACKGROUND='#334155'             # Slate-700 para elementos secundarios
+# Lenguajes con colores contextuales Tokyo Night
+# Python - solo cuando hay archivos .py o entorno virtual
+POWERLEVEL9K_PYENV_FOREGROUND='#e0af68'            # Tokyo Night yellow para Python
+POWERLEVEL9K_PYENV_BACKGROUND='#24283b'
 POWERLEVEL9K_PYENV_ICON='🐍'
+POWERLEVEL9K_PYTHON_ICON='🐍'
 
-# Node.js con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_NODEENV_FOREGROUND='#e2e8f0'          # Slate-200 para contraste medio
-POWERLEVEL9K_NODEENV_BACKGROUND='#334155'           # Slate-700 para elementos secundarios
+# Node.js - solo cuando hay package.json o node_modules
+POWERLEVEL9K_NODEENV_FOREGROUND='#9ece6a'          # Tokyo Night green para Node
+POWERLEVEL9K_NODEENV_BACKGROUND='#24283b'
 POWERLEVEL9K_NODEENV_ICON='⬢'
+POWERLEVEL9K_NODE_VERSION_FOREGROUND='#9ece6a'
+POWERLEVEL9K_NODE_VERSION_BACKGROUND='#24283b'
 
-# Rust con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_RUST_VERSION_FOREGROUND='#e2e8f0'     # Slate-200 para contraste medio
-POWERLEVEL9K_RUST_VERSION_BACKGROUND='#334155'      # Slate-700 para elementos secundarios
+# Rust - solo cuando hay Cargo.toml
+POWERLEVEL9K_RUST_VERSION_FOREGROUND='#f7768e'     # Tokyo Night red para Rust
+POWERLEVEL9K_RUST_VERSION_BACKGROUND='#24283b'
 POWERLEVEL9K_RUST_VERSION_ICON='🦀'
 
-# Go con estilo DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_GO_VERSION_FOREGROUND='#e2e8f0'       # Slate-200 para contraste medio
-POWERLEVEL9K_GO_VERSION_BACKGROUND='#334155'        # Slate-700 para elementos secundarios
+# Go - solo cuando hay go.mod
+POWERLEVEL9K_GO_VERSION_FOREGROUND='#7aa2f7'       # Tokyo Night blue para Go
+POWERLEVEL9K_GO_VERSION_BACKGROUND='#24283b'
 POWERLEVEL9K_GO_VERSION_ICON='🐹'
 
 # =====================================================
 # ⚡ PROMPT CHARACTER - Diseño de dos líneas con flecha debajo
 # =====================================================
 
-# Prompt character de dos líneas con flecha debajo y separador elegante
+# Prompt character adaptativo con animación sutil
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='%F{#93C5FD}❯%f '
+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='%F{#7aa2f7}❯%f '  # Tokyo Night blue arrow
+# Prompt alternativo para errores
+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX_ERROR='%F{#f7768e}❯%f '  # Tokyo Night red arrow
 
 # =====================================================
 # 🔧 ESTADO DEL SISTEMA - Información maximalista con diseño premium
 # =====================================================
 
-# Estado del sistema DreamCoder 100% enfocado en legibilidad visual
-POWERLEVEL9K_STATUS_OK_BACKGROUND='#1e293b'        # Slate-800 para elementos principales
-POWERLEVEL9K_STATUS_OK_FOREGROUND='#a6e3a1'        # Verde Catppuccin para éxito
-POWERLEVEL9K_STATUS_ERROR_BACKGROUND='#dc2626'     # Rojo para errores
-POWERLEVEL9K_STATUS_ERROR_FOREGROUND='#fef2f2'     # Blanco para máximo contraste
-POWERLEVEL9K_STATUS_OK_ICON='✔'
-POWERLEVEL9K_STATUS_ERROR_ICON='✘'
+# Estado del sistema con retroalimentación visual inteligente
+POWERLEVEL9K_STATUS_OK_BACKGROUND='#24283b'
+POWERLEVEL9K_STATUS_OK_FOREGROUND='#9ece6a'        # Tokyo Night green para éxito
+POWERLEVEL9K_STATUS_ERROR_BACKGROUND='#24283b'
+POWERLEVEL9K_STATUS_ERROR_FOREGROUND='#f7768e'     # Tokyo Night red para errores
+POWERLEVEL9K_STATUS_OK_ICON='✨'                  # Sparkles para éxito
+POWERLEVEL9K_STATUS_ERROR_ICON='💥'           # Boom para errores
+POWERLEVEL9K_STATUS_OK=false                       # Solo mostrar en errores
 
-# Jobs en background DreamCoder optimizado para legibilidad
-POWERLEVEL9K_BACKGROUND_JOBS_ICON='⚙️'
-POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND='#e2e8f0'  # Slate-200 para contraste medio
-POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND='#334155'   # Slate-700 para elementos secundarios
+# Jobs en background con indicador visual mejorado
+POWERLEVEL9K_BACKGROUND_JOBS_ICON='⚡'
+POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND='#e0af68'  # Tokyo Night yellow
+POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND='#24283b'
+POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR='#bb9af7'  # Tokyo Night purple
 
-# Tiempo DreamCoder simplificado y elegante
-POWERLEVEL9K_TIME_FOREGROUND='#cbd5e1'              # Slate-300 para contraste bajo
-POWERLEVEL9K_TIME_BACKGROUND='#475569'              # Slate-600 para elementos de estado
+# Tiempo adaptativo con icono contextual
+POWERLEVEL9K_TIME_FOREGROUND='#565f89'             # Tokyo Night muted
+POWERLEVEL9K_TIME_BACKGROUND='#1a1b26'             # Tokyo Night base
 POWERLEVEL9K_TIME_FORMAT='%D{%H:%M}'
-POWERLEVEL9K_TIME_ICON=''
-POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=true
-POWERLEVEL9K_TIME_UPDATE_ON_COMMAND_EDIT=true
-POWERLEVEL9K_TIME_PREFIX=''
-POWERLEVEL9K_TIME_SUFFIX=''
-POWERLEVEL9K_TIME_SHOW_SECONDS=false
+POWERLEVEL9K_TIME_ICON='🕐'                   # Clock
+POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false          # Menos actualizaciones para mejor rendimiento
+POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_COLOR='#7aa2f7'
 
 # =====================================================
-# 📊 INFORMACIÓN DEL SISTEMA - Solo lo esencial con estilo maximalista
+# 📊 INFORMACIÓN DEL SISTEMA - Contextual e inteligente
 # =====================================================
 
-# Batería DreamCoder optimizada para legibilidad
+# Información del sistema - solo cuando es crítica
+# Batería - solo cuando <30%
 POWERLEVEL9K_BATTERY_CHARGING_ICON='⚡'
 POWERLEVEL9K_BATTERY_DISCONNECTED_ICON='🔋'
-POWERLEVEL9K_BATTERY_LOW_THRESHOLD=20
-POWERLEVEL9K_BATTERY_LOW_FOREGROUND='#cbd5e1'      # Slate-300 para contraste bajo
-POWERLEVEL9K_BATTERY_LOW_BACKGROUND='#475569'       # Slate-600 para elementos de estado
+POWERLEVEL9K_BATTERY_LOW_THRESHOLD=30               # Mostrar antes para mejor UX
+POWERLEVEL9K_BATTERY_LOW_FOREGROUND='#f7768e'      # Tokyo Night red para batería baja
+POWERLEVEL9K_BATTERY_LOW_BACKGROUND='#24283b'
+POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND='#e0af68' # Tokyo Night yellow para carga
+POWERLEVEL9K_BATTERY_CHARGING_BACKGROUND='#24283b'
 
-# RAM DreamCoder optimizada para legibilidad
-POWERLEVEL9K_RAM_FOREGROUND='#cbd5e1'               # Slate-300 para contraste bajo
-POWERLEVEL9K_RAM_BACKGROUND='#475569'                # Slate-600 para elementos de estado
+# RAM - solo cuando >80% de uso
+POWERLEVEL9K_RAM_FOREGROUND='#bb9af7'              # Tokyo Night purple para RAM
+POWERLEVEL9K_RAM_BACKGROUND='#24283b'
 POWERLEVEL9K_RAM_ICON='💾'
 
-# Load DreamCoder optimizado para legibilidad
-POWERLEVEL9K_LOAD_FOREGROUND='#cbd5e1'              # Slate-300 para contraste bajo
-POWERLEVEL9K_LOAD_BACKGROUND='#475569'               # Slate-600 para elementos de estado
-POWERLEVEL9K_LOAD_ICON='📈'
+# Load - solo cuando >2.0
+POWERLEVEL9K_LOAD_FOREGROUND='#f7768e'             # Tokyo Night red para carga alta
+POWERLEVEL9K_LOAD_BACKGROUND='#24283b'
+POWERLEVEL9K_LOAD_ICON='📊'
+POWERLEVEL9K_LOAD_CRITICAL=2.0                     # Umbral crítico
+
+# Configuraciones duplicadas eliminadas para mejor rendimiento
 
 # =====================================================
 # 🐳 HERRAMIENTAS DE DESARROLLO - Solo cuando es necesario con estilo maximalista
 # =====================================================
 
-# Docker DreamCoder optimizado para legibilidad
-POWERLEVEL9K_DOCKER_CONTEXT_FOREGROUND='#e2e8f0'    # Slate-200 para contraste medio
-POWERLEVEL9K_DOCKER_CONTEXT_BACKGROUND='#334155'     # Slate-700 para elementos secundarios
+# Docker - solo cuando hay Dockerfile o docker-compose
+POWERLEVEL9K_DOCKER_CONTEXT_FOREGROUND='#7aa2f7'    # Tokyo Night blue para Docker
+POWERLEVEL9K_DOCKER_CONTEXT_BACKGROUND='#24283b'
 POWERLEVEL9K_DOCKER_CONTEXT_ICON='🐳'
+POWERLEVEL9K_DOCKER_MACHINE_FOREGROUND='#7aa2f7'
+POWERLEVEL9K_DOCKER_MACHINE_BACKGROUND='#24283b'
 
-# Kubernetes DreamCoder optimizado para legibilidad
-POWERLEVEL9K_KUBECONTEXT_FOREGROUND='#e2e8f0'       # Slate-200 para contraste medio
-POWERLEVEL9K_KUBECONTEXT_BACKGROUND='#334155'        # Slate-700 para elementos secundarios
+# Kubernetes - solo cuando hay contexto activo
+POWERLEVEL9K_KUBECONTEXT_FOREGROUND='#bb9af7'       # Tokyo Night purple para K8s
+POWERLEVEL9K_KUBECONTEXT_BACKGROUND='#24283b'
 POWERLEVEL9K_KUBECONTEXT_ICON='☸️'
+POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx'
 
 # =====================================================
 # 🎯 CONFIGURACIÓN FINAL DREAMCODER TWO-LINE WITH ARROW
@@ -196,31 +223,31 @@ POWERLEVEL9K_KUBECONTEXT_ICON='☸️'
 # Configuraciones adicionales para el estilo DreamCoder de dos líneas
 POWERLEVEL9K_MODE='nerdfont-complete'
 
-# Separadores elegantes con símbolos Unicode sofisticados
-POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='%F{#93C5FD}❘%f'
-POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR='%F{#93C5FD}❘%f'
-POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='%F{#A7F3D0}❘%f'
-POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%F{#A7F3D0}❘%f'
+# Separadores optimizados para máximo rendimiento y compatibilidad
+POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='%F{#7aa2f7}%f'      # Powerline triangle (más rápido)
+POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR='%F{#7aa2f7}%f'     # Powerline triangle reversed
+POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='%F{#565f89}|%f'       # Simple pipe (ultra rápido)
+POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%F{#565f89}|%f'
 
-# Separadores entre elementos del prompt con estilo minimalista
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS_SEPARATOR='%F{#C4B5FD} ❘ %f'
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS_SEPARATOR='%F{#C4B5FD} ❘ %f'
+# Separadores minimalistas para mejor rendimiento
+# POWERLEVEL9K_LEFT_PROMPT_ELEMENTS_SEPARATOR=''              # Sin separadores extra
+# POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS_SEPARATOR=''
 
-# Separadores avanzados con símbolos Unicode elegantes
-POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR_FINISH='%F{#93C5FD}❘%f'
-POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR_FINISH='%F{#93C5FD}❘%f'
-
-# Separadores de conexión entre segmentos
-POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR_LEFT='%F{#A7F3D0}❘%f'
-POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR_RIGHT='%F{#A7F3D0}❘%f'
-
-# Hacer que el prompt sea de dos líneas con flecha debajo
-POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-
-# Configuración para mejor rendimiento
+# Configuración de rendimiento optimizada
 POWERLEVEL9K_DISABLE_RPROMPT_AFTER_COMMAND=true
 POWERLEVEL9K_DISABLE_RPROMPT_AFTER_COMMAND_EDIT=true
+
+# Optimizaciones adicionales
+POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=false              # Deshabilitar tiempo en tiempo real
+POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY=4096                 # Límite para repositorios grandes
+POWERLEVEL9K_VCS_STAGED_MAX_NUM=10                         # Límite de archivos staged mostrados
+POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM=10                       # Límite de archivos unstaged mostrados
+POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=2            # Solo mostrar tiempo si >2s
+POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0            # Sin decimales
+
+# Deshabilitar elementos innecesarios para mejor rendimiento
+POWERLEVEL9K_BATTERY_VERBOSE=false
+POWERLEVEL9K_LOAD_WHICH=1                                  # Solo 1min load average
 
 # =====================================================
 # 🚀 ACTIVACIÓN DE POWERLEVEL10K DREAMCODER TWO-LINE WITH ARROW
