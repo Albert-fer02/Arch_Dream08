@@ -165,12 +165,11 @@ POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND='#e0af68'  # Tokyo Night yellow
 POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND='#24283b'
 POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR='#bb9af7'  # Tokyo Night purple
 
-# Segmento personalizado para reemplazar la hora
-# Mostrará: " ✔ " cuando se renderice junto a los separadores de la RPROMPT
-POWERLEVEL9K_CUSTOM_OK='echo "✔ "'
-POWERLEVEL9K_CUSTOM_OK_FOREGROUND='#c0caf5'
-POWERLEVEL9K_CUSTOM_OK_BACKGROUND='#1a1b26'
-
+# Segmento personalizado para reemplazar la hora (armonizado)
+# Solo muestra el check; el separador "" lo agrega RPROMPT automáticamente
+POWERLEVEL9K_CUSTOM_OK='echo "✔"'
+POWERLEVEL9K_CUSTOM_OK_FOREGROUND='#9ece6a'   # Success green para coherencia
+POWERLEVEL9K_CUSTOM_OK_BACKGROUND='#24283b'   # Fondo oscuro consistente
 # =====================================================
 # 📊 INFORMACIÓN DEL SISTEMA - Contextual e inteligente
 # =====================================================
@@ -223,10 +222,10 @@ POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx'
 POWERLEVEL9K_MODE='nerdfont-complete'
 
 # Separadores optimizados para máximo rendimiento y compatibilidad
-POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='%F{#7aa2f7}%f'      # Powerline triangle (más rápido)
-POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR='%F{#7aa2f7}%f'     # Powerline triangle reversed
-POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='%F{#565f89}|%f'       # Simple pipe (ultra rápido)
-POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%F{#565f89}|%f'
+POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='%F{#24283b}%f'      # Tokyo Night darker
+POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR='%F{#24283b}%f'     # Tokyo Night darker reversed
+POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='%F{#565f89}│%f'     # Box drawing vertical elegante
+POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%F{#565f89}│%f'
 
 # Separadores minimalistas para mejor rendimiento
 # POWERLEVEL9K_LEFT_PROMPT_ELEMENTS_SEPARATOR=''              # Sin separadores extra
