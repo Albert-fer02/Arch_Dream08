@@ -1,10 +1,10 @@
 {
   "core:zsh": {
     "name": "Zsh Configuration",
-    "description": "Zsh con Starship + Zinit (Red Team optimizado)",
-    "dependencies": ["zsh", "starship", "git", "curl"],
+    "description": "Zsh con Powerlevel10k + Zinit (Red Team optimizado)",
+    "dependencies": ["zsh", "git", "curl"],
     "files": ["zshrc"],
-    "aur_packages": ["starship-bin"],
+    "aur_packages": [],
     "optional": false
   },
   "core:bash": {
@@ -49,9 +49,9 @@
   },
   "themes:catppuccin": {
     "name": "Catppuccin Color Palettes",
-    "description": "Paletas de colores Catppuccin optimizadas para cuidar los ojos (Mocha/Latte) - Solo Starship",
+    "description": "Paletas de colores Catppuccin optimizadas para cuidar los ojos (Mocha/Latte) - Solo Kitty",
     "dependencies": [],
-    "files": ["catppuccin-mocha.toml", "catppuccin-latte.toml"],
+    "files": ["colors-dreamcoder.conf"],
     "aur_packages": [],
     "optional": true
   }

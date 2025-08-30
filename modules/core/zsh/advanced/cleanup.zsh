@@ -4,7 +4,6 @@
 # =====================================================
 
 # Función de limpieza preparada para Powerlevel10k
-# (Variables de Starship eliminadas - migrando a Powerlevel10k)
 
 # Función principal de limpieza
 perform_cleanup() {

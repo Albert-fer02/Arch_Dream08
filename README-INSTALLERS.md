@@ -119,7 +119,7 @@ modules/category/module/
 ### 📦 Módulos Disponibles
 
 #### 🖥️ Core (Sistema)
-- **`core:zsh`** - Configuración avanzada de Zsh con Starship y Zinit
+- **`core:zsh`** - Configuración avanzada de Zsh con Powerlevel10k y Zinit
 - **`core:bash`** - Configuración de fallback para Bash
 
 #### 💻 Development (Desarrollo)
@@ -167,8 +167,7 @@ install_packages "git" "vim" "htop"
 # Instalar solo desde repositorios oficiales
 install_official_package "zsh"
 
-# Instalar solo desde AUR
-install_aur_package "starship-bin"
+
 
 # Actualizar sistema
 update_system

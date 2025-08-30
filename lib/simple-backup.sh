@@ -28,7 +28,7 @@ DEFAULT_BACKUP_PATHS=(
     "$HOME/.gitconfig"
     "$HOME/.config/kitty"
     "$HOME/.config/nvim"
-    "$HOME/.config/starship.toml"
+
     "$HOME/.ssh/config"
 )
 

@@ -14,7 +14,7 @@ modules/core/bash/
 │   ├── shell-base.bash       # Cargador del shell base
 │   ├── history.bash          # Configuración del historial
 │   ├── completion.bash       # Configuración de completions
-│   ├── starship.bash         # Configuración de Starship prompt
+
 │   └── environment.bash      # Variables de entorno
 ├── aliases/                  # Aliases organizados por categoría
 │   ├── basic.bash            # Aliases básicos de navegación
@@ -237,7 +237,7 @@ export ARCH_DREAM_DEBUG=1
 ## 📚 Referencias
 
 - [Bash Documentation](https://www.gnu.org/software/bash/manual/)
-- [Starship Documentation](https://starship.rs/)
+
 - [Arch Linux Wiki](https://wiki.archlinux.org/)
 
 ## 🤝 Contribución

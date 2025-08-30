@@ -26,8 +26,7 @@ safe_source "${BASH_SOURCE[0]%/*}/config/environment.bash"
 # 🎨 INTERFAZ DE USUARIO
 # =====================================================
 
-# Prompt de Starship
-safe_source "${BASH_SOURCE[0]%/*}/config/starship.bash"
+
 
 # Mensaje de bienvenida
 safe_source "${BASH_SOURCE[0]%/*}/ui/welcome.bash"

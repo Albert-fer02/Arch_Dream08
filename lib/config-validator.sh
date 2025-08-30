@@ -31,7 +31,7 @@ declare -A SHELL_CONFIGS=(
     ["zshrc"]="$HOME/.zshrc"
     ["bash_profile"]="$HOME/.bash_profile"
     ["zprofile"]="$HOME/.zprofile"
-    ["starship"]="$HOME/.config/starship.toml"
+
 )
 
 declare -A APP_CONFIGS=(
@@ -103,16 +103,7 @@ validate_shell_configs() {
                     fi
                 fi
                 ;;
-            starship)
-                # Validar sintaxis TOML
-                if [[ -f "$config_path" ]]; then
-                    if command -v starship &>/dev/null; then
-                        if ! starship config 2>/dev/null | grep -q "format"; then
-                            issues+=("starship: Configuración inválida o corrupta")
-                        fi
-                    fi
-                fi
-                ;;
+
         esac
     done
     

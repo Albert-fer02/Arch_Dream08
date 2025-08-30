@@ -94,7 +94,7 @@
 1. **core:zsh** ✅ - Configuración de shell Zsh
 2. **development:nvim** ✅ - Editor Neovim con LazyVim
 3. **terminal:kitty** ✅ - Terminal Kitty con tema personalizado
-4. **themes:catppuccin** ✅ - Temas Catppuccin para Starship
+4. **themes:catppuccin** ✅ - Temas Catppuccin para Kitty
 5. **tools:fastfetch** ✅ - Información del sistema con imágenes DreamCoder
 6. **tools:nano** ✅ - Editor Nano con configuraciones avanzadas
 
@@ -102,7 +102,7 @@
 - **Shell**: Zsh con configuración modular
 - **Terminal**: Kitty con tema DreamCoder
 - **Editor**: Neovim con LazyVim y plugins
-- **Temas**: Catppuccin para Starship
+- **Temas**: Catppuccin para Kitty
 - **Herramientas**: Fastfetch y Nano con configuraciones personalizadas
 
 ## 🚀 **PRÓXIMOS PASOS RECOMENDADOS**

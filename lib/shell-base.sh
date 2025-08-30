@@ -32,7 +32,6 @@ init_shell_base() {
     load_shared_aliases
     load_shared_functions
     setup_bash_history
-    load_starship_config
 }
 
 # =====================================================
@@ -396,7 +395,7 @@ load_shared_aliases() {
         alias reload-zsh="source ~/.zshrc"
         alias reload-bash="source ~/.bashrc"
     fi
-    alias starship-config="nvim $XDG_CONFIG_HOME/starship.toml"
+
 
     # Fastfetch aliases
     alias ff="fastfetch"
@@ -599,27 +598,7 @@ load_shared_functions() {
     }
 }
 
-# =====================================================
-# 🌟 STARSHIP CONFIGURATION
-# =====================================================
 
-load_starship_config() {
-    # Initialize Starship if available
-    if command -v starship &>/dev/null; then
-        if [[ "$IS_ZSH" == "true" ]]; then
-            eval "$(starship init zsh)"
-        elif [[ "$IS_BASH" == "true" ]]; then
-            eval "$(starship init bash)"
-        fi
-    else
-        # Fallback prompt for cases where Starship is not available
-        if [[ "$IS_ROOT" == "true" ]]; then
-            export PS1='\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]# '
-        else
-            export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-        fi
-    fi
-}
 
 # =====================================================
 # 🔧 LAZY LOADING FUNCTIONS

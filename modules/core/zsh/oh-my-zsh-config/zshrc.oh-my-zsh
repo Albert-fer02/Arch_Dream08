@@ -95,8 +95,7 @@ safe_source "$HOME/.config/zsh/config/environment.zsh"
 # 🎨 INTERFAZ DE USUARIO
 # =====================================================
 
-# Prompt de Starship
-safe_source "$HOME/.config/zsh/config/starship.zsh" false
+
 
 # Prompt personalizado
 safe_source "$HOME/.config/zsh/ui/prompt.zsh" false

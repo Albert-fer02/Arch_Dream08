@@ -61,7 +61,7 @@ Arch_Dream08/
 │   ├── simple-backup.sh              # 💾 Backup ligero y eficaz
 │   ├── config-validator.sh           # ✅ Validación centralizada
 │   ├── module-template.sh            # 📋 Template universal
-│   └── starship.toml                 # 🌟 Prompt único optimizado
+
 └── 📦 modules/                       # Módulos simplificados
     ├── core/{bash,zsh}/              # Configuraciones shell mínimas
     ├── development/nvim/             # Neovim optimizado
@@ -141,8 +141,8 @@ simple_backup_main create "mi_backup"
 
 | **Categoría** | **Módulo** | **Descripción** | **Dependencias** |
 |---------------|------------|-----------------|------------------|
-| **Core** | `core:bash` | Configuración Bash optimizada | `bash`, `starship` |
-| **Core** | `core:zsh` | Configuración Zsh con Zinit | `zsh`, `starship` |
+| **Core** | `core:bash` | Configuración Bash optimizada | `bash` |
+| **Core** | `core:zsh` | Configuración Zsh con Powerlevel10k | `zsh` |
 | **Development** | `development:nvim` | Neovim + LazyVim + AI plugins | `neovim`, `git` |
 | **Terminal** | `terminal:kitty` | Terminal GPU con temas | `kitty`, `fontconfig` |
 | **Tools** | `tools:fastfetch` | Info sistema personalizada | `fastfetch` |
@@ -164,7 +164,7 @@ export ARCH_DREAM_DEBUG=true          # Debug específico del proyecto
 
 # Personalización
 export ARCH_DREAM_LOCALE="en_US.UTF-8"  # Idioma preferido
-export STARSHIP_CONFIG="$HOME/.config/starship.toml"  # Config Starship
+
 ```
 
 ### Archivos de Configuración Local
@@ -250,17 +250,7 @@ DEBUG=true ./install-simple.sh mi:modulo
 pacman -Q $(cat modules/categoria/modulo/install.sh | grep MODULE_DEPENDENCIES)
 ```
 
-**3. Configuración Starship no carga**
-```bash
-# Verificar instalación
-command -v starship
 
-# Verificar configuración
-starship config
-
-# Reenlazar config
-ln -sf lib/starship.toml ~/.config/starship.toml
-```
 
 ### Restaurar desde Backup
 
@@ -335,7 +325,7 @@ MIT License - Ver archivo [LICENSE](LICENSE) para detalles.
 ## 🙏 Agradecimientos
 
 - **LazyVim**: Framework base para Neovim
-- **Starship**: Cross-shell prompt
+
 - **Kitty**: Terminal emulator
 - **Arch Linux**: La mejor distribución
 

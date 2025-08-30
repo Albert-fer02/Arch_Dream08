@@ -121,7 +121,7 @@ check_symlink "/home/dreamcoder08/.config/nano/nanorc" "Configuración de Nano" 
 check_symlink "/home/dreamcoder08/.config/nvim/init.lua" "Configuración principal de Neovim" && ((++passed_checks)) || ((++failed_checks))
 ((++total_checks))
 
-check_symlink "/home/dreamcoder08/.config/starship.toml" "Tema de Starship" && ((++passed_checks)) || ((++failed_checks))
+
 ((++total_checks))
 
 echo

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Catppuccin Theme - Eye Care Optimized
-# Provides color palettes for Starship and other applications
+# Provides color palettes for Kitty terminal and other applications
 # Note: Kitty configurations are handled by the terminal:kitty module
 
 set -euo pipefail
@@ -27,20 +27,10 @@ install_theme_files() {
     # Create theme directory
     mkdir -p "$HOME/.config/catppuccin"
     
-    # Install Starship theme
-    local starship_src="$SCRIPT_DIR/catppuccin-$variant.toml"
-    local starship_dst="$HOME/.config/starship-catppuccin-$variant.toml"
+    # Note: Kitty themes are handled by terminal:kitty module
+    # This module only provides color palette information
     
-    if [[ -f "$starship_src" ]]; then
-        create_symlink "$starship_src" "$starship_dst" "Starship $variant palette"
-        
-        # Create default symlink if this is the selected theme
-        if [[ "$variant" == "$THEME_VARIANT" ]]; then
-            create_symlink "$starship_src" "$HOME/.config/starship.toml" "Default Starship theme"
-        fi
-    fi
-    
-    success "Catppuccin $variant color palette installed"
+    success "Catppuccin $variant color palette information installed"
 }
 
 create_theme_switcher() {
@@ -66,20 +56,11 @@ show_help() {
     echo "  latte  - Switch to light palette (eye care in bright light)"
     echo "  help   - Show this help"
     echo ""
-    echo "Note: This only changes Starship theme. Kitty themes are configured separately."
+    echo "Note: Kitty themes are managed by terminal:kitty module"
 }
 
 switch_theme() {
     local variant="$1"
-    local starship_src="$THEMES_DIR/starship-catppuccin-$variant.toml"
-    
-    if [[ ! -f "$starship_src" ]]; then
-        echo "❌ Theme $variant not found. Run install.sh first."
-        exit 1
-    fi
-    
-    # Switch Starship theme
-    ln -sf "$starship_src" "$HOME/.config/starship.toml"
     
     echo "✅ Switched to Catppuccin $variant palette"
     echo "💡 Restart your terminal or run: exec \$SHELL"
@@ -99,38 +80,30 @@ case "${1:-help}" in
         ;;
 esac
 EOF
-    
+
     chmod +x "$switcher_script"
-    success "Theme switcher created: $switcher_script"
+    success "Theme switcher script created: $switcher_script"
 }
 
+# Main installation
 main() {
-    # Solo inicializar funciones básicas sin sudo para tema
-    source "$SCRIPT_DIR/../../../lib/common.sh" || true
-    
-    echo -e "${BOLD}${CYAN}🎨 INSTALANDO TEMA: Catppuccin Eye Care${COLOR_RESET}"
-    echo -e "${CYAN}Paletas de colores optimizadas para cuidar los ojos${COLOR_RESET}\n"
-    
     show_theme_info
     
-    # Install all available color palettes
-    for theme in "${THEMES_AVAILABLE[@]}"; do
-        install_theme_files "$theme"
+    # Install theme information for each variant
+    for variant in "${THEMES_AVAILABLE[@]}"; do
+        install_theme_files "$variant"
     done
     
     # Create theme switcher
     create_theme_switcher
     
-    # Set default theme
-    export CATPPUCCIN_THEME="$THEME_VARIANT"
-    
-    echo -e "\n${BOLD}${GREEN}✅ Paletas Catppuccin instaladas exitosamente${COLOR_RESET}"
-    echo -e "${YELLOW}💡 Para cambiar paletas:${COLOR_RESET}"
-    echo -e "  • ${CYAN}catppuccin-switch mocha${COLOR_RESET} - Paleta oscura (baja luz)"
-    echo -e "  • ${CYAN}catppuccin-switch latte${COLOR_RESET} - Paleta clara (luz brillante)"
-    echo -e "  • ${CYAN}export CATPPUCCIN_THEME=mocha${COLOR_RESET} - Variable de entorno"
-    echo -e "${CYAN}🎨 Paleta actual: $THEME_VARIANT${COLOR_RESET}"
-    echo -e "${CYAN}ℹ️  Kitty themes: Configurados por separado en terminal:kitty${COLOR_RESET}"
+    echo
+    success "🎨 Catppuccin themes installed successfully!"
+    echo -e "${CYAN}Next steps:${COLOR_RESET}"
+    echo -e "  1. Use: ${BOLD}catppuccin-switch mocha${COLOR_RESET} or ${BOLD}catppuccin-switch latte${COLOR_RESET}"
+    echo -e "  2. Kitty themes are configured by terminal:kitty module"
+    echo -e "  3. Restart your terminal: ${BOLD}exec \$SHELL${COLOR_RESET}"
 }
 
+# Run main function
 main "$@"

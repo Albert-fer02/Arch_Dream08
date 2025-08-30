@@ -21,5 +21,3 @@ zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
 
 # Configuración preparada para Powerlevel10k
-# (Starship eliminado - migrando a Powerlevel10k)
-fi
