@@ -118,6 +118,19 @@ safe_source "$ARCH_DREAM_ZSH_DIR/plugins/plugin-manager.zsh"
 safe_source "$ARCH_DREAM_ZSH_DIR/keybindings/keybindings.zsh"
 
 # =====================================================
+# 🔄 AUTO-APLICADOR DE CONFIGURACIÓN ROOT
+# =====================================================
+
+# Aplicar configuración root automáticamente al usar sudo
+sudo() {
+    # Aplicar configuración root antes de ejecutar comando
+    if [[ "$1" == "-i" ]] || [[ "$1" == "su" ]] || [[ "$1" == "-s" ]]; then
+        "$ARCH_DREAM_ZSH_DIR/auto-apply-root.sh" 2>/dev/null || true
+    fi
+    command sudo "$@"
+}
+
+# =====================================================
 # 🔧 CONFIGURACIÓN ADICIONAL DEL SISTEMA
 # =====================================================
 
@@ -175,3 +188,6 @@ ensure_cache_dirs
 
 # Welcome message ya no es necesario - fastfetch se ejecuta al inicio
 
+alias claude-subagents="~/.claude/subagent-manager.sh"
+
+export PATH="/home/dreamcoder08/.npm-global/bin:$PATH"
