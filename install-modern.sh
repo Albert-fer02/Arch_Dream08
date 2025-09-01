@@ -1,69 +1,33 @@
 #!/bin/bash
 # =====================================================
-# 🚀 ARCH DREAM - INSTALADOR MODERNO v6.0 (ARREGLADO)
+# 🚀 ARCH DREAM - MODERN INSTALLER v6.0
 # =====================================================
-# Instalador funcional con dependencias resueltas
+# Instalador modular que usa librerías existentes
+# Arquitectura limpia y separación de responsabilidades
 # =====================================================
 
 set -euo pipefail
 IFS=$'\n\t'
 
 # =====================================================
-# 🔧 CONFIGURACIÓN Y COLORES
+# 🔧 BOOTSTRAP & CORE INITIALIZATION
 # =====================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_VERSION="6.0.0"
 
-# Colores modernos
-AQUA='\033[38;5;51m'
-GREEN='\033[38;5;118m'
-CYAN='\033[38;5;87m'
-PURPLE='\033[38;5;147m'
-YELLOW='\033[38;5;226m'
-RED='\033[38;5;196m'
-BLUE='\033[38;5;33m'
-BOLD='\033[1m'
-DIM='\033[2m'
-COLOR_RESET='\033[0m'
-
-# Variables globales
-FORCE_INSTALL=false
-DRY_RUN=false
-QUIET_MODE=false
-VERBOSE_MODE=false
-SKIP_BACKUP=false
-PARALLEL_INSTALL=false
+# Core libraries loading
+source "$SCRIPT_DIR/lib/common.sh"
+source "$SCRIPT_DIR/lib/shell-base.sh"
+source "$SCRIPT_DIR/lib/module-manager.sh"
+source "$SCRIPT_DIR/lib/simple-backup.sh"
+source "$SCRIPT_DIR/lib/config-validator.sh"
 
 # =====================================================
-# 🔧 FUNCIONES BÁSICAS
+# 🎨 MODERN UI FRAMEWORK
 # =====================================================
 
-info() {
-    [[ "$QUIET_MODE" != "true" ]] && echo -e "${CYAN}[INFO]${COLOR_RESET} $*"
-}
-
-success() {
-    [[ "$QUIET_MODE" != "true" ]] && echo -e "${GREEN}[OK]${COLOR_RESET} $*"
-}
-
-warn() {
-    echo -e "${YELLOW}[WARN]${COLOR_RESET} $*" >&2
-}
-
-error() {
-    echo -e "${RED}[ERROR]${COLOR_RESET} $*" >&2
-}
-
-debug() {
-    [[ "$VERBOSE_MODE" == "true" ]] && echo -e "${PURPLE}[DEBUG]${COLOR_RESET} $*"
-}
-
-# =====================================================
-# 🎨 UI FUNCTIONS
-# =====================================================
-
-show_banner() {
+show_welcome_banner() {
     clear
     echo -e "${BOLD}${AQUA}"
     cat << 'EOF'
@@ -71,40 +35,41 @@ show_banner() {
     ║     🚀 ARCH DREAM MACHINE - INSTALADOR MODERNO v6.0        ║
     ║           ⚡ Digital Dream Architect ⚡                       ║
     ║                                                             ║
-    ║        Arquitectura limpia • UI moderna • Funcional        ║
+    ║        Arquitectura modular • UI moderna • Rápido          ║
     ╚══════════════════════════════════════════════════════════════╝
 EOF
     echo -e "${COLOR_RESET}${CYAN}"
-    echo "    🎯 Instalador simplificado y funcional"
-    echo "    ⚡ Sin dependencias complejas"
+    echo "    🎯 Usando librerías optimizadas del proyecto"
+    echo "    ⚡ Separación de responsabilidades"
     echo -e "${COLOR_RESET}"
     echo
 }
 
-show_help() {
-    show_banner
-    
-    echo -e "${BOLD}${BLUE}COMANDOS PRINCIPALES:${COLOR_RESET}"
+show_help_modern() {
+    echo -e "${BOLD}${BLUE}🚀 Arch Dream Machine v$PROJECT_VERSION${COLOR_RESET}"
+    echo
+    echo -e "${YELLOW}COMANDOS PRINCIPALES:${COLOR_RESET}"
     echo -e "  ${GREEN}install [módulos...]${COLOR_RESET}  Instalar módulos específicos"
     echo -e "  ${GREEN}profile <tipo>${COLOR_RESET}       Aplicar perfil preconfigurado"
     echo -e "  ${GREEN}list${COLOR_RESET}                 Mostrar módulos disponibles"
     echo -e "  ${GREEN}status${COLOR_RESET}               Estado de instalaciones"
     echo -e "  ${GREEN}doctor${COLOR_RESET}               Diagnóstico del sistema"
     echo
-    echo -e "${BOLD}${BLUE}PERFILES DISPONIBLES:${COLOR_RESET}"
+    echo -e "${YELLOW}PERFILES DISPONIBLES:${COLOR_RESET}"
     echo -e "  ${CYAN}developer${COLOR_RESET}  - Entorno completo de desarrollo"
     echo -e "  ${CYAN}minimal${COLOR_RESET}    - Configuración básica y limpia"
     echo -e "  ${CYAN}gaming${COLOR_RESET}     - Optimizado para gaming"
     echo -e "  ${CYAN}server${COLOR_RESET}     - Configuración para servidor"
     echo
-    echo -e "${BOLD}${BLUE}OPCIONES:${COLOR_RESET}"
+    echo -e "${YELLOW}OPCIONES:${COLOR_RESET}"
     echo -e "  ${PURPLE}-f, --force${COLOR_RESET}       Forzar reinstalación"
     echo -e "  ${PURPLE}-q, --quiet${COLOR_RESET}       Modo silencioso"
     echo -e "  ${PURPLE}-d, --dry-run${COLOR_RESET}     Simulación (no instalar)"
+    echo -e "  ${PURPLE}-p, --parallel${COLOR_RESET}    Instalación paralela"
     echo -e "  ${PURPLE}--no-backup${COLOR_RESET}       Saltar backup"
     echo -e "  ${PURPLE}--verbose${COLOR_RESET}         Modo verboso"
     echo
-    echo -e "${BOLD}${BLUE}EJEMPLOS:${COLOR_RESET}"
+    echo -e "${YELLOW}EJEMPLOS:${COLOR_RESET}"
     echo -e "  ${DIM}$0 profile developer${COLOR_RESET}"
     echo -e "  ${DIM}$0 install core:zsh terminal:kitty${COLOR_RESET}"
     echo -e "  ${DIM}$0 list${COLOR_RESET}"
@@ -112,112 +77,18 @@ show_help() {
 }
 
 # =====================================================
-# 🔍 MODULE DISCOVERY & VALIDATION
+# 🔍 INTERACTIVE MODULE SELECTION
 # =====================================================
 
-discover_modules() {
-    find "$SCRIPT_DIR/modules" -name "install.sh" 2>/dev/null | \
-    sed "s|$SCRIPT_DIR/modules/||g; s|/install.sh||g; s|/|:|g" | \
-    sort -V
-}
-
-validate_module() {
-    local module="$1"
-    local module_path="$SCRIPT_DIR/modules/${module/:/\/}"
-    
-    [[ -f "$module_path/install.sh" ]] || return 1
-    bash -n "$module_path/install.sh" || return 1
-    [[ -x "$module_path/install.sh" ]] || return 1
-    return 0
-}
-
-is_module_installed() {
-    local module="$1"
-    
-    case "$module" in
-        "core:zsh") [[ -f ~/.zshrc ]] ;;
-        "core:bash") [[ -f ~/.bashrc ]] ;;
-        "development:nvim") [[ -d ~/.config/nvim ]] ;;
-        "terminal:kitty") [[ -f ~/.config/kitty/kitty.conf ]] ;;
-        "tools:fastfetch") command -v fastfetch &>/dev/null ;;
-        "tools:nano") [[ -f ~/.nanorc ]] ;;
-        "themes:catppuccin") [[ -f ~/.config/kitty/colors-dreamcoder.conf ]] ;;
-        *) false ;;
-    esac
-}
-
-# =====================================================
-# 📦 INSTALLATION FUNCTIONS
-# =====================================================
-
-install_module() {
-    local module="$1"
-    local module_path="$SCRIPT_DIR/modules/${module/:/\/}"
-    
-    validate_module "$module" || {
-        error "❌ Módulo inválido: $module"
-        return 1
-    }
-    
-    info "📦 Instalando: $module"
-    
-    if [[ "$DRY_RUN" == "true" ]]; then
-        success "🔍 DRY RUN: $module sería instalado"
-        return 0
-    fi
-    
-    local install_start=$(date +%s)
-    
-    if timeout 300 bash -c "cd '$module_path' && bash install.sh" &>/dev/null; then
-        local install_time=$(($(date +%s) - install_start))
-        success "✅ $module instalado (${install_time}s)"
-        return 0
-    else
-        local install_time=$(($(date +%s) - install_start))
-        error "❌ Fallo al instalar $module (${install_time}s)"
-        return 1
-    fi
-}
-
-create_backup() {
-    [[ "$SKIP_BACKUP" == "true" ]] && return 0
-    
-    local timestamp=$(date +%Y%m%d_%H%M%S)
-    local backup_dir="$HOME/.arch-dream-backup-$timestamp"
-    
-    info "💾 Creando backup de configuraciones..."
-    mkdir -p "$backup_dir" || return 1
-    
-    local configs=(".bashrc" ".zshrc" ".gitconfig" ".config/kitty" ".config/nvim")
-    local backed_up=0
-    
-    for config in "${configs[@]}"; do
-        if [[ -e "$HOME/$config" ]]; then
-            if cp -r "$HOME/$config" "$backup_dir/" 2>/dev/null; then
-                backed_up=$((backed_up + 1))
-            fi
-        fi
-    done
-    
-    if [[ $backed_up -gt 0 ]]; then
-        success "✅ Backup creado: $backup_dir ($backed_up archivos)"
-        echo "$backup_dir" > "$HOME/.arch-dream-last-backup"
-    else
-        info "ℹ️  No se encontraron configuraciones para respaldar"
-        rmdir "$backup_dir" 2>/dev/null || true
-    fi
-}
-
-# =====================================================
-# 🎯 COMMAND HANDLERS
-# =====================================================
-
-cmd_list() {
-    echo -e "${BOLD}${BLUE}📦 MÓDULOS DISPONIBLES${COLOR_RESET}"
+interactive_module_selection() {
+    echo -e "${BOLD}${CYAN}📦 SELECCIÓN INTERACTIVA DE MÓDULOS${COLOR_RESET}"
     echo
     
     local modules=()
     mapfile -t modules < <(discover_modules)
+    
+    echo -e "${YELLOW}Módulos disponibles:${COLOR_RESET}"
+    echo
     
     local current_category=""
     for i in "${!modules[@]}"; do
@@ -227,27 +98,47 @@ cmd_list() {
         
         if [[ "$category" != "$current_category" ]]; then
             [[ -n "$current_category" ]] && echo
-            echo -e "${BOLD}${PURPLE}  📁 $category:${COLOR_RESET}"
+            echo -e "${BOLD}${PURPLE}  $category:${COLOR_RESET}"
             current_category="$category"
         fi
         
-        local status="○"
-        if is_module_installed "$module"; then
-            status="${GREEN}✅${COLOR_RESET}"
-        else
-            status="${DIM}○${COLOR_RESET}"
-        fi
-        
-        printf "     ${CYAN}%2d)${COLOR_RESET} %-20s %s\n" "$((i+1))" "$name" "$status"
+        printf "    ${CYAN}%2d)${COLOR_RESET} %-20s\n" "$((i+1))" "$name"
     done
     
     echo
-    echo -e "${YELLOW}💡 Opciones de instalación:${COLOR_RESET}"
-    echo -e "  • ${BOLD}./install.sh install <números>${COLOR_RESET} - Instalar módulos específicos"
-    echo -e "  • ${BOLD}./install.sh profile <tipo>${COLOR_RESET} - Instalar perfil completo"
+    echo -e "${YELLOW}💡 Opciones especiales:${COLOR_RESET}"
+    echo -e "  • ${BOLD}all${COLOR_RESET} - Todos los módulos"
+    echo -e "  • ${BOLD}<categoria>:*${COLOR_RESET} - Toda una categoría"
+    echo -e "  • ${BOLD}números separados por comas${COLOR_RESET} - Módulos específicos"
+    echo
+    
+    read -p "$(echo -e "${CYAN}Selección: ${COLOR_RESET}")" selection
+    
+    case "$selection" in
+        "all")
+            printf '%s\n' "${modules[@]}"
+            ;;
+        *:*)
+            local pattern="${selection%:*}"
+            printf '%s\n' "${modules[@]}" | grep "^${pattern}:"
+            ;;
+        *)
+            IFS=',' read -ra indices <<< "$selection"
+            for idx in "${indices[@]}"; do
+                idx=$(echo "$idx" | xargs)  # trim whitespace
+                if [[ "$idx" =~ ^[0-9]+$ && $idx -ge 1 && $idx -le ${#modules[@]} ]]; then
+                    echo "${modules[$((idx-1))]}"
+                fi
+            done
+            ;;
+    esac
 }
 
-cmd_status() {
+# =====================================================
+# 📊 STATUS & DIAGNOSTICS
+# =====================================================
+
+show_system_status() {
     echo -e "${BOLD}${BLUE}📊 ESTADO DEL SISTEMA ARCH DREAM${COLOR_RESET}"
     echo
     
@@ -258,7 +149,7 @@ cmd_status() {
     echo "   • Shell: $SHELL"
     echo
     
-    # Installed modules
+    # Installed modules status
     echo -e "${CYAN}📦 Módulos instalados:${COLOR_RESET}"
     local modules=()
     mapfile -t modules < <(discover_modules)
@@ -277,13 +168,13 @@ cmd_status() {
     echo -e "${CYAN}📈 Resumen: ${GREEN}$installed${COLOR_RESET}/${#modules[@]} módulos instalados"
 }
 
-cmd_doctor() {
+run_system_doctor() {
     echo -e "${BOLD}${BLUE}🔍 DIAGNÓSTICO DEL SISTEMA${COLOR_RESET}"
     echo
     
     local issues=0
     
-    # Check dependencies
+    # Check core requirements
     echo -e "${CYAN}🔧 Verificando dependencias básicas...${COLOR_RESET}"
     for cmd in git curl sudo pacman; do
         if command -v "$cmd" &>/dev/null; then
@@ -307,7 +198,7 @@ cmd_doctor() {
         issues=$((issues + 1))
     fi
     
-    # Check connectivity
+    # Check internet connectivity
     echo
     echo -e "${CYAN}🌐 Verificando conectividad...${COLOR_RESET}"
     if ping -c 1 -W 3 archlinux.org &>/dev/null; then
@@ -317,7 +208,7 @@ cmd_doctor() {
         issues=$((issues + 1))
     fi
     
-    # Final result
+    # Final diagnosis
     echo
     if [[ $issues -eq 0 ]]; then
         echo -e "${GREEN}✨ Sistema listo para instalar Arch Dream${COLOR_RESET}"
@@ -328,7 +219,11 @@ cmd_doctor() {
     fi
 }
 
-cmd_profile() {
+# =====================================================
+# 🎯 PROFILE MANAGEMENT
+# =====================================================
+
+install_profile() {
     local profile="$1"
     
     echo -e "${BOLD}${CYAN}🎯 INSTALANDO PERFIL: $profile${COLOR_RESET}"
@@ -337,16 +232,32 @@ cmd_profile() {
     local modules=()
     case "$profile" in
         developer|dev)
-            modules=("core:zsh" "development:nvim" "terminal:kitty" "tools:fastfetch")
+            modules=(
+                "core:zsh"
+                "development:nvim"
+                "terminal:kitty" 
+                "tools:fastfetch"
+            )
             ;;
         minimal|min)
-            modules=("core:zsh" "tools:nano")
+            modules=(
+                "core:zsh"
+                "tools:nano"
+            )
             ;;
         gaming)
-            modules=("core:zsh" "terminal:kitty" "themes:catppuccin" "tools:fastfetch")
+            modules=(
+                "core:zsh"
+                "terminal:kitty"
+                "themes:catppuccin"
+                "tools:fastfetch"
+            )
             ;;
         server)
-            modules=("core:bash" "tools:nano")
+            modules=(
+                "core:bash"
+                "tools:nano"
+            )
             ;;
         *)
             error "Perfil desconocido: $profile"
@@ -358,69 +269,14 @@ cmd_profile() {
     info "Módulos del perfil $profile: ${modules[*]}"
     echo
     
-    cmd_install_modules "${modules[@]}"
+    install_modules "${modules[@]}"
 }
 
-cmd_interactive_install() {
-    local modules=()
-    mapfile -t modules < <(discover_modules)
-    
-    echo -e "${BOLD}${CYAN}📦 SELECCIÓN INTERACTIVA DE MÓDULOS${COLOR_RESET}"
-    echo
-    
-    local current_category=""
-    for i in "${!modules[@]}"; do
-        local module="${modules[i]}"
-        local category="${module%%:*}"
-        local name="${module#*:}"
-        
-        if [[ "$category" != "$current_category" ]]; then
-            [[ -n "$current_category" ]] && echo
-            echo -e "${BOLD}${PURPLE}  📁 $category:${COLOR_RESET}"
-            current_category="$category"
-        fi
-        
-        printf "     ${CYAN}%2d)${COLOR_RESET} %-20s\n" "$((i+1))" "$name"
-    done
-    
-    echo
-    echo -e "${YELLOW}💡 Opciones especiales:${COLOR_RESET}"
-    echo -e "  • ${BOLD}all${COLOR_RESET} - Todos los módulos"
-    echo -e "  • ${BOLD}<categoria>:*${COLOR_RESET} - Toda una categoría (ej: core:*)"
-    echo -e "  • ${BOLD}números separados por comas${COLOR_RESET} - Módulos específicos"
-    echo
-    
-    read -p "$(echo -e "${CYAN}Selección: ${COLOR_RESET}")" selection
-    
-    local selected_modules=()
-    case "$selection" in
-        "all")
-            selected_modules=("${modules[@]}")
-            ;;
-        *:*)
-            local pattern="${selection%:*}"
-            mapfile -t selected_modules < <(printf '%s\n' "${modules[@]}" | grep "^${pattern}:")
-            ;;
-        *)
-            IFS=',' read -ra indices <<< "$selection"
-            for idx in "${indices[@]}"; do
-                idx=$(echo "$idx" | xargs)  # trim whitespace
-                if [[ "$idx" =~ ^[0-9]+$ && $idx -ge 1 && $idx -le ${#modules[@]} ]]; then
-                    selected_modules+=("${modules[$((idx-1))]}")
-                fi
-            done
-            ;;
-    esac
-    
-    if [[ ${#selected_modules[@]} -eq 0 ]]; then
-        error "No se seleccionaron módulos válidos"
-        return 1
-    fi
-    
-    cmd_install_modules "${selected_modules[@]}"
-}
+# =====================================================
+# 🚀 MAIN INSTALLATION ORCHESTRATOR
+# =====================================================
 
-cmd_install_modules() {
+install_modules() {
     local modules=("$@")
     
     [[ ${#modules[@]} -eq 0 ]] && {
@@ -431,51 +287,47 @@ cmd_install_modules() {
     echo -e "${BOLD}${CYAN}🚀 INICIANDO INSTALACIÓN${COLOR_RESET}"
     echo
     
-    # Validate modules
+    # Validate all modules first
     info "Validando módulos..."
     for module in "${modules[@]}"; do
-        if validate_module "$module"; then
-            success "✓ $module"
-        else
-            error "❌ Módulo inválido: $module"
+        if ! validate_module "$module"; then
+            error "Módulo inválido: $module"
             return 1
+        fi
+        success "✓ $module"
+    done
+    
+    # Create backup if needed
+    if [[ "${SKIP_BACKUP:-}" != "true" ]]; then
+        info "Creando backup de configuraciones..."
+        create_backup || warn "No se pudo crear backup"
+    fi
+    
+    # Resolve dependencies
+    info "Resolviendo dependencias..."
+    local resolved_modules=()
+    mapfile -t resolved_modules < <(resolve_dependencies "${modules[@]}")
+    
+    echo -e "${YELLOW}📋 Plan de instalación:${COLOR_RESET}"
+    for module in "${resolved_modules[@]}"; do
+        if [[ " ${modules[*]} " =~ " $module " ]]; then
+            echo -e "   • $module"
+        else
+            echo -e "   • $module ${DIM}(dependencia)${COLOR_RESET}"
         fi
     done
     echo
-    
-    # Create backup
-    create_backup
-    echo
-    
-    # Show plan
-    echo -e "${YELLOW}📋 Plan de instalación:${COLOR_RESET}"
-    for module in "${modules[@]}"; do
-        echo -e "   • $module"
-    done
-    echo
-    
-    # Confirmation
-    if [[ "$DRY_RUN" != "true" && "$FORCE_INSTALL" != "true" ]]; then
-        read -p "$(echo -e "${YELLOW}¿Continuar con la instalación? [y/N]: ${COLOR_RESET}")" -n 1 -r
-        echo
-        [[ $REPLY =~ ^[Yy]$ ]] || {
-            info "Instalación cancelada por el usuario"
-            return 0
-        }
-        echo
-    fi
     
     # Install modules
     local start_time=$(date +%s)
     local installed=0
     local failed=0
     
-    for module in "${modules[@]}"; do
+    for module in "${resolved_modules[@]}"; do
         if install_module "$module"; then
             installed=$((installed + 1))
         else
             failed=$((failed + 1))
-            [[ "$FORCE_INSTALL" != "true" ]] && break
         fi
     done
     
@@ -504,38 +356,46 @@ cmd_install_modules() {
 }
 
 # =====================================================
-# 🎮 MAIN FUNCTION
+# 🎮 COMMAND ROUTER & ARGUMENT PARSER
 # =====================================================
 
 main() {
-    # Parse arguments
+    # Initialize system
+    init_module_manager
+    
+    # Parse global options
     local command=""
     local args=()
     
     while [[ $# -gt 0 ]]; do
         case $1 in
             -h|--help)
-                show_help
+                show_help_modern
                 exit 0
                 ;;
             -f|--force)
-                FORCE_INSTALL=true
+                export FORCE_INSTALL=true
                 shift
                 ;;
             -q|--quiet)
-                QUIET_MODE=true
+                export QUIET_MODE=true
                 shift
                 ;;
             -d|--dry-run)
-                DRY_RUN=true
+                export DRY_RUN=true
+                shift
+                ;;
+            -p|--parallel)
+                export PARALLEL_INSTALL=true
                 shift
                 ;;
             --no-backup)
-                SKIP_BACKUP=true
+                export SKIP_BACKUP=true
                 shift
                 ;;
             --verbose)
-                VERBOSE_MODE=true
+                export VERBOSE_MODE=true
+                export LOG_LEVEL=DEBUG
                 shift
                 ;;
             install|profile|list|status|doctor)
@@ -544,6 +404,7 @@ main() {
                 break
                 ;;
             *)
+                # If no command specified, assume 'install'
                 command="install"
                 break
                 ;;
@@ -553,16 +414,18 @@ main() {
     # Collect remaining arguments
     args=("$@")
     
-    # Show banner for interactive commands
-    [[ "$QUIET_MODE" != "true" && "$command" != "list" ]] && show_banner
+    # Show banner
+    show_welcome_banner
     
-    # Route to handlers
+    # Route to appropriate handler
     case "$command" in
         install)
             if [[ ${#args[@]} -eq 0 ]]; then
-                cmd_interactive_install
+                local selected_modules=()
+                mapfile -t selected_modules < <(interactive_module_selection)
+                install_modules "${selected_modules[@]}"
             else
-                cmd_install_modules "${args[@]}"
+                install_modules "${args[@]}"
             fi
             ;;
         profile)
@@ -570,26 +433,28 @@ main() {
                 error "Especifica un perfil: developer, minimal, gaming, server"
                 exit 1
             }
-            cmd_profile "${args[0]}"
+            install_profile "${args[0]}"
             ;;
         list)
-            cmd_list
+            echo -e "${BOLD}${BLUE}📦 MÓDULOS DISPONIBLES${COLOR_RESET}"
+            echo
+            discover_modules | sed 's/^/  • /'
             ;;
         status)
-            cmd_status
+            show_system_status
             ;;
         doctor)
-            cmd_doctor
+            run_system_doctor
             ;;
         *)
-            show_help
+            show_help_modern
             exit 1
             ;;
     esac
 }
 
 # =====================================================
-# 🚀 ENTRY POINT
+# 🎯 ENTRY POINT
 # =====================================================
 
 main "$@"
